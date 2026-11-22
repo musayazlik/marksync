@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Marksync</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main class="stack">
+      <header class="row spread">
+        <div class="row">
+          <span id="dot" class="dot"></span>
+          <h1>Marksync</h1>
+        </div>
+        <button id="open-options" title="Backups and settings">Settings</button>
+      </header>
+
+      <section id="disconnected" class="stack" hidden>
+        <p>
+          Link your Google account to keep bookmarks identical in every browser where Marksync is
+          installed.
+        </p>
+        <p class="muted small">
+          Bookmarks are stored only in a <strong>Marksync</strong> folder in your own Google Drive.
+          Marksync cannot see any other file there.
+        </p>
+        <button id="connect" class="primary">Connect Google Drive</button>
+      </section>
+
+      <section id="connected" class="stack" hidden>
+        <div class="card stack">
+          <p id="email"></p>
+          <p id="summary" class="muted small"></p>
+        </div>
+
+        <div id="mass-delete" class="notice warn stack" hidden>
+          <p id="mass-delete-text"></p>
+          <div class="row">
+            <button id="confirm-delete" class="danger">Delete them everywhere</button>
+            <button id="bring-back">Bring them back</button>
+            <button id="keep-local" hidden>Keep my bookmarks</button>
+          </div>
+        </div>
+
+        <div id="error" class="notice error small" hidden></div>
+
+        <div class="row">
+          <button id="sync" class="primary">Sync now</button>
+          <button id="backup">Back up now</button>
+        </div>
+        <p id="backup-summary" class="muted small"></p>
+      </section>
+
+      <button id="import">Import from other browsers…</button>
+
+      <p id="action-error" class="notice error small" hidden></p>
+    </main>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

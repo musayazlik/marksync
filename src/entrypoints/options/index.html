@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="manifest.open_in_tab" content="true" />
+    <title>Marksync settings</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main class="stack">
+      <h1>Marksync</h1>
+
+      <section class="card stack" aria-labelledby="account-h">
+        <h2 id="account-h">Google account</h2>
+        <div class="row spread">
+          <div class="row">
+            <span id="dot" class="dot"></span>
+            <p id="account-text"></p>
+          </div>
+          <div class="row">
+            <button id="connect" class="primary">Connect Google Drive</button>
+            <button id="disconnect" class="danger" hidden>Disconnect</button>
+          </div>
+        </div>
+        <p id="sync-text" class="muted small"></p>
+        <label class="stack small">
+          Name of this browser
+          <input id="deviceName" type="text" maxlength="60" />
+        </label>
+        <p class="muted small">
+          Shown in backups and in the import list of your other browsers. Leave it empty to use the
+          detected name.
+        </p>
+      </section>
+
+      <section class="card stack" aria-labelledby="sync-h">
+        <h2 id="sync-h">Sync</h2>
+        <label class="row"><input id="syncEnabled" type="checkbox" /> Sync bookmarks in this browser</label>
+        <label class="row">
+          Check for changes from other browsers every
+          <select id="syncIntervalMin">
+            <option value="1">1 minute</option>
+            <option value="5">5 minutes</option>
+            <option value="15">15 minutes</option>
+            <option value="60">1 hour</option>
+          </select>
+        </label>
+        <p class="muted small">
+          Changes made in this browser are sent within about a second. Changes from your other
+          browsers arrive as soon as you switch to this browser, and otherwise at the interval above.
+        </p>
+      </section>
+
+      <section class="card stack" aria-labelledby="backup-h">
+        <div class="row spread">
+          <h2 id="backup-h">Backups in Google Drive</h2>
+          <div class="row">
+            <button id="export">Export HTML</button>
+            <button id="backup-now" class="primary">Back up now</button>
+          </div>
+        </div>
+        <label class="row"><input id="autoBackup" type="checkbox" /> Back up automatically</label>
+        <label class="row">
+          Every
+          <select id="backupIntervalHours">
+            <option value="6">6 hours</option>
+            <option value="24">day</option>
+            <option value="168">week</option>
+          </select>
+          and keep the last
+          <select id="backupRetention">
+            <option value="10">10</option>
+            <option value="30">30</option>
+            <option value="90">90</option>
+          </select>
+          backups
+        </label>
+        <table id="backups">
+          <thead>
+            <tr><th>Date</th><th>From</th><th>Items</th><th></th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <p id="backups-empty" class="muted small" hidden>No backups yet.</p>
+        <p class="muted small">
+          Restoring replaces the bookmarks in every connected browser. The current bookmarks are
+          backed up first, so you can undo a restore.
+        </p>
+      </section>
+
+      <section id="import" class="card stack" aria-labelledby="import-h">
+        <h2 id="import-h">Import bookmarks</h2>
+        <p class="muted small">
+          Bring bookmarks from another browser into this one. When sync is on, they then appear in
+          all your browsers.
+        </p>
+        <fieldset class="stack">
+          <legend class="small muted">How to import</legend>
+          <label class="row">
+            <input type="radio" name="import-mode" value="merge" checked />
+            Merge into my bookmarks and skip the ones I already have
+          </label>
+          <label class="row">
+            <input type="radio" name="import-mode" value="folder" />
+            Put them in a new folder
+          </label>
+        </fieldset>
+
+        <h3>From another browser with Marksync</h3>
+        <table id="browsers">
+          <thead>
+            <tr><th>Browser</th><th>Bookmarks</th><th>Updated</th><th></th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <p id="browsers-empty" class="muted small" hidden>
+          No other browsers yet. Install Marksync there and connect the same Google account. This
+          works even if sync is turned off in that browser.
+        </p>
+        <p id="browsers-offline" class="muted small" hidden>
+          Connect your Google account to see your other browsers.
+        </p>
+
+        <h3>From an HTML file</h3>
+        <p class="muted small">
+          For browsers without Marksync. Export the file there first:<br />
+          Chrome, Brave, Edge: Bookmark manager → ⋮ → Export bookmarks.<br />
+          Firefox: Bookmarks → Manage bookmarks → Import and Backup → Export Bookmarks to HTML.<br />
+          Safari: File → Export → Bookmarks.
+        </p>
+        <div class="row">
+          <input id="import-file" type="file" accept=".html,.htm,text/html" />
+          <button id="import-file-btn" class="primary" disabled>Import file</button>
+        </div>
+
+        <p id="import-result" class="notice small" role="status" hidden></p>
+      </section>
+
+
+      <p id="action-error" class="notice error small" hidden></p>
+    </main>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

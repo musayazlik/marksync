@@ -26,6 +26,7 @@ function geckoId(mode: string): string {
 // https://wxt.dev/api/config.html
 export default defineConfig({
   srcDir: 'src',
+  publicDir: 'src/public',
   manifestVersion: 3,
   zip: {
     // The sources zip goes to Firefox Add-ons reviewers; never ship secrets in it.
@@ -42,7 +43,15 @@ export default defineConfig({
       'https://openidconnect.googleapis.com/*',
       'https://oauth2.googleapis.com/*',
     ],
-    action: { default_title: 'Marksync' },
+    action: {
+      default_title: 'Marksync',
+      default_icon: {
+        16: 'icon/16.png',
+        24: 'icon/24.png',
+        32: 'icon/32.png',
+        64: 'icon/64.png',
+      },
+    },
     // Development only: a fixed key gives unpacked Chromium builds the same
     // extension ID in Chrome, Brave and Edge. Store builds get their ID from
     // the store and never carry the development key.

@@ -38,6 +38,7 @@ export default defineConfig({
     name: '__MSG_extName__',
     description: '__MSG_extDescription__',
     default_locale: 'en',
+    homepage_url: 'https://github.com/musayazlik/marksync',
     permissions: ['bookmarks', 'storage', 'unlimitedStorage', 'alarms', 'identity'],
     host_permissions: [
       'https://www.googleapis.com/*',

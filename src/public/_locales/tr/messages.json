@@ -110,6 +110,12 @@
   "optionsTitle": {
     "message": "Marksync ayarları"
   },
+  "version": {
+    "message": "Sürüm {1}"
+  },
+  "versionNotes": {
+    "message": "Bu sürümdeki yenilikler"
+  },
   "welcomeHeading": {
     "message": "Marksync'e hoş geldiniz"
   },

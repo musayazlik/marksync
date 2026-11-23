@@ -1,6 +1,9 @@
 import { t } from './i18n';
 import type { Status } from './state';
 
+/** Release notes of every version (GitHub Releases, written by release-please). */
+export const RELEASES_URL = 'https://github.com/musayazlik/marksync/releases';
+
 export const $ = <T extends HTMLElement = HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
 
 export function timeAgo(ms: number | undefined): string {

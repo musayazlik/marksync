@@ -113,6 +113,12 @@
   "optionsTitle": {
     "message": "Marksync settings"
   },
+  "version": {
+    "message": "Version {1}"
+  },
+  "versionNotes": {
+    "message": "What's new in this version"
+  },
   "welcomeHeading": {
     "message": "Welcome to Marksync"
   },

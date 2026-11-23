@@ -1,12 +1,20 @@
+import { browser } from 'wxt/browser';
 import { errorText, localizePage, t, tn } from '../../shared/i18n';
 import { send } from '../../shared/messages';
 import { getSettings, settingsItem, statusItem, type Settings, type Status } from '../../shared/state';
-import { $, statusTone, timeAgo, withBusy } from '../../shared/ui';
+import { $, RELEASES_URL, statusTone, timeAgo, withBusy } from '../../shared/ui';
 import { detectBrowser } from '../../platform/browser-info';
 import type { BackupInfo } from '../../services/backup-service';
 import type { ImportMode, ImportResult } from '../../sync/importer';
 
 localizePage();
+
+// The version comes from package.json (set by release-please) and links to
+// that release's notes on GitHub.
+const version = browser.runtime.getManifest().version;
+const versionLink = $<HTMLAnchorElement>('#version');
+versionLink.textContent = t('version', version);
+versionLink.href = `${RELEASES_URL}/tag/v${version}`;
 const actionError = $('#action-error');
 /** The page opened right after installing (see background.ts). */
 const welcome = location.hash === '#welcome';

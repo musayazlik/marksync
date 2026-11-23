@@ -29,6 +29,14 @@ oradadır. Üçüncü taraf bir sunucu yoktur; her şey Google Drive'ınızdaki
 | Safari | mümkün değil | Safari eklentilerinde yer imi API'si yok. Safari'den HTML dışa aktarıp başka tarayıcıda içe aktarın |
 | Mobil tarayıcılar | mümkün değil | Android ve iOS'ta eklentiler için yer imi API'si yok |
 
+## Gizlilik
+
+- İstenen Google izinleri: `drive.file` (yalnızca Marksync'in oluşturduğu dosyalar), `openid`, `email`.
+- Yer imleri tarayıcıdan doğrudan Google Drive'a gider; Marksync'in sunucusu yoktur.
+- Erişim token'ı oturum deposunda tutulur ve tarayıcı kapanınca silinir.
+- *Disconnect* yalnızca tıkladığınız tarayıcının bağlantısını keser; diğer tarayıcılarınız bağlı kalır.
+  Marksync'in erişimini her yerden kaldırmak için https://myaccount.google.com/permissions adresini kullanın.
+
 ## Geliştirme
 
 ```sh

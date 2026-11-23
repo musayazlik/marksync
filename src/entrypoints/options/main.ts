@@ -197,8 +197,8 @@ bind('#connect', async () => {
 bind('#disconnect', async () => {
   if (
     !confirm(
-      'Stop syncing this browser? Your bookmarks and Drive files stay as they are.\n\n' +
-        'To remove Marksync\'s access to your Google account completely, also visit myaccount.google.com/permissions.',
+      'Stop syncing this browser? Your bookmarks, your Drive files and your other connected browsers stay as they are.\n\n' +
+        'To remove Marksync\'s access to your Google account in every browser, visit myaccount.google.com/permissions.',
     )
   )
     return;

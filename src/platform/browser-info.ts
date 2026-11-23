@@ -1,4 +1,5 @@
 import { getSettings } from '../shared/state';
+import { t } from '../shared/i18n';
 
 interface Brand {
   brand: string;
@@ -39,7 +40,7 @@ export function detectBrowser(): string {
           : /Linux/.test(platform)
             ? 'Linux'
             : '';
-  return os ? `${name} on ${os}` : name;
+  return os ? t('deviceLabel', name, os) : name;
 }
 
 /** The name shown for this browser in backups and in other browsers' import lists. */

@@ -34,16 +34,17 @@ export default defineConfig({
   },
   // The manifest is a function so .env values are loaded before it runs.
   manifest: ({ browser, mode }) => ({
-    name: 'Marksync',
-    description:
-      'Keeps your bookmarks identical in Chrome, Brave, Edge and Firefox, with backups in your own Google Drive.',
+    // Name and store description come from src/public/_locales/<lang>/messages.json.
+    name: '__MSG_extName__',
+    description: '__MSG_extDescription__',
+    default_locale: 'en',
     permissions: ['bookmarks', 'storage', 'unlimitedStorage', 'alarms', 'identity'],
     host_permissions: [
       'https://www.googleapis.com/*',
       'https://openidconnect.googleapis.com/*',
     ],
     action: {
-      default_title: 'Marksync',
+      default_title: '__MSG_extName__',
       default_icon: {
         16: 'icon/16.png',
         24: 'icon/24.png',

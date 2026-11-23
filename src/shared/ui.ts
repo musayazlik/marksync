@@ -1,15 +1,16 @@
+import { t } from './i18n';
 import type { Status } from './state';
 
 export const $ = <T extends HTMLElement = HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
 
 export function timeAgo(ms: number | undefined): string {
-  if (!ms) return 'never';
+  if (!ms) return t('timeNever');
   const s = Math.round((Date.now() - ms) / 1000);
-  if (s < 45) return 'just now';
+  if (s < 45) return t('timeJustNow');
   const m = Math.round(s / 60);
-  if (m < 60) return `${m} min ago`;
+  if (m < 60) return t('timeMinutesAgo', m);
   const h = Math.round(m / 60);
-  if (h < 24) return `${h} h ago`;
+  if (h < 24) return t('timeHoursAgo', h);
   return new Date(ms).toLocaleString();
 }
 

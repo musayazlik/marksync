@@ -1,4 +1,5 @@
 import { browser } from 'wxt/browser';
+import { t } from '../shared/i18n';
 import { googleClientId, patchStatus, resetAccountState, statusItem, tokenItem } from '../shared/state';
 
 /**
@@ -16,7 +17,7 @@ const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file';
 const SCOPES = [DRIVE_SCOPE, 'openid', 'email'];
 
 export class AuthRequiredError extends Error {
-  constructor(message = 'Reconnect your Google account to keep syncing.') {
+  constructor(message = t('errReconnect')) {
     super(message);
   }
 }
@@ -31,7 +32,7 @@ export function redirectUrl(): string {
 function clientId(): string {
   const id = googleClientId();
   // Only happens in a self-made build without .env, never in a store build.
-  if (!id) throw new ConfigError('This build has no Google OAuth client ID (WXT_GOOGLE_CLIENT_ID). See docs/GOOGLE_SETUP.md.');
+  if (!id) throw new ConfigError(t('errNoClientId'));
   return id;
 }
 
@@ -67,15 +68,15 @@ async function runFlow(interactive: boolean, loginHint?: string): Promise<string
 
   const params = new URLSearchParams(new URL(result).hash.slice(1));
   const error = params.get('error');
-  if (error) throw new AuthRequiredError(`Google sign-in failed: ${error}`);
-  if (params.get('state') !== state) throw new Error('Google sign-in returned an unexpected state.');
+  if (error) throw new AuthRequiredError(t('errSignInFailed', error));
+  if (params.get('state') !== state) throw new Error(t('errSignInState'));
   if (!params.get('scope')?.split(' ').includes(DRIVE_SCOPE)) {
-    throw new AuthRequiredError('Google Drive access was not granted. Connect again and allow Drive access.');
+    throw new AuthRequiredError(t('errDriveNotGranted'));
   }
 
   const accessToken = params.get('access_token');
   if (!accessToken) throw new AuthRequiredError();
-  if (generation !== authGeneration) throw new AuthRequiredError('Disconnected while signing in.');
+  if (generation !== authGeneration) throw new AuthRequiredError(t('errDisconnectedWhileSigningIn'));
   const expiresIn = Number(params.get('expires_in'));
   const lifetime = Number.isFinite(expiresIn) && expiresIn > 0 ? Math.min(expiresIn, 3600) : 3600;
   await tokenItem.setValue({ accessToken, expiresAt: Date.now() + lifetime * 1000 });
@@ -113,7 +114,7 @@ export async function getAccessToken(): Promise<string> {
   const { connected, email } = await statusItem.getValue();
   if (!connected) {
     await tokenItem.removeValue();
-    throw new AuthRequiredError('Connect your Google account first.');
+    throw new AuthRequiredError(t('errConnectFirst'));
   }
   const cached = await tokenItem.getValue();
   if (cached && cached.expiresAt - 60_000 > Date.now()) return cached.accessToken;
@@ -123,7 +124,7 @@ export async function getAccessToken(): Promise<string> {
   const actual = await tokenEmail(token);
   if (email && actual && actual !== email) {
     await tokenItem.removeValue();
-    throw new AuthRequiredError(`Google returned a different account (${actual}). Reconnect to continue.`);
+    throw new AuthRequiredError(t('errOtherAccount', actual));
   }
   return token;
 }

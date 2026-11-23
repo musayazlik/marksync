@@ -1,47 +1,63 @@
 import { browser } from 'wxt/browser';
 import { send } from '../../shared/messages';
-import { statusItem, type Status } from '../../shared/state';
+import { errorText, localizePage, t, tn } from '../../shared/i18n';
+import { getSettings, settingsItem, statusItem, type Status } from '../../shared/state';
 import { $, statusTone, timeAgo, withBusy } from '../../shared/ui';
 
+localizePage();
 const actionError = $('#action-error');
 
-function render(s: Status) {
+let status: Status = { connected: false, syncing: false };
+let syncEnabled = true;
+
+function render() {
+  const s = status;
   $('#dot').className = `dot ${statusTone(s)}`;
   $('#disconnected').hidden = s.connected;
   $('#connected').hidden = !s.connected;
   if (!s.connected) return;
 
-  $('#email').textContent = s.email ? `Connected as ${s.email}` : 'Connected';
-  const parts = [s.syncing ? 'Syncing…' : `Last sync ${timeAgo(s.lastSyncAt)}`];
-  if (s.total !== undefined) parts.push(`${s.total.toLocaleString()} items`);
-  if (s.skipped) parts.push(`${s.skipped} not supported in this browser`);
+  $('#email').textContent = s.email ? t('connectedAs', s.email) : t('connected');
+  const parts = [!syncEnabled ? t('syncOff') : s.syncing ? t('syncing') : t('lastSync', timeAgo(s.lastSyncAt))];
+  if (s.total !== undefined) parts.push(tn('items', s.total));
+  if (s.skipped) parts.push(tn('skippedItems', s.skipped));
   $('#summary').textContent = parts.join(' · ');
-  $('#backup-summary').textContent = `Last backup ${timeAgo(s.lastBackupAt)}`;
+  $('#backup-summary').textContent = t('lastBackup', timeAgo(s.lastBackupAt));
 
-  const massDelete = s.error?.code === 'mass-delete';
+  $<HTMLButtonElement>('#sync').disabled = !syncEnabled;
+  $('#sync').title = syncEnabled ? '' : t('syncOffHint');
+
+  // With sync off nothing is applied, so a paused deletion can wait.
+  const massDelete = syncEnabled && s.error?.code === 'mass-delete';
   $('#mass-delete').hidden = !massDelete;
   const remote = massDelete && s.error?.source === 'remote';
   $('#bring-back').hidden = remote;
   $('#keep-local').hidden = !remote;
-  $('#confirm-delete').textContent = remote ? 'Delete them here too' : 'Delete them everywhere';
-  if (remote) {
-    $('#mass-delete-text').textContent =
-      `${s.error!.deletions} of ${s.error!.total} bookmarks were deleted in another browser or directly in Google Drive. ` +
-      'Sync is paused until you decide. A backup is taken before anything is deleted here.';
-  } else if (massDelete) {
-    $('#mass-delete-text').textContent =
-      `${s.error!.deletions} of ${s.error!.total} bookmarks were removed in this browser. ` +
-      'Sync is paused so they are not deleted everywhere by mistake.';
-  }
+  $('#confirm-delete').textContent = t(remote ? 'deleteHereToo' : 'deleteEverywhere');
+  if (massDelete) $('#mass-delete-text').textContent = errorText(s.error!);
   const error = $('#error');
-  error.hidden = !s.error || massDelete;
-  error.textContent = s.error?.code === 'auth' ? `${s.error.message} Click “Connect” in Settings.` : (s.error?.message ?? '');
+  error.hidden = !s.error || s.error.code === 'mass-delete';
+  if (s.error && s.error.code !== 'mass-delete') {
+    error.textContent = s.error.code === 'auth' ? t('authHint', errorText(s.error)) : errorText(s.error);
+  }
 }
 
-void statusItem.getValue().then(render);
+const refreshSettings = async () => {
+  syncEnabled = (await getSettings()).syncEnabled;
+  render();
+};
+void Promise.all([statusItem.getValue(), getSettings()]).then(([s, settings]) => {
+  status = s;
+  syncEnabled = settings.syncEnabled;
+  render();
+});
 // Opening the popup counts as coming back to this browser: pull fresh changes.
 void send({ type: 'checkNow' }).catch(() => undefined);
-statusItem.watch((s) => render(s ?? { connected: false, syncing: false }));
+statusItem.watch((s) => {
+  status = s ?? { connected: false, syncing: false };
+  render();
+});
+settingsItem.watch(() => void refreshSettings());
 
 const bind = (sel: string, action: () => Promise<unknown>) => {
   const btn = $<HTMLButtonElement>(sel);

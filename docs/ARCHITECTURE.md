@@ -166,5 +166,19 @@ the new bookmarks to all browsers.
   the latest one. Fractional indexes would merge them.
 - Changes from other browsers arrive on the next alarm (no push).
 - Not synced: favicons, separators, Firefox tags and keywords.
-- Ideas: optional end-to-end encryption with a passphrase, Turkish and other
-  UI languages (`_locales`), Safari build, conflict history view.
+- Ideas: optional end-to-end encryption with a passphrase, more UI languages,
+  Safari build, conflict history view.
+
+## Interface
+
+- **Languages**: English and Turkish, following the browser's language.
+  Texts live in `src/public/_locales/<lang>/messages.json`; pages mark
+  elements with `data-i18n` and code calls `t()` (`src/shared/i18n.ts`).
+  `tests/i18n.test.ts` fails if a key is missing or the languages differ.
+  The pure layers (`src/core`, `src/sync`) stay free of browser APIs, so their
+  rare error messages (a broken or oversized file) are English only.
+- **Toolbar badge**: a red `!` when sync cannot run (sign-in, setup, broken
+  file), an amber `!` when a large deletion waits for a decision. Network
+  errors get no badge; they are usually a computer going offline. The
+  tooltip says what is wrong (`src/services/badge.ts`).
+- **First install** opens Settings with a short welcome and the Connect button.

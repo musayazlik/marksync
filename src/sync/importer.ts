@@ -1,5 +1,5 @@
 import { ROOT_TITLES, type ImportNode, type ImportSource } from '../core/import';
-import { ROOT_KEYS } from '../core/types';
+import { ROOT_KEYS, type RootKey } from '../core/types';
 import type { BookmarksApi } from './bookmarks-api';
 import { MENU_FOLDER_TITLE, readLocal } from './local-tree';
 
@@ -25,7 +25,16 @@ export interface ImportResult {
 export async function importIntoLocal(
   api: BookmarksApi,
   source: ImportSource,
-  opts: { mode: ImportMode; label: string; menuFolderId?: string; date?: Date },
+  opts: {
+    mode: ImportMode;
+    label: string;
+    menuFolderId?: string;
+    date?: Date;
+    /** Folder mode: name of the new folder, in the UI language. Default: "Imported from <label> (<date>)". */
+    containerTitle?: string;
+    /** Folder mode: names of the sub-folders for each top-level folder, in the UI language. */
+    rootTitles?: Record<RootKey, string>;
+  },
 ): Promise<ImportResult> {
   const { snapshot, flavor } = await readLocal(api, opts.menuFolderId);
   const roots = { ...snapshot.roots };
@@ -58,11 +67,12 @@ export async function importIntoLocal(
 
   if (opts.mode === 'folder') {
     const day = (opts.date ?? new Date()).toISOString().slice(0, 10);
-    const container = await api.create({ parentId: roots.other, title: `Imported from ${opts.label} (${day})` });
+    const title = opts.containerTitle ?? `Imported from ${opts.label} (${day})`;
+    const container = await api.create({ parentId: roots.other, title });
     for (const key of ROOT_KEYS) {
       const items = source.roots[key];
       if (!items?.length) continue;
-      const folder = await api.create({ parentId: container.id, title: ROOT_TITLES[key] });
+      const folder = await api.create({ parentId: container.id, title: (opts.rootTitles ?? ROOT_TITLES)[key] });
       await addAll(folder.id, items, false);
     }
     return result;

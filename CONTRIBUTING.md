@@ -18,6 +18,10 @@ pnpm build:all
 - Browser differences (root folders, unsupported items) live in `src/sync/local-tree.ts`.
   If you find a new quirk, add it to the fake in `tests/fakes.ts` first, then fix it.
 - Google sign-in and Drive calls live in `src/platform`.
+- Every text shown to users lives in `src/public/_locales/<lang>/messages.json`
+  (English and Turkish). Add a new key to every language; `pnpm test` checks
+  that none is missing. Use `{1}`, `{2}` for values and never a `$` sign.
+  New languages are welcome: copy `en/messages.json` to a new folder.
 
 ## Changing the sync file format
 

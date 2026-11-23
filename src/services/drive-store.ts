@@ -1,6 +1,7 @@
 import type { SyncState } from '../core/types';
 import { DriveClient, DriveError, quote } from '../platform/drive';
 import { getAccessToken, invalidateToken } from '../platform/identity';
+import { t } from '../shared/i18n';
 import { driveIdsItem } from '../shared/state';
 import { ConflictError, type RemoteStore } from '../sync/engine';
 
@@ -70,7 +71,7 @@ export async function assertInFolder(drive: DriveClient, fileId: string, folder:
   const expected = folder === 'backups' ? folders.backupsFolderId : folders.browsersFolderId;
   const meta = await drive.getMeta(fileId);
   if (!meta.parents?.includes(expected)) {
-    throw new Error(folder === 'backups' ? 'This file is not a Marksync backup.' : 'This file is not a Marksync browser snapshot.');
+    throw new Error(t(folder === 'backups' ? 'errNotBackup' : 'errNotSnapshot'));
   }
 }
 
@@ -113,7 +114,7 @@ export class DriveRemoteStore implements RemoteStore {
       const meta = await this.drive.getMeta(id);
       const state = await this.drive.downloadJson<SyncState>(id);
       if (typeof state !== 'object' || state === null || state.schema !== 1) {
-        throw new Error('The sync file in Google Drive was written by a newer Marksync. Update the extension.');
+        throw new Error(t('errNewerSyncFile'));
       }
       return { state, version: meta.version ?? '' };
     } catch (err) {

@@ -1,0 +1,374 @@
+{
+  "extName": {
+    "message": "Marksync"
+  },
+  "extDescription": {
+    "message": "Yer imlerinizi Chrome, Brave, Edge ve Firefox'ta aynı tutar; yedekleri kendi Google Drive'ınızda saklar."
+  },
+  "openOptions": {
+    "message": "Ayarlar"
+  },
+  "openOptionsTitle": {
+    "message": "Yedekler ve ayarlar"
+  },
+  "popupIntro": {
+    "message": "Yer imlerinizi Marksync kurulu her tarayıcıda aynı tutmak için Google hesabınızı bağlayın."
+  },
+  "privacyNote": {
+    "message": "Yer imleri yalnızca kendi Google Drive'ınızdaki Marksync klasöründe saklanır. Marksync oradaki başka hiçbir dosyayı göremez."
+  },
+  "connectDrive": {
+    "message": "Google Drive'ı bağla"
+  },
+  "bringBack": {
+    "message": "Geri getir"
+  },
+  "keepLocal": {
+    "message": "Yer imlerimi koru"
+  },
+  "deleteEverywhere": {
+    "message": "Her yerden sil"
+  },
+  "deleteHereToo": {
+    "message": "Burada da sil"
+  },
+  "syncNow": {
+    "message": "Şimdi eşitle"
+  },
+  "backupNow": {
+    "message": "Şimdi yedekle"
+  },
+  "popupImport": {
+    "message": "Başka tarayıcılardan içe aktar…"
+  },
+  "connectedAs": {
+    "message": "{1} olarak bağlı"
+  },
+  "connected": {
+    "message": "Bağlı"
+  },
+  "notConnected": {
+    "message": "Bağlı değil"
+  },
+  "reconnect": {
+    "message": "Yeniden bağlan"
+  },
+  "syncOff": {
+    "message": "Bu tarayıcıda eşitleme kapalı"
+  },
+  "syncOffHint": {
+    "message": "Bu tarayıcıda eşitleme Ayarlar'dan kapatılmış."
+  },
+  "syncing": {
+    "message": "Eşitleniyor…"
+  },
+  "lastSync": {
+    "message": "Son eşitleme: {1}"
+  },
+  "lastBackup": {
+    "message": "Son yedek: {1}"
+  },
+  "items_one": {
+    "message": "{1} öğe"
+  },
+  "items_other": {
+    "message": "{1} öğe"
+  },
+  "skippedItems_one": {
+    "message": "{1} öğe bu tarayıcıda desteklenmiyor"
+  },
+  "skippedItems_other": {
+    "message": "{1} öğe bu tarayıcıda desteklenmiyor"
+  },
+  "authHint": {
+    "message": "{1} Ayarlar'ı açıp Yeniden bağlan'a tıklayın."
+  },
+  "massDeleteRemote": {
+    "message": "{2} yer iminin {1} tanesi başka bir tarayıcıda ya da doğrudan Google Drive'da silindi. Siz karar verene kadar eşitleme duraklatıldı. Burada bir şey silinmeden önce yedek alınır."
+  },
+  "massDeleteLocal": {
+    "message": "{2} yer iminin {1} tanesi bu tarayıcıda kaldırıldı. Yanlışlıkla her yerden silinmesinler diye eşitleme duraklatıldı."
+  },
+  "errNetwork": {
+    "message": "Google Drive'a ulaşılamadı. Marksync yeniden deneyecek."
+  },
+  "badgePaused": {
+    "message": "eşitleme duraklatıldı, karar vermek için açın"
+  },
+  "timeNever": {
+    "message": "hiç"
+  },
+  "timeJustNow": {
+    "message": "az önce"
+  },
+  "timeMinutesAgo": {
+    "message": "{1} dk önce"
+  },
+  "timeHoursAgo": {
+    "message": "{1} sa önce"
+  },
+  "optionsTitle": {
+    "message": "Marksync ayarları"
+  },
+  "welcomeHeading": {
+    "message": "Marksync'e hoş geldiniz"
+  },
+  "welcomeConnect": {
+    "message": "Başlamak için aşağıdan Google hesabınızı bağlayın. Marksync'i kurduğunuz her tarayıcıda aynı Google hesabıyla aynısını yapın."
+  },
+  "welcomeNoDuplicates": {
+    "message": "Birden fazla tarayıcıda zaten bulunan yer imleri eşleştirilir, kopyalanmaz."
+  },
+  "accountHeading": {
+    "message": "Google hesabı"
+  },
+  "disconnect": {
+    "message": "Bağlantıyı kes"
+  },
+  "deviceNameLabel": {
+    "message": "Bu tarayıcının adı"
+  },
+  "deviceNameHelp": {
+    "message": "Yedeklerde ve diğer tarayıcılarınızın içe aktarma listesinde görünür. Algılanan adı kullanmak için boş bırakın."
+  },
+  "syncHeading": {
+    "message": "Eşitleme"
+  },
+  "syncEnabledLabel": {
+    "message": "Bu tarayıcıda yer imlerini eşitle"
+  },
+  "syncIntervalLabel": {
+    "message": "Diğer tarayıcılardaki değişikliklere bakma sıklığı:"
+  },
+  "interval1Min": {
+    "message": "1 dakikada bir"
+  },
+  "interval5Min": {
+    "message": "5 dakikada bir"
+  },
+  "interval15Min": {
+    "message": "15 dakikada bir"
+  },
+  "interval1Hour": {
+    "message": "Saatte bir"
+  },
+  "syncHelp": {
+    "message": "Bu tarayıcıda yapılan değişiklikler yaklaşık bir saniye içinde gönderilir. Diğer tarayıcılarınızdaki değişiklikler bu tarayıcıya geçtiğiniz anda, aksi halde yukarıdaki aralıkla gelir."
+  },
+  "backupsHeading": {
+    "message": "Google Drive'daki yedekler"
+  },
+  "exportHtml": {
+    "message": "HTML olarak dışa aktar"
+  },
+  "autoBackupLabel": {
+    "message": "Otomatik yedekle"
+  },
+  "backupEveryBefore": {
+    "message": "Her"
+  },
+  "backupEvery6Hours": {
+    "message": "6 saatte"
+  },
+  "backupEveryDay": {
+    "message": "gün"
+  },
+  "backupEveryWeek": {
+    "message": "hafta"
+  },
+  "backupKeepBefore": {
+    "message": "yedekle ve son"
+  },
+  "backupKeepAfter": {
+    "message": "yedeği sakla"
+  },
+  "columnDate": {
+    "message": "Tarih"
+  },
+  "columnFrom": {
+    "message": "Kaynak"
+  },
+  "columnItems": {
+    "message": "Öğe"
+  },
+  "columnBrowser": {
+    "message": "Tarayıcı"
+  },
+  "columnBookmarks": {
+    "message": "Yer imi"
+  },
+  "columnUpdated": {
+    "message": "Güncellendi"
+  },
+  "noBackups": {
+    "message": "Henüz yedek yok."
+  },
+  "restoreHelp": {
+    "message": "Geri yükleme, bağlı tüm tarayıcılardaki yer imlerini değiştirir. Önce mevcut yer imlerinin yedeği alınır, böylece geri yüklemeyi geri alabilirsiniz."
+  },
+  "backupReasonScheduled": {
+    "message": "otomatik"
+  },
+  "backupReasonBeforeRestore": {
+    "message": "geri yüklemeden önce"
+  },
+  "backupReasonBeforeRemoteDelete": {
+    "message": "başka tarayıcıdan gelen büyük bir silmeden önce"
+  },
+  "restore": {
+    "message": "Geri yükle"
+  },
+  "delete": {
+    "message": "Sil"
+  },
+  "confirmRestore": {
+    "message": "Tüm tarayıcılardaki yer imleri {1} tarihli yedekle değiştirilsin mi?"
+  },
+  "confirmDeleteBackup": {
+    "message": "Bu yedek Google Drive'dan silinsin mi?"
+  },
+  "confirmDisconnect": {
+    "message": "Bu tarayıcıda eşitleme durdurulsun mu? Yer imleriniz, Drive dosyalarınız ve bağlı diğer tarayıcılarınız olduğu gibi kalır.\n\nMarksync'in Google hesabınıza erişimini tüm tarayıcılarda kaldırmak için myaccount.google.com/permissions adresini ziyaret edin."
+  },
+  "importHeading": {
+    "message": "Yer imlerini içe aktar"
+  },
+  "importIntro": {
+    "message": "Başka bir tarayıcıdaki yer imlerini bu tarayıcıya getirin. Eşitleme açıksa ardından tüm tarayıcılarınızda görünürler."
+  },
+  "importHow": {
+    "message": "Nasıl içe aktarılsın"
+  },
+  "importModeMerge": {
+    "message": "Yer imlerimle birleştir, zaten olanları atla"
+  },
+  "importModeFolder": {
+    "message": "Yeni bir klasöre koy"
+  },
+  "importFromBrowserHeading": {
+    "message": "Marksync kurulu başka bir tarayıcıdan"
+  },
+  "browsersEmpty": {
+    "message": "Henüz başka tarayıcı yok. Orada Marksync'i kurup aynı Google hesabını bağlayın. O tarayıcıda eşitleme kapalı olsa bile çalışır."
+  },
+  "browsersOffline": {
+    "message": "Diğer tarayıcılarınızı görmek için Google hesabınızı bağlayın."
+  },
+  "importFileHeading": {
+    "message": "HTML dosyasından"
+  },
+  "importFileHelp": {
+    "message": "Marksync olmayan tarayıcılar için. Önce dosyayı orada dışa aktarın:"
+  },
+  "importFileChromium": {
+    "message": "Chrome, Brave, Edge: Yer işareti yöneticisi → ⋮ → Yer işaretlerini dışa aktar."
+  },
+  "importFileFirefox": {
+    "message": "Firefox: Yer imleri → Yer imlerini yönet → İçe aktar ve yedekle → Yer imlerini HTML olarak dışa aktar."
+  },
+  "importFileSafari": {
+    "message": "Safari: Dosya → Dışa Aktar → Yer İşaretleri."
+  },
+  "importFileButton": {
+    "message": "Dosyayı içe aktar"
+  },
+  "importAdded_one": {
+    "message": "{1} yer imi eklendi."
+  },
+  "importAdded_other": {
+    "message": "{1} yer imi eklendi."
+  },
+  "importDuplicates_one": {
+    "message": "{1} tanesi zaten vardı."
+  },
+  "importDuplicates_other": {
+    "message": "{1} tanesi zaten vardı."
+  },
+  "importFailed_one": {
+    "message": "{1} tanesi bu tarayıcıya eklenemedi."
+  },
+  "importFailed_other": {
+    "message": "{1} tanesi bu tarayıcıya eklenemedi."
+  },
+  "thisBrowser": {
+    "message": "{1} (bu tarayıcı)"
+  },
+  "import": {
+    "message": "İçe aktar"
+  },
+  "remove": {
+    "message": "Kaldır"
+  },
+  "removeBrowserHint": {
+    "message": "Artık kullanmadığınız bir tarayıcıyı bu listeden kaldırın"
+  },
+  "confirmRemoveBrowser": {
+    "message": "{1} bu listeden kaldırılsın mı? Yer imlerine dokunulmaz."
+  },
+  "importedFolder": {
+    "message": "İçe aktarılan: {1} ({2})"
+  },
+  "rootToolbar": {
+    "message": "Yer imleri çubuğu"
+  },
+  "rootMenu": {
+    "message": "Yer İmleri Menüsü"
+  },
+  "rootOther": {
+    "message": "Diğer yer imleri"
+  },
+  "rootMobile": {
+    "message": "Mobil yer imleri"
+  },
+  "anotherBrowser": {
+    "message": "başka bir tarayıcı"
+  },
+  "deviceLabel": {
+    "message": "{1} ({2})"
+  },
+  "errReconnect": {
+    "message": "Eşitlemeye devam etmek için Google hesabınızı yeniden bağlayın."
+  },
+  "errNoClientId": {
+    "message": "Bu derlemede Google OAuth istemci kimliği yok (WXT_GOOGLE_CLIENT_ID). docs/GOOGLE_SETUP.md dosyasına bakın."
+  },
+  "errSignInFailed": {
+    "message": "Google ile giriş başarısız: {1}"
+  },
+  "errSignInState": {
+    "message": "Google girişi beklenmeyen bir durum döndürdü."
+  },
+  "errDriveNotGranted": {
+    "message": "Google Drive erişimine izin verilmedi. Yeniden bağlanıp Drive erişimine izin verin."
+  },
+  "errDisconnectedWhileSigningIn": {
+    "message": "Giriş sırasında bağlantı kesildi."
+  },
+  "errConnectFirst": {
+    "message": "Önce Google hesabınızı bağlayın."
+  },
+  "errOtherAccount": {
+    "message": "Google farklı bir hesap döndürdü ({1}). Devam etmek için yeniden bağlanın."
+  },
+  "errNewerSyncFile": {
+    "message": "Google Drive'daki eşitleme dosyası daha yeni bir Marksync sürümüyle yazılmış. Eklentiyi güncelleyin."
+  },
+  "errNotBackup": {
+    "message": "Bu dosya bir Marksync yedeği değil."
+  },
+  "errNotSnapshot": {
+    "message": "Bu dosya bir Marksync tarayıcı kopyası değil."
+  },
+  "errNothingToImport": {
+    "message": "İçe aktarılacak yer imi bulunamadı."
+  },
+  "errNoFileContent": {
+    "message": "Dosya içeriği yok."
+  },
+  "errUnknownRequest": {
+    "message": "Bilinmeyen istek."
+  },
+  "errNoAnswer": {
+    "message": "Eklentinin arka plan betiği yanıt vermedi."
+  }
+}

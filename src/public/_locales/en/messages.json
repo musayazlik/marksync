@@ -1,0 +1,379 @@
+{
+  "extName": {
+    "message": "Marksync"
+  },
+  "extDescription": {
+    "message": "Keeps your bookmarks identical in Chrome, Brave, Edge and Firefox, with backups in your own Google Drive.",
+    "description": "Store listing summary; Chrome Web Store allows at most 132 characters."
+  },
+  "openOptions": {
+    "message": "Settings"
+  },
+  "openOptionsTitle": {
+    "message": "Backups and settings"
+  },
+  "popupIntro": {
+    "message": "Link your Google account to keep bookmarks identical in every browser where Marksync is installed."
+  },
+  "privacyNote": {
+    "message": "Bookmarks are stored only in a Marksync folder in your own Google Drive. Marksync cannot see any other file there."
+  },
+  "connectDrive": {
+    "message": "Connect Google Drive"
+  },
+  "bringBack": {
+    "message": "Bring them back"
+  },
+  "keepLocal": {
+    "message": "Keep my bookmarks"
+  },
+  "deleteEverywhere": {
+    "message": "Delete them everywhere"
+  },
+  "deleteHereToo": {
+    "message": "Delete them here too"
+  },
+  "syncNow": {
+    "message": "Sync now"
+  },
+  "backupNow": {
+    "message": "Back up now"
+  },
+  "popupImport": {
+    "message": "Import from other browsers…"
+  },
+  "connectedAs": {
+    "message": "Connected as {1}"
+  },
+  "connected": {
+    "message": "Connected"
+  },
+  "notConnected": {
+    "message": "Not connected"
+  },
+  "reconnect": {
+    "message": "Reconnect"
+  },
+  "syncOff": {
+    "message": "Sync is off in this browser"
+  },
+  "syncOffHint": {
+    "message": "Sync is turned off for this browser in Settings."
+  },
+  "syncing": {
+    "message": "Syncing…"
+  },
+  "lastSync": {
+    "message": "Last sync {1}"
+  },
+  "lastBackup": {
+    "message": "Last backup {1}"
+  },
+  "items_one": {
+    "message": "{1} item"
+  },
+  "items_other": {
+    "message": "{1} items"
+  },
+  "skippedItems_one": {
+    "message": "{1} item not supported in this browser"
+  },
+  "skippedItems_other": {
+    "message": "{1} items not supported in this browser"
+  },
+  "authHint": {
+    "message": "{1} Open Settings and click Reconnect."
+  },
+  "massDeleteRemote": {
+    "message": "{1} of {2} bookmarks were deleted in another browser or directly in Google Drive. Sync is paused until you decide. A backup is taken before anything is deleted here.",
+    "description": "{1}: deleted bookmarks, {2}: all bookmarks."
+  },
+  "massDeleteLocal": {
+    "message": "{1} of {2} bookmarks were removed in this browser. Sync is paused so they are not deleted everywhere by mistake.",
+    "description": "{1}: deleted bookmarks, {2}: all bookmarks."
+  },
+  "errNetwork": {
+    "message": "Google Drive could not be reached. Marksync will try again."
+  },
+  "badgePaused": {
+    "message": "sync is paused, open it to decide"
+  },
+  "timeNever": {
+    "message": "never"
+  },
+  "timeJustNow": {
+    "message": "just now"
+  },
+  "timeMinutesAgo": {
+    "message": "{1} min ago"
+  },
+  "timeHoursAgo": {
+    "message": "{1} h ago"
+  },
+  "optionsTitle": {
+    "message": "Marksync settings"
+  },
+  "welcomeHeading": {
+    "message": "Welcome to Marksync"
+  },
+  "welcomeConnect": {
+    "message": "To start, connect your Google account below. Do the same in every browser where you install Marksync, with the same Google account."
+  },
+  "welcomeNoDuplicates": {
+    "message": "Bookmarks that are already in several browsers are matched, not duplicated."
+  },
+  "accountHeading": {
+    "message": "Google account"
+  },
+  "disconnect": {
+    "message": "Disconnect"
+  },
+  "deviceNameLabel": {
+    "message": "Name of this browser"
+  },
+  "deviceNameHelp": {
+    "message": "Shown in backups and in the import list of your other browsers. Leave it empty to use the detected name."
+  },
+  "syncHeading": {
+    "message": "Sync"
+  },
+  "syncEnabledLabel": {
+    "message": "Sync bookmarks in this browser"
+  },
+  "syncIntervalLabel": {
+    "message": "Check for changes from other browsers every"
+  },
+  "interval1Min": {
+    "message": "1 minute"
+  },
+  "interval5Min": {
+    "message": "5 minutes"
+  },
+  "interval15Min": {
+    "message": "15 minutes"
+  },
+  "interval1Hour": {
+    "message": "1 hour"
+  },
+  "syncHelp": {
+    "message": "Changes made in this browser are sent within about a second. Changes from your other browsers arrive as soon as you switch to this browser, and otherwise at the interval above."
+  },
+  "backupsHeading": {
+    "message": "Backups in Google Drive"
+  },
+  "exportHtml": {
+    "message": "Export HTML"
+  },
+  "autoBackupLabel": {
+    "message": "Back up automatically"
+  },
+  "backupEveryBefore": {
+    "message": "Every"
+  },
+  "backupEvery6Hours": {
+    "message": "6 hours"
+  },
+  "backupEveryDay": {
+    "message": "day"
+  },
+  "backupEveryWeek": {
+    "message": "week"
+  },
+  "backupKeepBefore": {
+    "message": "and keep the last"
+  },
+  "backupKeepAfter": {
+    "message": "backups"
+  },
+  "columnDate": {
+    "message": "Date"
+  },
+  "columnFrom": {
+    "message": "From"
+  },
+  "columnItems": {
+    "message": "Items"
+  },
+  "columnBrowser": {
+    "message": "Browser"
+  },
+  "columnBookmarks": {
+    "message": "Bookmarks"
+  },
+  "columnUpdated": {
+    "message": "Updated"
+  },
+  "noBackups": {
+    "message": "No backups yet."
+  },
+  "restoreHelp": {
+    "message": "Restoring replaces the bookmarks in every connected browser. The current bookmarks are backed up first, so you can undo a restore."
+  },
+  "backupReasonScheduled": {
+    "message": "automatic"
+  },
+  "backupReasonBeforeRestore": {
+    "message": "before restore"
+  },
+  "backupReasonBeforeRemoteDelete": {
+    "message": "before a large deletion from another browser"
+  },
+  "restore": {
+    "message": "Restore"
+  },
+  "delete": {
+    "message": "Delete"
+  },
+  "confirmRestore": {
+    "message": "Replace the bookmarks in all browsers with the backup from {1}?"
+  },
+  "confirmDeleteBackup": {
+    "message": "Delete this backup from Google Drive?"
+  },
+  "confirmDisconnect": {
+    "message": "Stop syncing this browser? Your bookmarks, your Drive files and your other connected browsers stay as they are.\n\nTo remove Marksync's access to your Google account in every browser, visit myaccount.google.com/permissions."
+  },
+  "importHeading": {
+    "message": "Import bookmarks"
+  },
+  "importIntro": {
+    "message": "Bring bookmarks from another browser into this one. When sync is on, they then appear in all your browsers."
+  },
+  "importHow": {
+    "message": "How to import"
+  },
+  "importModeMerge": {
+    "message": "Merge into my bookmarks and skip the ones I already have"
+  },
+  "importModeFolder": {
+    "message": "Put them in a new folder"
+  },
+  "importFromBrowserHeading": {
+    "message": "From another browser with Marksync"
+  },
+  "browsersEmpty": {
+    "message": "No other browsers yet. Install Marksync there and connect the same Google account. This works even if sync is turned off in that browser."
+  },
+  "browsersOffline": {
+    "message": "Connect your Google account to see your other browsers."
+  },
+  "importFileHeading": {
+    "message": "From an HTML file"
+  },
+  "importFileHelp": {
+    "message": "For browsers without Marksync. Export the file there first:"
+  },
+  "importFileChromium": {
+    "message": "Chrome, Brave, Edge: Bookmark manager → ⋮ → Export bookmarks."
+  },
+  "importFileFirefox": {
+    "message": "Firefox: Bookmarks → Manage bookmarks → Import and Backup → Export Bookmarks to HTML."
+  },
+  "importFileSafari": {
+    "message": "Safari: File → Export → Bookmarks."
+  },
+  "importFileButton": {
+    "message": "Import file"
+  },
+  "importAdded_one": {
+    "message": "Added 1 bookmark."
+  },
+  "importAdded_other": {
+    "message": "Added {1} bookmarks."
+  },
+  "importDuplicates_one": {
+    "message": "1 was already here."
+  },
+  "importDuplicates_other": {
+    "message": "{1} were already here."
+  },
+  "importFailed_one": {
+    "message": "1 could not be added in this browser."
+  },
+  "importFailed_other": {
+    "message": "{1} could not be added in this browser."
+  },
+  "thisBrowser": {
+    "message": "{1} (this browser)"
+  },
+  "import": {
+    "message": "Import"
+  },
+  "remove": {
+    "message": "Remove"
+  },
+  "removeBrowserHint": {
+    "message": "Remove a browser you no longer use from this list"
+  },
+  "confirmRemoveBrowser": {
+    "message": "Remove {1} from this list? Its bookmarks are not touched."
+  },
+  "importedFolder": {
+    "message": "Imported from {1} ({2})",
+    "description": "Name of the folder an import creates. {1}: source browser or file name, {2}: date."
+  },
+  "rootToolbar": {
+    "message": "Bookmarks bar"
+  },
+  "rootMenu": {
+    "message": "Bookmarks Menu"
+  },
+  "rootOther": {
+    "message": "Other bookmarks"
+  },
+  "rootMobile": {
+    "message": "Mobile bookmarks"
+  },
+  "anotherBrowser": {
+    "message": "another browser"
+  },
+  "deviceLabel": {
+    "message": "{1} on {2}",
+    "description": "{1} is the browser name, {2} the operating system, e.g. \"Brave on Windows\"."
+  },
+  "errReconnect": {
+    "message": "Reconnect your Google account to keep syncing."
+  },
+  "errNoClientId": {
+    "message": "This build has no Google OAuth client ID (WXT_GOOGLE_CLIENT_ID). See docs/GOOGLE_SETUP.md."
+  },
+  "errSignInFailed": {
+    "message": "Google sign-in failed: {1}"
+  },
+  "errSignInState": {
+    "message": "Google sign-in returned an unexpected state."
+  },
+  "errDriveNotGranted": {
+    "message": "Google Drive access was not granted. Connect again and allow Drive access."
+  },
+  "errDisconnectedWhileSigningIn": {
+    "message": "Disconnected while signing in."
+  },
+  "errConnectFirst": {
+    "message": "Connect your Google account first."
+  },
+  "errOtherAccount": {
+    "message": "Google returned a different account ({1}). Reconnect to continue."
+  },
+  "errNewerSyncFile": {
+    "message": "The sync file in Google Drive was written by a newer Marksync. Update the extension."
+  },
+  "errNotBackup": {
+    "message": "This file is not a Marksync backup."
+  },
+  "errNotSnapshot": {
+    "message": "This file is not a Marksync browser snapshot."
+  },
+  "errNothingToImport": {
+    "message": "No bookmarks found to import."
+  },
+  "errNoFileContent": {
+    "message": "No file content."
+  },
+  "errUnknownRequest": {
+    "message": "Unknown request."
+  },
+  "errNoAnswer": {
+    "message": "The background script did not answer."
+  }
+}

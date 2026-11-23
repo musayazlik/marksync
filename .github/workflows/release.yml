@@ -6,10 +6,20 @@ name: Release
 #    release (feat → minor, fix → patch; before 1.0.0 a breaking change → minor).
 # 2. Merging that PR tags vX.Y.Z and publishes a GitHub Release.
 # 3. The store packages are then built from the tag and attached to it.
+#
+# "Run workflow" (workflow_dispatch) builds and attaches the packages again
+# for an existing release, e.g. after a failed upload or once WXT_GECKO_ID is
+# set. It never creates a release or changes the version.
 
 on:
   push:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag to build packages for (e.g. v0.2.0)
+        required: true
+        type: string
 
 # No permissions by default; each job asks only for what it needs.
 permissions: {}
@@ -20,6 +30,7 @@ concurrency:
 
 jobs:
   release-please:
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     permissions:
       contents: write # tags, releases, the release branch
@@ -40,20 +51,36 @@ jobs:
   # change the repository or the release.
   build:
     needs: release-please
-    if: needs.release-please.outputs.created == 'true'
+    # On a manual run release-please is skipped, so do not require it to succeed.
+    if: >-
+      !cancelled() &&
+      (needs.release-please.outputs.created == 'true' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
     env:
       # Repository variables (Settings → Secrets and variables → Actions → Variables).
       # Both values end up inside the published extension, so they are not secrets.
       WXT_GOOGLE_CLIENT_ID: ${{ vars.WXT_GOOGLE_CLIENT_ID }}
       WXT_GECKO_ID: ${{ vars.WXT_GECKO_ID }}
-      VERSION: ${{ needs.release-please.outputs.version }}
     steps:
+      - name: Release tag
+        id: tag
+        env:
+          TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || needs.release-please.outputs.tag }}
+        run: |
+          if ! printf '%s' "$TAG" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::\"$TAG\" is not a release tag like v1.2.3."
+            exit 1
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "VERSION=${TAG#v}" >> "$GITHUB_ENV"
+
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ needs.release-please.outputs.tag }}
+          ref: refs/tags/${{ steps.tag.outputs.tag }}
           persist-credentials: false
       - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
       # No dependency cache in release builds, so a poisoned cache cannot reach a release.
@@ -91,22 +118,26 @@ jobs:
         if: env.WXT_GECKO_ID == ''
         run: echo "::warning::Repository variable WXT_GECKO_ID is not set, so this release has no Firefox package."
 
-      - name: Checksums
-        working-directory: .output
-        run: sha256sum *.zip | tee SHA256SUMS.txt
+      # upload-artifact skips hidden folders such as .output, so the packages
+      # are collected in a plain folder first.
+      - name: Collect packages and checksums
+        run: |
+          mkdir packages
+          cp .output/*.zip packages/
+          cd packages
+          sha256sum *.zip | tee SHA256SUMS.txt
 
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: packages
-          path: |
-            .output/*.zip
-            .output/SHA256SUMS.txt
+          path: packages/
           if-no-files-found: error
           retention-days: 7
 
   # Only this job can write to the release, and it runs no project code.
   publish:
-    needs: [release-please, build]
+    needs: build
+    if: ${{ !cancelled() && needs.build.result == 'success' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write # upload release assets
@@ -118,5 +149,5 @@ jobs:
       - name: Attach the packages to the release
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: ${{ needs.release-please.outputs.tag }}
+          TAG: ${{ needs.build.outputs.tag }}
         run: gh release upload "$TAG" packages/* --repo "$GITHUB_REPOSITORY" --clobber

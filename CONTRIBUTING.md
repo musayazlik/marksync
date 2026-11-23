@@ -53,6 +53,11 @@ Releases are made by [release-please](https://github.com/googleapis/release-plea
    Firefox Add-ons reviewers.
 4. Upload the packages to the stores. Store submission is manual for now.
 
+If packages are missing from a release (a failed upload, or `WXT_GECKO_ID`
+was set afterwards), open Actions → Release → **Run workflow** and enter the
+tag, e.g. `v0.2.0`. It builds that tag again and replaces the release's
+packages; it never creates a release or changes the version.
+
 Repository variables used by release builds (Settings → Secrets and variables
 → Actions → Variables; they end up in the published extension, so they are not
 secrets):

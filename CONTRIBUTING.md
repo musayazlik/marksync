@@ -11,6 +11,61 @@ pnpm test
 pnpm build:all
 ```
 
+## Commit messages
+
+Commits and pull request titles follow [Conventional Commits](https://www.conventionalcommits.org/).
+The release tooling reads them to pick the next version and write the changelog:
+
+| Prefix | Use for | Version | In the changelog |
+|---|---|---|---|
+| `feat:` | something new users can see or do | minor (0.**2**.0) | Features |
+| `fix:` | a bug users could hit | patch (0.1.**1**) | Bug Fixes |
+| `perf:` | faster or lighter, same behaviour | patch | Performance |
+| `feat!:` or a `BREAKING CHANGE:` footer | users must act (e.g. a sync file schema change) | major from 1.0.0; minor before | marked as breaking |
+| `docs:` `refactor:` `test:` `build:` `ci:` `chore:` `style:` | everything else | none | hidden |
+
+Add a scope when it helps: `fix(sync): …`, `feat(options): …`. Write the
+description for users ("keep folder order when two browsers reorder"), not
+for the code ("change compareSiblings"). CI checks pull request titles.
+
+A commit with several user-visible changes can list the extra ones as
+Conventional Commit lines at the end of the message body; each becomes its own
+changelog entry.
+
+Merge pull requests with **Rebase and merge** or **Squash and merge**. When
+squashing, keep the PR title as the commit title.
+
+## Releases
+
+Releases are made by [release-please](https://github.com/googleapis/release-please)
+(`.github/workflows/release.yml`); nobody edits version numbers by hand.
+
+1. Every push to `main` opens or updates a pull request named
+   `chore(main): release X.Y.Z`. It bumps `version` in `package.json` (which
+   becomes the extension's manifest version) and adds the new section to
+   `CHANGELOG.md`.
+2. Merge it when you want to ship. That tags `vX.Y.Z` and publishes a GitHub
+   Release with the changelog.
+3. The workflow then builds the store packages from the tag and attaches them
+   to the release, with `SHA256SUMS.txt`:
+   `marksync-X.Y.Z-chrome.zip` (Chrome Web Store), `-edge.zip`, `-opera.zip`,
+   and, when `WXT_GECKO_ID` is set, `-firefox.zip` plus `-sources.zip` for
+   Firefox Add-ons reviewers.
+4. Upload the packages to the stores. Store submission is manual for now.
+
+Repository variables used by release builds (Settings → Secrets and variables
+→ Actions → Variables; they end up in the published extension, so they are not
+secrets):
+
+- `WXT_GOOGLE_CLIENT_ID`: the production OAuth client (docs/GOOGLE_SETUP.md). Required.
+- `WXT_GECKO_ID`: a Firefox add-on ID you own. Without it the release has no Firefox package.
+
+The release pull request is opened by GitHub Actions, so GitHub does not run
+CI on it. CI already ran on every commit it contains.
+
+To ship a specific version (for example `1.0.0`), add a commit whose body ends
+with `Release-As: 1.0.0`.
+
 ## Where things go
 
 - Sync rules (diff, merge, conflict handling) live in `src/core` and must stay

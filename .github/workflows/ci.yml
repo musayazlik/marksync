@@ -9,6 +9,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   check:
     runs-on: ubuntu-latest
@@ -16,17 +20,33 @@ jobs:
       # CI builds are never released, so they may use a placeholder Firefox ID.
       MARKSYNC_UNRELEASED_BUILD: '1'
     steps:
-      # Third-party actions should be pinned to full commit SHAs before any
-      # release or secret-using step is added to this workflow.
-      - uses: actions/checkout@v4
+      # Actions are pinned to commit SHAs; Dependabot keeps them up to date.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 22
+          node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm build:all
+
+  # Release-please reads commit messages to pick the next version, so pull
+  # request titles must be Conventional Commits too (they become the commit
+  # message when a PR is squash-merged).
+  pr-title:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check the pull request title
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          pattern='^(feat|fix|perf|revert|docs|style|refactor|test|build|ci|chore)(\([a-z0-9-]+\))?!?: .+'
+          if ! printf '%s' "$TITLE" | grep -Eq "$pattern"; then
+            echo "::error::PR title \"$TITLE\" is not a Conventional Commit, e.g. \"fix(sync): keep folder order\". See CONTRIBUTING.md."
+            exit 1
+          fi

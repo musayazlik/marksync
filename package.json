@@ -5,6 +5,14 @@
   "private": true,
   "type": "module",
   "license": "MIT",
+  "homepage": "https://github.com/musayazlik/marksync#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/musayazlik/marksync.git"
+  },
+  "bugs": {
+    "url": "https://github.com/musayazlik/marksync/issues"
+  },
   "scripts": {
     "dev": "wxt",
     "dev:firefox": "wxt -b firefox",

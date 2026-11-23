@@ -1,5 +1,8 @@
 # Marksync
 
+[![CI](https://github.com/musayazlik/marksync/actions/workflows/ci.yml/badge.svg)](https://github.com/musayazlik/marksync/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/musayazlik/marksync)](https://github.com/musayazlik/marksync/releases)
+
 Open-source bookmark sync for **Chrome, Brave, Edge and Firefox**, with
 backups in **your own Google Drive**.
 
@@ -56,6 +59,10 @@ pnpm build:dev            # development build to load unpacked (.output/chrome-m
 pnpm build:all            # store builds; Firefox needs WXT_GECKO_ID set to an ID you own
 pnpm zip:all              # store packages (+ sources zip for Firefox Add-ons)
 ```
+
+Releases are automated: see [CONTRIBUTING.md](CONTRIBUTING.md#releases). Every version's
+changes are in [CHANGELOG.md](CHANGELOG.md), and its store packages are attached to the
+[GitHub release](https://github.com/musayazlik/marksync/releases).
 
 Load the build manually:
 

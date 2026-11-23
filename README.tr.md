@@ -1,5 +1,8 @@
 # Marksync
 
+[![CI](https://github.com/musayazlik/marksync/actions/workflows/ci.yml/badge.svg)](https://github.com/musayazlik/marksync/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/musayazlik/marksync)](https://github.com/musayazlik/marksync/releases)
+
 **Chrome, Brave, Edge ve Firefox** arasında yer imlerini eşitleyen, yedekleri
 **kendi Google Drive'ınızda** tutan açık kaynak eklenti.
 
@@ -51,3 +54,9 @@ pnpm zip:all              # mağaza paketleri
 ```
 
 Ayrıntılar için [README.md](README.md) ve [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
+## Sürümler
+
+Sürümler otomatik çıkar ([CONTRIBUTING.md](CONTRIBUTING.md#releases)). Her sürümün
+değişiklikleri [CHANGELOG.md](CHANGELOG.md) dosyasında, mağaza paketleri ise
+[GitHub Releases](https://github.com/musayazlik/marksync/releases) sayfasındadır.

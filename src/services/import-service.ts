@@ -1,6 +1,7 @@
 import { countSource, parseNetscapeHtml, snapshotToSource, validateImportSource, type ImportSource } from '../core/import';
 import { deviceLabel } from '../platform/browser-info';
 import { DriveError, quote } from '../platform/drive';
+import { t } from '../shared/i18n';
 import { deviceIdItem, snapshotMetaItem, syncStateItem } from '../shared/state';
 import { importIntoLocal, type ImportMode, type ImportResult } from '../sync/importer';
 import { readLocal } from '../sync/local-tree';
@@ -108,12 +109,20 @@ export async function removeBrowser(fileId: string): Promise<void> {
 }
 
 async function importSource(source: ImportSource, mode: ImportMode, label: string): Promise<ImportResult> {
-  if (countSource(source) === 0) throw new Error('No bookmarks found to import.');
+  if (countSource(source) === 0) throw new Error(t('errNothingToImport'));
   return exclusive(async () => {
     const state = await syncStateItem.getValue();
+    const day = new Date().toISOString().slice(0, 10);
     const result = await importIntoLocal(localBookmarks(), source, {
       mode,
       label,
+      containerTitle: t('importedFolder', label, day),
+      rootTitles: {
+        toolbar: t('rootToolbar'),
+        menu: t('rootMenu'),
+        other: t('rootOther'),
+        mobile: t('rootMobile'),
+      },
       ...(state.menuFolderId ? { menuFolderId: state.menuFolderId } : {}),
     });
     if (result.menuFolderId) {
@@ -128,14 +137,14 @@ export async function importFromBrowser(fileId: string, mode: ImportMode): Promi
   await assertInFolder(drive, fileId, 'browsers');
   const file = await drive.downloadJson<BrowserSnapshotFile>(fileId);
   if (typeof file !== 'object' || file === null || file.kind !== 'marksync-browser' || file.schema !== 1) {
-    throw new Error('This is not a Marksync browser file.');
+    throw new Error(t('errNotSnapshot'));
   }
-  const label = typeof file.label === 'string' && file.label.trim() ? file.label.slice(0, 60) : 'another browser';
+  const label = typeof file.label === 'string' && file.label.trim() ? file.label.slice(0, 60) : t('anotherBrowser');
   return importSource(validateImportSource(file.source), mode, label);
 }
 
 /** Imports an HTML bookmarks file exported by any browser. Works without a Google account. */
 export function importHtml(html: string, mode: ImportMode, label: string): Promise<ImportResult> {
-  if (typeof html !== 'string') throw new Error('No file content.');
+  if (typeof html !== 'string') throw new Error(t('errNoFileContent'));
   return importSource(parseNetscapeHtml(html), mode, String(label).slice(0, 60));
 }

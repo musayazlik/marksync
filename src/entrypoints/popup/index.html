@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
+    <!-- Text comes from src/public/_locales (see src/shared/i18n.ts). -->
     <main class="stack">
       <header class="row spread">
         <div class="row">
@@ -15,19 +16,13 @@
           <h1>Marksync</h1>
           <span id="dot" class="dot"></span>
         </div>
-        <button id="open-options" title="Backups and settings">Settings</button>
+        <button id="open-options" data-i18n="openOptions" data-i18n-title="openOptionsTitle"></button>
       </header>
 
       <section id="disconnected" class="stack" hidden>
-        <p>
-          Link your Google account to keep bookmarks identical in every browser where Marksync is
-          installed.
-        </p>
-        <p class="muted small">
-          Bookmarks are stored only in a <strong>Marksync</strong> folder in your own Google Drive.
-          Marksync cannot see any other file there.
-        </p>
-        <button id="connect" class="primary">Connect Google Drive</button>
+        <p data-i18n="popupIntro"></p>
+        <p class="muted small" data-i18n="privacyNote"></p>
+        <button id="connect" class="primary" data-i18n="connectDrive"></button>
       </section>
 
       <section id="connected" class="stack" hidden>
@@ -39,22 +34,22 @@
         <div id="mass-delete" class="notice warn stack" hidden>
           <p id="mass-delete-text"></p>
           <div class="row">
-            <button id="confirm-delete" class="danger">Delete them everywhere</button>
-            <button id="bring-back">Bring them back</button>
-            <button id="keep-local" hidden>Keep my bookmarks</button>
+            <button id="confirm-delete" class="danger"></button>
+            <button id="bring-back" data-i18n="bringBack"></button>
+            <button id="keep-local" data-i18n="keepLocal" hidden></button>
           </div>
         </div>
 
         <div id="error" class="notice error small" hidden></div>
 
         <div class="row">
-          <button id="sync" class="primary">Sync now</button>
-          <button id="backup">Back up now</button>
+          <button id="sync" class="primary" data-i18n="syncNow"></button>
+          <button id="backup" data-i18n="backupNow"></button>
         </div>
         <p id="backup-summary" class="muted small"></p>
       </section>
 
-      <button id="import">Import from other browsers…</button>
+      <button id="import" data-i18n="popupImport"></button>
 
       <p id="action-error" class="notice error small" hidden></p>
     </main>

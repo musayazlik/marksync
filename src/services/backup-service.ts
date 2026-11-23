@@ -2,6 +2,7 @@ import { buildLocalRecords, liveRecords } from '../core/records';
 import type { BackupFile, RecordMap } from '../core/types';
 import { deviceLabel } from '../platform/browser-info';
 import type { DriveFile } from '../platform/drive';
+import { t } from '../shared/i18n';
 import { getSettings, patchStatus, syncStateItem } from '../shared/state';
 import { readLocal } from '../sync/local-tree';
 import { sanitizeRemoteRecords } from '../core/validate';
@@ -94,7 +95,7 @@ export async function restoreBackup(id: string): Promise<void> {
   await assertInFolder(drive, id, 'backups');
   const backup = await drive.downloadJson<BackupFile>(id);
   if (typeof backup !== 'object' || backup === null || backup.kind !== 'marksync-backup' || backup.schema !== 1) {
-    throw new Error('This file is not a Marksync backup.');
+    throw new Error(t('errNotBackup'));
   }
   // Backups live in Drive too: only well-formed records are restored.
   const { records } = sanitizeRemoteRecords(backup.records, Date.now());

@@ -20,6 +20,7 @@ other file there.
 - Automatic and manual backups in Google Drive, restore with one click
 - Import from another browser (with Marksync, or from any browser's HTML export), merged without duplicates or into a new folder
 - Export to a standard HTML bookmarks file
+- Interface in English and Turkish; a badge on the toolbar icon when sync needs you
 
 ## Supported browsers
 

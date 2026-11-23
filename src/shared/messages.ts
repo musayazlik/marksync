@@ -1,4 +1,5 @@
 import { browser } from 'wxt/browser';
+import { t } from './i18n';
 import type { BackupInfo } from '../services/backup-service';
 import type { BrowserInfo } from '../services/import-service';
 import type { ImportMode, ImportResult } from '../sync/importer';
@@ -47,7 +48,7 @@ export type Envelope<T> = { ok: true; data: T } | { ok: false; error: string };
 
 export async function send<R extends Request>(req: R): Promise<ResponseData[R['type']]> {
   const res = (await browser.runtime.sendMessage(req)) as Envelope<ResponseData[R['type']]> | undefined;
-  if (!res) throw new Error('The background script did not answer.');
+  if (!res) throw new Error(t('errNoAnswer'));
   if (!res.ok) throw new Error(res.error);
   return res.data;
 }

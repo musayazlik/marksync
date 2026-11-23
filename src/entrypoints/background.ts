@@ -16,9 +16,11 @@ import {
   publishSnapshot,
   removeBrowser,
 } from '../services/import-service';
+import { updateBadge } from '../services/badge';
 import { isApplying, keepLocalBookmarks, resyncFromDrive, runSync, syncIfRemoteChanged } from '../services/sync-service';
 import type { Envelope, Request } from '../shared/messages';
-import { getSettings, patchStatus, statusItem } from '../shared/state';
+import { t } from '../shared/i18n';
+import { getSettings, patchStatus, settingsItem, statusItem } from '../shared/state';
 
 const SYNC_ALARM = 'marksync-sync';
 const BACKUP_ALARM = 'marksync-backup';
@@ -73,7 +75,22 @@ export default defineBackground(() => {
     if (s.autoBackup) browser.alarms.create(BACKUP_ALARM, { periodInMinutes: 60 });
   }
 
-  browser.runtime.onInstalled.addListener(() => void scheduleAlarms());
+  browser.runtime.onInstalled.addListener((details) => {
+    void scheduleAlarms();
+    // First install only (not updates): open Settings with a short welcome
+    // and the Connect button, instead of leaving the user to find the icon.
+    if (details.reason === 'install') {
+      void browser.tabs.create({ url: browser.runtime.getURL('/options.html#welcome') });
+    }
+  });
+
+  /** Keeps the toolbar icon's badge and tooltip in step with the sync status. */
+  async function refreshBadge() {
+    const [status, settings] = await Promise.all([statusItem.getValue(), getSettings()]);
+    await updateBadge(status, settings).catch((err) => console.warn('[marksync] badge update failed', err));
+  }
+  statusItem.watch(() => void refreshBadge());
+  settingsItem.watch(() => void refreshBadge());
   browser.runtime.onStartup.addListener(() => {
     void scheduleAlarms();
     void syncAndPublish();
@@ -120,6 +137,7 @@ export default defineBackground(() => {
       case 'disconnect':
         return disconnect();
       case 'syncNow':
+        if (!(await getSettings()).syncEnabled) throw new Error(t('syncOffHint'));
         await runSync(req.allowMassDelete ? { allowMassDelete: true } : {});
         void publishSnapshot().catch(() => undefined);
         return;
@@ -174,7 +192,7 @@ export default defineBackground(() => {
       return false;
     }
     if (typeof req !== 'object' || req === null || !knownTypes.has(req.type)) {
-      sendResponse({ ok: false, error: 'Unknown request.' } satisfies Envelope<unknown>);
+      sendResponse({ ok: false, error: t('errUnknownRequest') } satisfies Envelope<unknown>);
       return false;
     }
     handle(req)
@@ -187,5 +205,5 @@ export default defineBackground(() => {
   });
 
   // A sync left "running" by a killed service worker should not block the UI.
-  void patchStatus({ syncing: false });
+  void patchStatus({ syncing: false }).then(refreshBadge);
 });

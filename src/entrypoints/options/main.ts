@@ -1,3 +1,4 @@
+import { errorText, localizePage, t, tn } from '../../shared/i18n';
 import { send } from '../../shared/messages';
 import { getSettings, settingsItem, statusItem, type Settings, type Status } from '../../shared/state';
 import { $, statusTone, timeAgo, withBusy } from '../../shared/ui';
@@ -5,19 +6,20 @@ import { detectBrowser } from '../../platform/browser-info';
 import type { BackupInfo } from '../../services/backup-service';
 import type { ImportMode, ImportResult } from '../../sync/importer';
 
+localizePage();
 const actionError = $('#action-error');
+/** The page opened right after installing (see background.ts). */
+const welcome = location.hash === '#welcome';
 
 function renderStatus(s: Status) {
   $('#dot').className = `dot ${statusTone(s)}`;
-  $('#account-text').textContent = s.connected
-    ? `Connected as ${s.email ?? 'your Google account'}`
-    : 'Not connected';
+  $('#welcome').hidden = !welcome || s.connected;
+  $('#account-text').textContent = s.connected ? (s.email ? t('connectedAs', s.email) : t('connected')) : t('notConnected');
   $('#connect').hidden = s.connected && s.error?.code !== 'auth';
-  $('#connect').textContent = s.connected ? 'Reconnect' : 'Connect Google Drive';
+  $('#connect').textContent = t(s.connected ? 'reconnect' : 'connectDrive');
   $('#disconnect').hidden = !s.connected;
   $('#sync-text').textContent = s.connected
-    ? `${s.syncing ? 'Syncing…' : `Last sync ${timeAgo(s.lastSyncAt)}`}` +
-      (s.error ? ` · ${s.error.message}` : '')
+    ? (s.syncing ? t('syncing') : t('lastSync', timeAgo(s.lastSyncAt))) + (s.error ? ` · ${errorText(s.error)}` : '')
     : '';
 }
 
@@ -49,12 +51,18 @@ async function loadSettings() {
 
 // ---------- backups ----------
 
-const reasonLabel: Record<BackupInfo['reason'], string> = {
-  manual: '',
-  scheduled: ' (automatic)',
-  'before-restore': ' (before restore)',
-  'before-remote-delete': ' (before a large deletion from another browser)',
+const reasonKey: Record<BackupInfo['reason'], string | undefined> = {
+  manual: undefined,
+  scheduled: 'backupReasonScheduled',
+  'before-restore': 'backupReasonBeforeRestore',
+  'before-remote-delete': 'backupReasonBeforeRemoteDelete',
 };
+
+function backupDate(b: BackupInfo): string {
+  const date = new Date(b.createdTime).toLocaleString();
+  const key = reasonKey[b.reason];
+  return key ? `${date} (${t(key)})` : date;
+}
 
 async function loadBackups() {
   const status = await statusItem.getValue();
@@ -67,7 +75,7 @@ async function loadBackups() {
   for (const b of backups) {
     const tr = document.createElement('tr');
     const cells = [
-      new Date(b.createdTime).toLocaleString() + reasonLabel[b.reason],
+      backupDate(b),
       b.source,
       b.count.toLocaleString(),
     ];
@@ -78,16 +86,16 @@ async function loadBackups() {
     }
     const actions = document.createElement('td');
     const restore = document.createElement('button');
-    restore.textContent = 'Restore';
+    restore.textContent = t('restore');
     restore.addEventListener('click', () => {
-      if (!confirm(`Replace the bookmarks in all browsers with the backup from ${cells[0]}?`)) return;
+      if (!confirm(t('confirmRestore', cells[0]!))) return;
       void withBusy(restore, () => send({ type: 'restoreBackup', id: b.id }).then(loadBackups), actionError);
     });
     const del = document.createElement('button');
-    del.textContent = 'Delete';
+    del.textContent = t('delete');
     del.className = 'danger';
     del.addEventListener('click', () => {
-      if (!confirm('Delete this backup from Google Drive?')) return;
+      if (!confirm(t('confirmDeleteBackup'))) return;
       void withBusy(del, () => send({ type: 'deleteBackup', id: b.id }).then(loadBackups), actionError);
     });
     actions.append(restore, ' ', del);
@@ -102,9 +110,9 @@ const importMode = (): ImportMode =>
   ($<HTMLInputElement>('input[name="import-mode"]:checked').value as ImportMode) ?? 'merge';
 
 function showImportResult(r: ImportResult) {
-  const parts = [`Added ${r.added.toLocaleString()} bookmarks.`];
-  if (r.duplicates) parts.push(`${r.duplicates.toLocaleString()} were already here.`);
-  if (r.failed) parts.push(`${r.failed} could not be added in this browser.`);
+  const parts = [tn('importAdded', r.added)];
+  if (r.duplicates) parts.push(tn('importDuplicates', r.duplicates));
+  if (r.failed) parts.push(tn('importFailed', r.failed));
   const el = $('#import-result');
   el.textContent = parts.join(' ');
   el.hidden = false;
@@ -124,7 +132,7 @@ async function loadBrowsers() {
   for (const b of browsers) {
     const tr = document.createElement('tr');
     const cells = [
-      b.self ? `${b.label} (this browser)` : b.label,
+      b.self ? t('thisBrowser', b.label) : b.label,
       b.count.toLocaleString(),
       timeAgo(Date.parse(b.updatedAt)),
     ];
@@ -136,7 +144,7 @@ async function loadBrowsers() {
     const actions = document.createElement('td');
     if (!b.self) {
       const imp = document.createElement('button');
-      imp.textContent = 'Import';
+      imp.textContent = t('import');
       imp.addEventListener('click', () =>
         withBusy(
           imp,
@@ -145,11 +153,11 @@ async function loadBrowsers() {
         ),
       );
       const remove = document.createElement('button');
-      remove.textContent = 'Remove';
+      remove.textContent = t('remove');
       remove.className = 'danger';
-      remove.title = 'Remove a browser you no longer use from this list';
+      remove.title = t('removeBrowserHint');
       remove.addEventListener('click', () => {
-        if (!confirm(`Remove ${b.label} from this list? Its bookmarks are not touched.`)) return;
+        if (!confirm(t('confirmRemoveBrowser', b.label))) return;
         void withBusy(remove, () => send({ type: 'removeBrowser', fileId: b.fileId }).then(loadBrowsers), actionError);
       });
       actions.append(imp, ' ', remove);
@@ -190,20 +198,11 @@ const bind = (sel: string, action: () => Promise<unknown>) => {
   btn.addEventListener('click', () => withBusy(btn, action, actionError));
 };
 
-bind('#connect', async () => {
-  await send({ type: 'connect' });
-  await Promise.all([loadBackups(), loadBrowsers()]);
-});
+// The status watcher below reloads the account's lists after connect/disconnect.
+bind('#connect', () => send({ type: 'connect' }));
 bind('#disconnect', async () => {
-  if (
-    !confirm(
-      'Stop syncing this browser? Your bookmarks, your Drive files and your other connected browsers stay as they are.\n\n' +
-        'To remove Marksync\'s access to your Google account in every browser, visit myaccount.google.com/permissions.',
-    )
-  )
-    return;
+  if (!confirm(t('confirmDisconnect'))) return;
   await send({ type: 'disconnect' });
-  await Promise.all([loadBackups(), loadBrowsers()]);
 });
 bind('#backup-now', async () => {
   await send({ type: 'backupNow' });
@@ -214,8 +213,21 @@ bind('#export', async () => {
   download(`bookmarks-${new Date().toISOString().slice(0, 10)}.html`, html, 'text/html');
 });
 
-void statusItem.getValue().then(renderStatus);
-statusItem.watch((s) => s && renderStatus(s));
+let wasConnected: boolean | undefined;
+void statusItem.getValue().then((s) => {
+  wasConnected = s.connected;
+  renderStatus(s);
+});
+statusItem.watch((s) => {
+  if (!s) return;
+  renderStatus(s);
+  // Connected or disconnected elsewhere (e.g. from the popup): the backup
+  // and browser lists belong to the account, so load them again.
+  if (wasConnected !== undefined && s.connected !== wasConnected) {
+    void Promise.all([loadBackups(), loadBrowsers()]).catch(showError);
+  }
+  wasConnected = s.connected;
+});
 void loadSettings();
 // Development builds only: the OAuth redirect URI to register in Google Cloud.
 // The block is removed from store builds (`wxt build`, `wxt zip`).

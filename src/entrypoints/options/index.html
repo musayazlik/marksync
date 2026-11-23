@@ -4,138 +4,130 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="manifest.open_in_tab" content="true" />
-    <title>Marksync settings</title>
+    <title data-i18n="optionsTitle">Marksync</title>
     <link rel="icon" type="image/png" sizes="32x32" href="/icon/32.png" />
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
+    <!-- Text comes from src/public/_locales (see src/shared/i18n.ts). -->
     <main class="stack">
       <header class="row">
         <img src="/icon/32.png" srcset="/icon/64.png 2x" width="32" height="32" alt="" />
         <h1>Marksync</h1>
       </header>
 
+      <!-- Shown once, on the page opened right after installing. -->
+      <section id="welcome" class="card stack" aria-labelledby="welcome-h" hidden>
+        <h2 id="welcome-h" data-i18n="welcomeHeading"></h2>
+        <p data-i18n="welcomeConnect"></p>
+        <p class="muted small" data-i18n="welcomeNoDuplicates"></p>
+        <p class="muted small" data-i18n="privacyNote"></p>
+      </section>
+
       <section class="card stack" aria-labelledby="account-h">
-        <h2 id="account-h">Google account</h2>
+        <h2 id="account-h" data-i18n="accountHeading"></h2>
         <div class="row spread">
           <div class="row">
             <span id="dot" class="dot"></span>
             <p id="account-text"></p>
           </div>
           <div class="row">
-            <button id="connect" class="primary">Connect Google Drive</button>
-            <button id="disconnect" class="danger" hidden>Disconnect</button>
+            <button id="connect" class="primary" data-i18n="connectDrive"></button>
+            <button id="disconnect" class="danger" data-i18n="disconnect" hidden></button>
           </div>
         </div>
         <p id="sync-text" class="muted small"></p>
         <label class="stack small">
-          Name of this browser
+          <span data-i18n="deviceNameLabel"></span>
           <input id="deviceName" type="text" maxlength="60" />
         </label>
-        <p class="muted small">
-          Shown in backups and in the import list of your other browsers. Leave it empty to use the
-          detected name.
-        </p>
+        <p class="muted small" data-i18n="deviceNameHelp"></p>
       </section>
 
       <section class="card stack" aria-labelledby="sync-h">
-        <h2 id="sync-h">Sync</h2>
-        <label class="row"><input id="syncEnabled" type="checkbox" /> Sync bookmarks in this browser</label>
+        <h2 id="sync-h" data-i18n="syncHeading"></h2>
+        <label class="row"><input id="syncEnabled" type="checkbox" /> <span data-i18n="syncEnabledLabel"></span></label>
         <label class="row">
-          Check for changes from other browsers every
+          <span data-i18n="syncIntervalLabel"></span>
           <select id="syncIntervalMin">
-            <option value="1">1 minute</option>
-            <option value="5">5 minutes</option>
-            <option value="15">15 minutes</option>
-            <option value="60">1 hour</option>
+            <option value="1" data-i18n="interval1Min"></option>
+            <option value="5" data-i18n="interval5Min"></option>
+            <option value="15" data-i18n="interval15Min"></option>
+            <option value="60" data-i18n="interval1Hour"></option>
           </select>
         </label>
-        <p class="muted small">
-          Changes made in this browser are sent within about a second. Changes from your other
-          browsers arrive as soon as you switch to this browser, and otherwise at the interval above.
-        </p>
+        <p class="muted small" data-i18n="syncHelp"></p>
       </section>
 
       <section class="card stack" aria-labelledby="backup-h">
         <div class="row spread">
-          <h2 id="backup-h">Backups in Google Drive</h2>
+          <h2 id="backup-h" data-i18n="backupsHeading"></h2>
           <div class="row">
-            <button id="export">Export HTML</button>
-            <button id="backup-now" class="primary">Back up now</button>
+            <button id="export" data-i18n="exportHtml"></button>
+            <button id="backup-now" class="primary" data-i18n="backupNow"></button>
           </div>
         </div>
-        <label class="row"><input id="autoBackup" type="checkbox" /> Back up automatically</label>
+        <label class="row"><input id="autoBackup" type="checkbox" /> <span data-i18n="autoBackupLabel"></span></label>
         <label class="row">
-          Every
+          <span data-i18n="backupEveryBefore"></span>
           <select id="backupIntervalHours">
-            <option value="6">6 hours</option>
-            <option value="24">day</option>
-            <option value="168">week</option>
+            <option value="6" data-i18n="backupEvery6Hours"></option>
+            <option value="24" data-i18n="backupEveryDay"></option>
+            <option value="168" data-i18n="backupEveryWeek"></option>
           </select>
-          and keep the last
+          <span data-i18n="backupKeepBefore"></span>
           <select id="backupRetention">
             <option value="10">10</option>
             <option value="30">30</option>
             <option value="90">90</option>
           </select>
-          backups
+          <span data-i18n="backupKeepAfter"></span>
         </label>
         <table id="backups">
           <thead>
-            <tr><th>Date</th><th>From</th><th>Items</th><th></th></tr>
+            <tr><th data-i18n="columnDate"></th><th data-i18n="columnFrom"></th><th data-i18n="columnItems"></th><th></th></tr>
           </thead>
           <tbody></tbody>
         </table>
-        <p id="backups-empty" class="muted small" hidden>No backups yet.</p>
-        <p class="muted small">
-          Restoring replaces the bookmarks in every connected browser. The current bookmarks are
-          backed up first, so you can undo a restore.
-        </p>
+        <p id="backups-empty" class="muted small" data-i18n="noBackups" hidden></p>
+        <p class="muted small" data-i18n="restoreHelp"></p>
       </section>
 
       <section id="import" class="card stack" aria-labelledby="import-h">
-        <h2 id="import-h">Import bookmarks</h2>
-        <p class="muted small">
-          Bring bookmarks from another browser into this one. When sync is on, they then appear in
-          all your browsers.
-        </p>
+        <h2 id="import-h" data-i18n="importHeading"></h2>
+        <p class="muted small" data-i18n="importIntro"></p>
         <fieldset class="stack">
-          <legend class="small muted">How to import</legend>
+          <legend class="small muted" data-i18n="importHow"></legend>
           <label class="row">
             <input type="radio" name="import-mode" value="merge" checked />
-            Merge into my bookmarks and skip the ones I already have
+            <span data-i18n="importModeMerge"></span>
           </label>
           <label class="row">
             <input type="radio" name="import-mode" value="folder" />
-            Put them in a new folder
+            <span data-i18n="importModeFolder"></span>
           </label>
         </fieldset>
 
-        <h3>From another browser with Marksync</h3>
+        <h3 data-i18n="importFromBrowserHeading"></h3>
         <table id="browsers">
           <thead>
-            <tr><th>Browser</th><th>Bookmarks</th><th>Updated</th><th></th></tr>
+            <tr><th data-i18n="columnBrowser"></th><th data-i18n="columnBookmarks"></th><th data-i18n="columnUpdated"></th><th></th></tr>
           </thead>
           <tbody></tbody>
         </table>
-        <p id="browsers-empty" class="muted small" hidden>
-          No other browsers yet. Install Marksync there and connect the same Google account. This
-          works even if sync is turned off in that browser.
-        </p>
-        <p id="browsers-offline" class="muted small" hidden>
-          Connect your Google account to see your other browsers.
-        </p>
+        <p id="browsers-empty" class="muted small" data-i18n="browsersEmpty" hidden></p>
+        <p id="browsers-offline" class="muted small" data-i18n="browsersOffline" hidden></p>
 
-        <h3>From an HTML file</h3>
+        <h3 data-i18n="importFileHeading"></h3>
         <p class="muted small">
-          For browsers without Marksync. Export the file there first:<br />
-          Chrome, Brave, Edge: Bookmark manager → ⋮ → Export bookmarks.<br />
-          Firefox: Bookmarks → Manage bookmarks → Import and Backup → Export Bookmarks to HTML.<br />
-          Safari: File → Export → Bookmarks.
+          <span data-i18n="importFileHelp"></span><br />
+          <span data-i18n="importFileChromium"></span><br />
+          <span data-i18n="importFileFirefox"></span><br />
+          <span data-i18n="importFileSafari"></span>
         </p>
         <div class="row">
           <input id="import-file" type="file" accept=".html,.htm,text/html" />
-          <button id="import-file-btn" class="primary" disabled>Import file</button>
+          <button id="import-file-btn" class="primary" data-i18n="importFileButton" disabled></button>
         </div>
 
         <p id="import-result" class="notice small" role="status" hidden></p>

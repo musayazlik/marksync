@@ -41,7 +41,6 @@ export default defineConfig({
     host_permissions: [
       'https://www.googleapis.com/*',
       'https://openidconnect.googleapis.com/*',
-      'https://oauth2.googleapis.com/*',
     ],
     action: {
       default_title: 'Marksync',

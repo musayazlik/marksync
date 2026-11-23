@@ -73,6 +73,8 @@ You need a Google Cloud project with the Drive API and an OAuth client of type
 - Requested Google scopes: `drive.file` (only files Marksync creates), `openid`, `email`.
 - Bookmarks go straight from your browser to Google Drive; there is no Marksync server.
 - Access tokens are kept in session storage and cleared when the browser closes.
+- *Disconnect* unlinks only the browser you click it in; your other browsers stay connected.
+  To remove Marksync's access everywhere, use https://myaccount.google.com/permissions.
 
 ## Contributing
 

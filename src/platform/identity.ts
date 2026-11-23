@@ -133,22 +133,18 @@ export async function invalidateToken(): Promise<void> {
 }
 
 /**
- * Unlinks the account in this browser: stops syncing, revokes the current
- * access token, and forgets everything tied to the account. The Google grant
- * itself stays for the user's other browsers; it can be removed at
- * https://myaccount.google.com/permissions.
+ * Unlinks the account in this browser only: stops syncing, forgets the
+ * access token and everything tied to the account.
+ *
+ * The token is deliberately not sent to Google's revoke endpoint. Revoking
+ * removes Marksync's whole grant for the account, so every other connected
+ * browser would fail its silent token refresh and have to reconnect. The
+ * forgotten token expires on its own within an hour. Users who want to
+ * remove access everywhere can do so at https://myaccount.google.com/permissions.
  */
 export async function disconnect(): Promise<void> {
   authGeneration++;
   await patchStatus({ connected: false, email: undefined, error: undefined });
-  const cached = await tokenItem.getValue();
   await tokenItem.removeValue();
-  if (cached && cached.expiresAt > Date.now()) {
-    await fetch('https://oauth2.googleapis.com/revoke', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({ token: cached.accessToken }),
-    }).catch(() => undefined);
-  }
   await resetAccountState();
 }

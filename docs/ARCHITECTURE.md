@@ -130,6 +130,10 @@ browser. The access token lasts one hour and is kept in session storage.
 When it expires, the flow runs again without a window (`prompt=none`). If the
 user signed out of Google in that browser, the popup asks them to reconnect.
 
+*Disconnect* forgets the token and the account state in that browser only.
+It does not call Google's revoke endpoint: revoking removes the grant for the
+whole account, which would sign out every other connected browser too.
+
 ## Backups and restore
 
 A backup is the full local tree with UUIDs. Restoring is treated as a local

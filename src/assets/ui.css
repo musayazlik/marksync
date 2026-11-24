@@ -468,6 +468,67 @@ td:last-child {
   white-space: nowrap;
 }
 
+/* ---------- segmented control ---------- */
+
+/* A segmented control whose thumb slides to the chosen filter. */
+.segmented {
+  position: relative;
+  display: inline-flex;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--sunken);
+  border: 1px solid var(--line);
+}
+
+.segmented button {
+  position: relative;
+  z-index: 1;
+  border: 0;
+  background: transparent;
+  color: var(--ink-2);
+  padding: 7px 12px;
+  gap: 6px;
+}
+
+.segmented button:hover:not(:disabled) {
+  color: var(--ink);
+}
+
+.segmented button[aria-checked='true'] {
+  color: var(--ink);
+}
+
+.segmented b {
+  font-weight: 600;
+  font-size: 11.5px;
+  min-width: 18px;
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: var(--line);
+  color: var(--ink-2);
+  transition: background-color 200ms ease;
+}
+
+.segmented button[aria-checked='true'] b {
+  background: var(--iris-soft);
+  color: var(--iris);
+}
+
+.segmented-thumb {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 0;
+  width: var(--w, 0);
+  translate: var(--x, 0) 0;
+  border-radius: 999px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  transition:
+    translate 380ms var(--ease-spring),
+    width 380ms var(--ease-spring);
+}
+
 /* ---------- status emblem ---------- */
 
 /*

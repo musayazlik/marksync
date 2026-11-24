@@ -22,6 +22,7 @@ oradadır. Üçüncü taraf bir sunucu yoktur; her şey Google Drive'ınızdaki
 - Standart HTML yer imi dosyasına dışa aktarma
 - Türkçe ve İngilizce arayüz; eşitleme müdahale gerektirdiğinde araç çubuğu simgesinde uyarı rozeti
 - Yinelenen yer imi bulucu: birden fazla kez kaydedilmiş sayfalar (fark yalnızca http/https, sondaki eğik çizgi ya da `utm_` parametreleri olsa bile); her birinden bir kopya tutulur, önce yedek alınır
+- Bağlantı denetimi: sayfası kaybolmuş ya da taşınmış yer imlerini bulur; taşınanı yeni adresiyle güncelleyin, kaybolanı [Wayback Machine](https://web.archive.org)'deki kayıtlı kopyasına yönlendirin
 - Kendi [OpenRouter](https://openrouter.ai) anahtarınızla isteğe bağlı yapay zekâ düzenlemesi: bir gelen kutusu klasörü seçin, model (varsayılan Claude Opus) oraya eklediğiniz her yer imini araştırır, en uygun klasöre taşır ve sitenin ne olduğunu, ne için kullanıldığını açıklar; her karar Geri al seçeneğiyle bir kayıt sayfasında listelenir
 
 ## Desteklenen tarayıcılar
@@ -46,6 +47,9 @@ oradadır. Üçüncü taraf bir sunucu yoktur; her şey Google Drive'ınızdaki
   `openrouter.ai` için izin istenir), o tarayıcı gelen kutusuna eklediğiniz her yer iminin başlığını ve
   adresini (sorgu kısmı olmadan) ve klasör adlarınızı OpenRouter'a ve seçtiğiniz modele gönderir.
   OpenRouter anahtarınız o tarayıcının yerel deposunda kalır, Drive'a hiçbir zaman yüklenmez.
+- Bağlantı denetimi yalnızca siz başlattığınızda çalışır (bu sırada tüm siteleri açma izni istenir).
+  Her yer iminin adresini çerezleriniz olmadan ister, kendi bilgisayarınızdaki veya yerel ağınızdaki
+  adresleri hiç açmaz ve kaybolan her sayfanın adresini `archive.org`'da arar.
 
 ## Geliştirme
 

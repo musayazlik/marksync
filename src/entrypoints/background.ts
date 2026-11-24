@@ -18,6 +18,7 @@ import {
 } from '../services/import-service';
 import { updateBadge } from '../services/badge';
 import { removeDuplicates, scanDuplicates } from '../services/dedupe-service';
+import { fixAllLinks, fixLink, markInterruptedScan, startLinkScan, stopLinkScan } from '../services/links-service';
 import {
   clearSortLog,
   listFolderChoices,
@@ -46,6 +47,9 @@ export default defineBackground(() => {
   let browserImporting = false;
 
   let lastFocusCheck = 0;
+
+  // A link check that was running when the worker stopped can be continued from the links page.
+  void markInterruptedScan().catch(() => undefined);
 
   /**
    * Syncs (if sync is on) and shares this browser's tree with the others
@@ -212,6 +216,14 @@ export default defineBackground(() => {
         return scanDuplicates();
       case 'dupRemove':
         return removeDuplicates(req.expected);
+      case 'linkScan':
+        return startLinkScan({ resume: req.resume });
+      case 'linkStop':
+        return stopLinkScan();
+      case 'linkFix':
+        return fixLink(req.id, req.action);
+      case 'linkFixAll':
+        return fixAllLinks(req.kind);
     }
   }
 
@@ -221,7 +233,7 @@ export default defineBackground(() => {
     'connect', 'disconnect', 'syncNow', 'checkNow', 'resyncFromDrive', 'keepLocal', 'backupNow', 'listBackups',
     'restoreBackup', 'deleteBackup', 'listBrowsers', 'removeBrowser', 'importFromBrowser', 'importHtml',
     'exportHtml', 'getRedirectUrl', 'settingsChanged', 'aiListFolders', 'aiTestKey', 'aiSortNow', 'aiUndo',
-    'aiClearLog', 'dupScan', 'dupRemove',
+    'aiClearLog', 'dupScan', 'dupRemove', 'linkScan', 'linkStop', 'linkFix', 'linkFixAll',
   ]);
 
   browser.runtime.onMessage.addListener((req: Request, sender, sendResponse) => {

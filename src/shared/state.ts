@@ -1,5 +1,6 @@
 import { storage } from '#imports';
 import type { SiteInfo } from '../core/ai-sort';
+import type { LinkReason, Snapshot } from '../core/links';
 import type { LocalState } from '../sync/engine';
 
 export interface Settings {
@@ -140,6 +141,42 @@ export interface SortLogEntry {
 /** Newest first; written only by the background script. */
 export const sortLogItem = storage.defineItem<SortLogEntry[]>('local:sortLog', { fallback: [] });
 export const SORT_LOG_MAX = 500;
+
+/** A bookmark the link checker flagged (pages that answer normally are not kept). */
+export interface LinkResult {
+  id: string;
+  title: string;
+  /** The address that was checked. */
+  url: string;
+  folderPath: string;
+  status: 'dead' | 'redirected' | 'unknown';
+  reason?: LinkReason;
+  httpStatus?: number;
+  /** For redirected pages: where the page is now. */
+  finalUrl?: string;
+  /** For dead pages: the Wayback Machine copy; null when none was found. */
+  archive?: Snapshot | null;
+  /** What the user did about it. */
+  done?: 'updated' | 'archived' | 'removed' | 'kept';
+}
+
+/** The latest link check in this browser; written only by the background script. */
+export interface LinkScan {
+  running: boolean;
+  /** The last check stopped before finishing (browser closed, worker stopped, or Stop). */
+  interrupted?: boolean;
+  startedAt?: number;
+  finishedAt?: number;
+  total: number;
+  checked: number;
+  results: LinkResult[];
+  /** Bookmarks already checked in this run, so an interrupted run can continue. */
+  checkedIds: string[];
+}
+
+export const linkScanItem = storage.defineItem<LinkScan>('local:linkScan', {
+  fallback: { running: false, total: 0, checked: 0, results: [], checkedIds: [] },
+});
 
 /** Drive file and content hash of this browser's last uploaded snapshot. */
 export const snapshotMetaItem = storage.defineItem<{ fileId?: string; hash?: string }>('local:snapshotMeta', {

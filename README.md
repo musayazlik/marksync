@@ -25,6 +25,7 @@ other file there.
 - Export to a standard HTML bookmarks file
 - Interface in English and Turkish; a badge on the toolbar icon when sync needs you
 - Duplicate finder: pages bookmarked more than once (even with http/https, a trailing slash or `utm_` parameters as the only difference); keep one copy, with a backup taken first
+- Link checker: finds bookmarks whose pages are gone or have moved; update a moved bookmark to its new address, or point a dead one to its saved copy in the [Wayback Machine](https://web.archive.org)
 - Optional AI sorting with your own [OpenRouter](https://openrouter.ai) key: pick an inbox folder, and the model (Claude Opus by default) researches each bookmark you add to it, moves it to the folder that fits best and explains what the site is and what it is used for; every decision is listed on a log page with Undo
 
 ## Supported browsers
@@ -89,6 +90,9 @@ You need a Google Cloud project with the Drive API and an OAuth client of type
   to contact `openrouter.ai`), that browser sends the title and address (without the query string)
   of each bookmark you add to the inbox, plus your folder names, to OpenRouter and the model you
   chose. Your OpenRouter key is kept in that browser's local storage and never uploaded to Drive.
+- The link checker runs only when you start it (which asks for permission to open every site).
+  It requests each bookmark's address without your cookies, never opens addresses on your own
+  computer or local network, and looks up the address of each page that is gone at `archive.org`.
 
 ## Contributing
 

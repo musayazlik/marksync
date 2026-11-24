@@ -692,6 +692,189 @@
     "message": "No duplicates: every page is bookmarked once."
   },
   "backupReasonBeforeCleanup": {
-    "message": "before removing duplicates"
+    "message": "before a clean-up"
+  },
+  "linkTitle": {
+    "message": "Link checker"
+  },
+  "linkIntro": {
+    "message": "Finds bookmarks whose pages are gone or have moved, and offers the Wayback Machine's saved copy of pages that no longer exist."
+  },
+  "linkSettingLabel": {
+    "message": "Broken links"
+  },
+  "linkSettingHelp": {
+    "message": "Check every bookmark and fix the ones that no longer open."
+  },
+  "linkOpen": {
+    "message": "Check links"
+  },
+  "linkStartText": {
+    "message": "Marksync opens the address of every bookmark in the background, a few at a time, and lists the ones that are gone, have moved or gave no clear answer. Nothing changes until you choose a fix."
+  },
+  "linkHintSignIn": {
+    "message": "Pages are opened without your cookies, so a page that needs you to be signed in can look missing. Open it before removing it."
+  },
+  "linkHintPrivacy": {
+    "message": "This needs access to every site, asked for when you start. Addresses on your own computer or local network are never opened. For pages that are gone, the address is looked up at archive.org."
+  },
+  "linkStart": {
+    "message": "Check my bookmarks"
+  },
+  "linkStop": {
+    "message": "Stop"
+  },
+  "linkContinue": {
+    "message": "Continue"
+  },
+  "linkStartOver": {
+    "message": "Start over"
+  },
+  "linkCheckAgain": {
+    "message": "Check again"
+  },
+  "linkProgress": {
+    "message": "Checked {1} of {2} bookmarks…"
+  },
+  "linkInterrupted": {
+    "message": "The last check stopped after {1} of {2} bookmarks."
+  },
+  "linkFinished": {
+    "message": "Checked {1} bookmarks on {2}."
+  },
+  "linkFilterDead": {
+    "message": "Gone"
+  },
+  "linkFilterMoved": {
+    "message": "Moved"
+  },
+  "linkFilterUnknown": {
+    "message": "Unclear"
+  },
+  "linkHelpDead": {
+    "message": "These pages no longer exist or their site cannot be reached. Use the archived copy, or remove the bookmark."
+  },
+  "linkHelpMoved": {
+    "message": "These pages open from another address now. Update the bookmark to the new address."
+  },
+  "linkHelpUnknown": {
+    "message": "These gave no clear answer: they may need you to be signed in, or the site was busy. Check them again later."
+  },
+  "linkReasonNotFound": {
+    "message": "Not found (404)"
+  },
+  "linkReasonGone": {
+    "message": "Removed by the site (410)"
+  },
+  "linkReasonUnreachable": {
+    "message": "Site cannot be reached"
+  },
+  "linkReasonMoved": {
+    "message": "Moved"
+  },
+  "linkReasonSignIn": {
+    "message": "Needs sign-in or blocked"
+  },
+  "linkReasonRateLimited": {
+    "message": "Too many requests"
+  },
+  "linkReasonServerError": {
+    "message": "Server error ({1})"
+  },
+  "linkReasonTimeout": {
+    "message": "No answer in time"
+  },
+  "linkReasonOther": {
+    "message": "Unexpected answer ({1})"
+  },
+  "linkArchiveFrom": {
+    "message": "Archived copy from {1}"
+  },
+  "linkArchiveOpen": {
+    "message": "Archived copy"
+  },
+  "linkNoArchive": {
+    "message": "No archived copy"
+  },
+  "linkArchiveLooking": {
+    "message": "Looking for an archived copy…"
+  },
+  "linkUseNew": {
+    "message": "Use new address"
+  },
+  "linkUseArchive": {
+    "message": "Use archived copy"
+  },
+  "linkRemove": {
+    "message": "Remove"
+  },
+  "linkRecheck": {
+    "message": "Check again"
+  },
+  "linkKeep": {
+    "message": "Keep as is"
+  },
+  "linkDoneUpdated": {
+    "message": "Updated"
+  },
+  "linkDoneArchived": {
+    "message": "Points to the archive"
+  },
+  "linkDoneRemoved": {
+    "message": "Removed"
+  },
+  "linkDoneKept": {
+    "message": "Kept"
+  },
+  "linkAllGood_one": {
+    "message": "The bookmark works."
+  },
+  "linkAllGood_other": {
+    "message": "All {1} bookmarks work."
+  },
+  "linkNothingHere": {
+    "message": "Nothing here."
+  },
+  "linkRemoveAll_one": {
+    "message": "Remove 1 bookmark"
+  },
+  "linkRemoveAll_other": {
+    "message": "Remove all {1}"
+  },
+  "linkUpdateAll_one": {
+    "message": "Update 1 bookmark"
+  },
+  "linkUpdateAll_other": {
+    "message": "Update all {1}"
+  },
+  "linkConfirmRemoveAll": {
+    "message": "Remove {1} bookmarks whose pages are gone? They are removed in every browser. A backup is saved to Google Drive first when Marksync is connected."
+  },
+  "linkConfirmUpdateAll": {
+    "message": "Point {1} bookmarks to the new addresses their pages moved to?"
+  },
+  "linkRemovedN_one": {
+    "message": "Removed 1 bookmark."
+  },
+  "linkRemovedN_other": {
+    "message": "Removed {1} bookmarks."
+  },
+  "linkUpdatedN_one": {
+    "message": "Updated 1 bookmark."
+  },
+  "linkUpdatedN_other": {
+    "message": "Updated {1} bookmarks."
+  },
+  "linkPermissionDenied": {
+    "message": "Checking links needs access to every site."
+  },
+  "linkPermissionMissing": {
+    "message": "Marksync is not allowed to open other sites. Start the check from the link checker page to allow it."
+  },
+  "linkGone": {
+    "message": "This bookmark no longer exists."
+  },
+  "linkChanged": {
+    "message": "This bookmark was changed after the check, so it was left as is. Check again to see its new state."
   }
 }

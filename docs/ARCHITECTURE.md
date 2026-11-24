@@ -16,6 +16,7 @@ src/
     netscape.ts  HTML export that every browser can import
     ai-sort.ts   AI sorting: folder list, prompt, checking the model's reply
     dedupe.ts    Duplicate finder: URL normalization and grouping
+    links.ts     Link checker: which addresses to check, verdicts, Wayback answers
   sync/        Talks to the bookmarks API through an interface
     local-tree.ts  Read the local tree (Chromium/Firefox roots) and apply a state to it
     engine.ts      One sync run: load → diff → merge → apply → upload
@@ -26,7 +27,7 @@ src/
     drive.ts       Google Drive v3 REST client
     openrouter.ts  OpenRouter chat completions client (AI sorting)
   services/    Wires the engine to Drive and extension storage
-  entrypoints/ background (events, alarms, messages), popup, options, sorter-log, duplicates
+  entrypoints/ background (events, alarms, messages), popup, options, sorter-log, duplicates, links
 tests/         In-memory Chromium and Firefox fakes, end-to-end sync tests
 ```
 
@@ -180,6 +181,34 @@ takes a backup first when connected to Drive (reason `before-cleanup`), then
 removes each chosen copy only if it still normalizes to the address it was
 listed under. Removals are ordinary local changes and sync everywhere; the
 mass-delete guard still applies.
+
+## Link checker
+
+`links.html` checks every bookmark's address and lists the ones that are
+gone, have moved or gave no clear answer. Starting it asks for the optional
+host permission `*://*/*` (and, in Firefox 140+, consent for `bookmarksInfo`).
+
+The scan runs in the background (`services/links-service.ts`), so it goes on
+while the page is closed; progress and results live in `storage.local`
+(`linkScan`). Four requests run at once, never two to the same host, each
+with a 12 s timeout and without cookies. A `HEAD` request comes first and a
+`GET` follows when the answer is one that `HEAD` often gets wrong; a page that
+looks dead is checked once more after 2 s before it is listed. Addresses that
+are not http(s), or that point to this computer or a private network, are
+never requested (`core/links.ts` `isCheckable`).
+
+Verdicts (`classify`): 404 and 410 and unreachable sites are **gone**; a
+redirect to a different page (not just https, `www.`, a trailing slash or
+tracking parameters) is **moved**; sign-in walls (401, 403), rate limits,
+server errors and timeouts are **unclear** and never offered for bulk removal.
+For each gone page the Wayback Machine availability API is asked for the
+closest working snapshot (`parseWayback` accepts only `web.archive.org`).
+
+A scan interrupted by the browser closing can be continued: the checked IDs
+are kept. Each fix re-reads the bookmark and does nothing if its address
+changed since the scan. *Remove all* takes a backup first when connected
+(reason `before-cleanup`). Fixes are ordinary local changes and sync
+everywhere.
 
 ## AI sorting (optional)
 

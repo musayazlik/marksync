@@ -3,6 +3,7 @@ import { t } from './i18n';
 import type { BackupInfo } from '../services/backup-service';
 import type { DuplicateGroup } from '../core/dedupe';
 import type { RemoveDuplicatesResult } from '../services/dedupe-service';
+import type { BulkLinkResult, LinkAction } from '../services/links-service';
 import type { BrowserInfo } from '../services/import-service';
 import type { SortNowResult } from '../services/sorter-service';
 import type { ImportMode, ImportResult } from '../sync/importer';
@@ -32,7 +33,11 @@ export type Request =
   | { type: 'aiUndo'; id: string }
   | { type: 'aiClearLog' }
   | { type: 'dupScan' }
-  | { type: 'dupRemove'; expected: Record<string, string> };
+  | { type: 'dupRemove'; expected: Record<string, string> }
+  | { type: 'linkScan'; resume?: boolean }
+  | { type: 'linkStop' }
+  | { type: 'linkFix'; id: string; action: LinkAction }
+  | { type: 'linkFixAll'; kind: 'remove-dead' | 'update-redirects' };
 
 export interface ResponseData {
   connect: string;
@@ -59,6 +64,10 @@ export interface ResponseData {
   aiClearLog: void;
   dupScan: DuplicateGroup[];
   dupRemove: RemoveDuplicatesResult;
+  linkScan: void;
+  linkStop: void;
+  linkFix: void;
+  linkFixAll: BulkLinkResult;
 }
 
 export type Envelope<T> = { ok: true; data: T } | { ok: false; error: string };

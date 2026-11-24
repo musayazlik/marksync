@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title data-i18n="linkTitle">Marksync</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="/icon/32.png" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <!-- Text comes from src/public/_locales (see src/shared/i18n.ts). -->
+    <header class="top">
+      <div class="top-inner">
+        <svg id="emblem" class="emblem" data-state="ok" viewBox="0 0 100 100" width="40" height="40" aria-hidden="true">
+          <rect class="bg" width="100" height="100" rx="26" />
+          <g class="arrows">
+            <path d="M21.8 60.3A30 30 0 0 1 74.6 32.8" />
+            <path d="M74.6 23.8L74.6 32.8L66.1 29.7" />
+            <path d="M78.2 39.7A30 30 0 0 1 25.4 67.2" />
+            <path d="M25.4 76.2L25.4 67.2L33.9 70.3" />
+          </g>
+          <path class="ribbon" d="M40 31H60V69L50 61.5L40 69Z" />
+        </svg>
+        <div class="top-text">
+          <h1 data-i18n="linkTitle"></h1>
+          <p class="muted small" data-i18n="linkIntro"></p>
+        </div>
+        <a class="button" href="./options.html" data-i18n="aiLogBack"></a>
+      </div>
+    </header>
+
+    <main>
+      <section id="start" class="panel stack" hidden>
+        <p data-i18n="linkStartText"></p>
+        <ul class="hints muted small">
+          <li data-i18n="linkHintSignIn"></li>
+          <li data-i18n="linkHintPrivacy"></li>
+        </ul>
+        <div class="row">
+          <button id="start-btn" class="primary" data-i18n="linkStart"></button>
+        </div>
+      </section>
+
+      <section id="progress" class="panel stack" hidden>
+        <div class="row spread">
+          <p id="progress-text"></p>
+          <button id="stop" class="quiet" data-i18n="linkStop"></button>
+        </div>
+        <div class="bar" role="progressbar" aria-valuemin="0" id="bar"><span></span></div>
+      </section>
+
+      <section id="interrupted" class="notice warn stack" hidden>
+        <p id="interrupted-text"></p>
+        <div class="row wrap">
+          <button id="resume" class="primary" data-i18n="linkContinue"></button>
+          <button id="restart" data-i18n="linkStartOver"></button>
+        </div>
+      </section>
+
+      <section id="finished" class="row spread wrap" hidden>
+        <p id="finished-text" class="muted"></p>
+        <button id="again" data-i18n="linkCheckAgain"></button>
+      </section>
+
+      <div id="results-area" class="stack" hidden>
+        <div class="toolbar">
+          <div class="segmented" role="radiogroup" id="filter" data-i18n-aria-label="aiLogShow">
+            <span class="segmented-thumb" aria-hidden="true"></span>
+            <button role="radio" data-filter="dead"><span data-i18n="linkFilterDead"></span><b data-count="dead"></b></button>
+            <button role="radio" data-filter="redirected"><span data-i18n="linkFilterMoved"></span><b data-count="redirected"></b></button>
+            <button role="radio" data-filter="unknown"><span data-i18n="linkFilterUnknown"></span><b data-count="unknown"></b></button>
+          </div>
+          <button id="bulk" class="primary" hidden></button>
+        </div>
+        <p id="bulk-result" class="notice ok small" role="status" hidden></p>
+        <p id="filter-help" class="muted small"></p>
+        <ul id="list" class="links"></ul>
+        <div id="empty" class="empty" hidden>
+          <svg viewBox="0 0 24 32" width="28" height="36" aria-hidden="true"><path d="M2 2h20v28l-10-7-10 7z" /></svg>
+          <p id="empty-text"></p>
+        </div>
+      </div>
+    </main>
+
+    <p id="action-error" class="notice error small toast" role="alert" hidden></p>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

@@ -687,6 +687,189 @@
     "message": "Yinelenen yok: her sayfa bir kez kayıtlı."
   },
   "backupReasonBeforeCleanup": {
-    "message": "yinelenenler kaldırılmadan önce"
+    "message": "temizlikten önce"
+  },
+  "linkTitle": {
+    "message": "Bağlantı denetimi"
+  },
+  "linkIntro": {
+    "message": "Sayfası kaybolmuş ya da taşınmış yer imlerini bulur; artık olmayan sayfalar için Wayback Machine'deki kayıtlı kopyayı önerir."
+  },
+  "linkSettingLabel": {
+    "message": "Bozuk bağlantılar"
+  },
+  "linkSettingHelp": {
+    "message": "Tüm yer imlerini denetleyin, artık açılmayanları düzeltin."
+  },
+  "linkOpen": {
+    "message": "Bağlantıları denetle"
+  },
+  "linkStartText": {
+    "message": "Marksync her yer iminin adresini arka planda, birkaçını aynı anda açar; kaybolmuş, taşınmış ya da net yanıt vermemiş olanları listeler. Siz bir düzeltme seçene kadar hiçbir şey değişmez."
+  },
+  "linkHintSignIn": {
+    "message": "Sayfalar çerezleriniz olmadan açılır; oturum açmanızı gerektiren bir sayfa yok gibi görünebilir. Kaldırmadan önce açıp bakın."
+  },
+  "linkHintPrivacy": {
+    "message": "Bunun için tüm sitelere erişim gerekir; başlattığınızda istenir. Kendi bilgisayarınızdaki veya yerel ağınızdaki adresler hiç açılmaz. Kaybolan sayfaların adresi archive.org'da aranır."
+  },
+  "linkStart": {
+    "message": "Yer imlerimi denetle"
+  },
+  "linkStop": {
+    "message": "Durdur"
+  },
+  "linkContinue": {
+    "message": "Devam et"
+  },
+  "linkStartOver": {
+    "message": "Baştan başla"
+  },
+  "linkCheckAgain": {
+    "message": "Yeniden denetle"
+  },
+  "linkProgress": {
+    "message": "{2} yer iminden {1} tanesi denetlendi…"
+  },
+  "linkInterrupted": {
+    "message": "Son denetim {2} yer iminden {1} tanesinden sonra durdu."
+  },
+  "linkFinished": {
+    "message": "{1} yer imi {2} tarihinde denetlendi."
+  },
+  "linkFilterDead": {
+    "message": "Kaybolanlar"
+  },
+  "linkFilterMoved": {
+    "message": "Taşınanlar"
+  },
+  "linkFilterUnknown": {
+    "message": "Belirsizler"
+  },
+  "linkHelpDead": {
+    "message": "Bu sayfalar artık yok ya da sitelerine ulaşılamıyor. Arşivdeki kopyayı kullanın ya da yer imini kaldırın."
+  },
+  "linkHelpMoved": {
+    "message": "Bu sayfalar artık başka bir adresten açılıyor. Yer imini yeni adresle güncelleyin."
+  },
+  "linkHelpUnknown": {
+    "message": "Bunlar net bir yanıt vermedi: oturum açmanız gerekebilir ya da site yoğundu. Daha sonra yeniden denetleyin."
+  },
+  "linkReasonNotFound": {
+    "message": "Bulunamadı (404)"
+  },
+  "linkReasonGone": {
+    "message": "Site kaldırmış (410)"
+  },
+  "linkReasonUnreachable": {
+    "message": "Siteye ulaşılamıyor"
+  },
+  "linkReasonMoved": {
+    "message": "Taşınmış"
+  },
+  "linkReasonSignIn": {
+    "message": "Oturum gerekiyor ya da engellendi"
+  },
+  "linkReasonRateLimited": {
+    "message": "Çok fazla istek"
+  },
+  "linkReasonServerError": {
+    "message": "Sunucu hatası ({1})"
+  },
+  "linkReasonTimeout": {
+    "message": "Zamanında yanıt yok"
+  },
+  "linkReasonOther": {
+    "message": "Beklenmeyen yanıt ({1})"
+  },
+  "linkArchiveFrom": {
+    "message": "{1} tarihli arşiv kopyası"
+  },
+  "linkArchiveOpen": {
+    "message": "Arşiv kopyası"
+  },
+  "linkNoArchive": {
+    "message": "Arşiv kopyası yok"
+  },
+  "linkArchiveLooking": {
+    "message": "Arşiv kopyası aranıyor…"
+  },
+  "linkUseNew": {
+    "message": "Yeni adresi kullan"
+  },
+  "linkUseArchive": {
+    "message": "Arşiv kopyasını kullan"
+  },
+  "linkRemove": {
+    "message": "Kaldır"
+  },
+  "linkRecheck": {
+    "message": "Yeniden denetle"
+  },
+  "linkKeep": {
+    "message": "Olduğu gibi bırak"
+  },
+  "linkDoneUpdated": {
+    "message": "Güncellendi"
+  },
+  "linkDoneArchived": {
+    "message": "Arşive yönlendirildi"
+  },
+  "linkDoneRemoved": {
+    "message": "Kaldırıldı"
+  },
+  "linkDoneKept": {
+    "message": "Bırakıldı"
+  },
+  "linkAllGood_one": {
+    "message": "Yer imi çalışıyor."
+  },
+  "linkAllGood_other": {
+    "message": "{1} yer iminin hepsi çalışıyor."
+  },
+  "linkNothingHere": {
+    "message": "Burada bir şey yok."
+  },
+  "linkRemoveAll_one": {
+    "message": "1 yer imini kaldır"
+  },
+  "linkRemoveAll_other": {
+    "message": "{1} yer iminin hepsini kaldır"
+  },
+  "linkUpdateAll_one": {
+    "message": "1 yer imini güncelle"
+  },
+  "linkUpdateAll_other": {
+    "message": "{1} yer iminin hepsini güncelle"
+  },
+  "linkConfirmRemoveAll": {
+    "message": "Sayfası kaybolmuş {1} yer imi kaldırılsın mı? Tüm tarayıcılardan kaldırılırlar. Marksync bağlıysa önce Google Drive'a yedek kaydedilir."
+  },
+  "linkConfirmUpdateAll": {
+    "message": "{1} yer imi, sayfalarının taşındığı yeni adreslerle güncellensin mi?"
+  },
+  "linkRemovedN_one": {
+    "message": "1 yer imi kaldırıldı."
+  },
+  "linkRemovedN_other": {
+    "message": "{1} yer imi kaldırıldı."
+  },
+  "linkUpdatedN_one": {
+    "message": "1 yer imi güncellendi."
+  },
+  "linkUpdatedN_other": {
+    "message": "{1} yer imi güncellendi."
+  },
+  "linkPermissionDenied": {
+    "message": "Bağlantıları denetlemek için tüm sitelere erişim gerekiyor."
+  },
+  "linkPermissionMissing": {
+    "message": "Marksync'in diğer siteleri açma izni yok. İzin vermek için denetimi bağlantı denetimi sayfasından başlatın."
+  },
+  "linkGone": {
+    "message": "Bu yer imi artık yok."
+  },
+  "linkChanged": {
+    "message": "Bu yer imi denetimden sonra değiştirilmiş, bu yüzden olduğu gibi bırakıldı. Yeni durumunu görmek için yeniden denetleyin."
   }
 }

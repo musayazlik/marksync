@@ -17,18 +17,26 @@ import { isSyncable } from './local-tree';
  */
 export interface SorterDeps {
   bookmarks: BookmarksApi;
-  /** Sends the prompt to the model and returns its reply text. */
-  complete(messages: ChatMessage[]): Promise<string>;
+  /** Sends the prompt to the model and returns its reply (text, or text with sources and cost). */
+  complete(messages: ChatMessage[], opts: { research: boolean }): Promise<string | ModelReply>;
   /** Folders never offered (Opera's Trash and Speed Dial). */
   exclude?: string[];
   /** UI language, for the model's short reason. */
   language: string;
 }
 
+export interface ModelReply {
+  text: string;
+  sources?: { url: string; title?: string }[];
+  cost?: number;
+}
+
 export interface SortRun {
   inboxId: string;
   allowNewFolders: boolean;
   model: string;
+  /** Let the model read the page and search the web. */
+  research?: boolean;
 }
 
 /** A log entry without its id and time. */
@@ -58,20 +66,29 @@ export async function sortOne(deps: SorterDeps, run: SortRun, bookmarkId: string
     fromId: run.inboxId,
     fromPath: folderPath(tree, run.inboxId),
     model: run.model,
+    ...(run.research ? { researched: true } : {}),
   };
 
   const folders = listFolderOptions(tree, { exclude: deps.exclude, skip: [run.inboxId] });
   let reply: string;
   try {
-    reply = await deps.complete(
+    const answer = await deps.complete(
       buildSortPrompt({
         title: node.title,
         url: node.url,
         folders,
         allowNewFolders: run.allowNewFolders,
         language: deps.language,
+        research: !!run.research,
       }),
+      { research: !!run.research },
     );
+    if (typeof answer === 'string') reply = answer;
+    else {
+      reply = answer.text;
+      if (answer.sources?.length) base.sources = answer.sources.slice(0, 8);
+      if (answer.cost !== undefined) base.cost = answer.cost;
+    }
   } catch (err) {
     const code = (err as { code?: unknown }).code;
     return { ...base, status: 'error', error: messageOf(err), errorCode: typeof code === 'string' ? code : 'unknown' };
@@ -83,7 +100,11 @@ export async function sortOne(deps: SorterDeps, run: SortRun, bookmarkId: string
   } catch (err) {
     return { ...base, status: 'error', error: messageOf(err), errorCode: err instanceof InvalidReplyError ? 'reply' : 'unknown' };
   }
-  const meta = { reason: decision.reason || undefined, confidence: decision.confidence };
+  const meta = {
+    reason: decision.reason || undefined,
+    confidence: decision.confidence,
+    ...(decision.site ? { site: decision.site } : {}),
+  };
   if (decision.action === 'keep') return { ...base, ...meta, status: 'kept' };
 
   // The model took a few seconds: look again before touching anything.

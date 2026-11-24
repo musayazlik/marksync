@@ -71,13 +71,20 @@ interface Ready {
   apiKey: string;
   model: string;
   allowNewFolders: boolean;
+  research: boolean;
 }
 
 /** The settings needed to sort, or null when AI sorting is off or incomplete. */
 async function readiness(): Promise<Ready | null> {
   const [s, apiKey] = await Promise.all([getSettings(), openRouterKeyItem.getValue()]);
   if (!s.aiSortEnabled || !s.aiInboxFolderId || !apiKey) return null;
-  return { inboxId: s.aiInboxFolderId, apiKey, model: s.aiModel, allowNewFolders: s.aiAllowNewFolders };
+  return {
+    inboxId: s.aiInboxFolderId,
+    apiKey,
+    model: s.aiModel,
+    allowNewFolders: s.aiAllowNewFolders,
+    research: s.aiResearch,
+  };
 }
 
 async function waitWhileSyncApplies() {
@@ -93,9 +100,15 @@ async function sortBookmark(id: string, ready: Ready): Promise<SortOutcome | nul
       bookmarks,
       exclude: special.exclude,
       language: browser.i18n.getUILanguage(),
-      complete: (messages) => chatCompletion({ apiKey: ready.apiKey, model: ready.model, messages }),
+      complete: (messages, { research }) =>
+        chatCompletion({ apiKey: ready.apiKey, model: ready.model, messages, research }),
     },
-    { inboxId: ready.inboxId, allowNewFolders: ready.allowNewFolders, model: ready.model },
+    {
+      inboxId: ready.inboxId,
+      allowNewFolders: ready.allowNewFolders,
+      model: ready.model,
+      research: ready.research,
+    },
     id,
   );
   if (outcome) await addLog(outcome);

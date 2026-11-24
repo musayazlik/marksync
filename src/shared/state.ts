@@ -1,4 +1,5 @@
 import { storage } from '#imports';
+import type { SiteInfo } from '../core/ai-sort';
 import type { LocalState } from '../sync/engine';
 
 export interface Settings {
@@ -19,10 +20,19 @@ export interface Settings {
   aiModel: string;
   /** Let the model create a new folder when none of the existing ones fits. */
   aiAllowNewFolders: boolean;
+  /** Let the model read the page and search the web before deciding (slower, small extra cost). */
+  aiResearch: boolean;
 }
 
-/** Cheap and fast; any OpenRouter model ID can be entered in Settings. */
-export const DEFAULT_AI_MODEL = 'google/gemini-3.5-flash-lite';
+/** Strong at research and judgement; any OpenRouter model ID can be entered in Settings. */
+export const DEFAULT_AI_MODEL = 'anthropic/claude-opus-5.5';
+/** Offered in Settings next to the free-text model field. */
+export const SUGGESTED_AI_MODELS = [
+  'anthropic/claude-opus-5.5',
+  'anthropic/claude-sonnet-5.5',
+  'google/gemini-3.8-flash',
+  'google/gemini-3.5-flash-lite',
+] as const;
 
 export const DEFAULT_SETTINGS: Settings = {
   syncEnabled: true,
@@ -35,6 +45,7 @@ export const DEFAULT_SETTINGS: Settings = {
   aiInboxFolderId: '',
   aiModel: DEFAULT_AI_MODEL,
   aiAllowNewFolders: false,
+  aiResearch: true,
 };
 
 export type ErrorCode = 'auth' | 'mass-delete' | 'config' | 'network' | 'unknown';
@@ -115,7 +126,16 @@ export interface SortLogEntry {
   errorCode?: string;
   /** Set when the user moved the bookmark back with Undo. */
   undoneAt?: number;
+  /** What the model found out about the site. */
+  site?: SiteInfo;
+  /** Web pages the model used (http/https only). */
+  sources?: { url: string; title?: string }[];
+  /** OpenRouter's reported cost of the request, in USD. */
+  cost?: number;
+  /** True when the model was allowed to read the page and search the web. */
+  researched?: boolean;
 }
+
 
 /** Newest first; written only by the background script. */
 export const sortLogItem = storage.defineItem<SortLogEntry[]>('local:sortLog', { fallback: [] });
@@ -148,6 +168,7 @@ export async function getSettings(): Promise<Settings> {
       typeof s.aiInboxFolderId === 'string' && s.aiInboxFolderId.length <= 100 ? s.aiInboxFolderId : d.aiInboxFolderId,
     aiModel: typeof s.aiModel === 'string' && s.aiModel.length <= 100 && MODEL_ID.test(s.aiModel.trim()) ? s.aiModel.trim() : d.aiModel,
     aiAllowNewFolders: typeof s.aiAllowNewFolders === 'boolean' ? s.aiAllowNewFolders : d.aiAllowNewFolders,
+    aiResearch: typeof s.aiResearch === 'boolean' ? s.aiResearch : d.aiResearch,
   };
 }
 

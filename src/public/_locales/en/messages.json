@@ -392,7 +392,7 @@
     "message": "Choose an inbox folder. When you add a bookmark to it in this browser, an AI model on OpenRouter picks the best matching folder among yours and moves the bookmark there a few seconds later."
   },
   "aiPrivacy": {
-    "message": "Only while this is on: the bookmark's title, its address without the part after \"?\" and the names of your folders are sent to OpenRouter and the model you choose. Other browsers send nothing unless you turn it on there too."
+    "message": "Only while this is on: the bookmark's title, its address without the part after \"?\" and the names of your folders are sent to OpenRouter and the model you choose. With web research on, OpenRouter also opens that address and may search the web for it. Other browsers send nothing unless you turn it on there too."
   },
   "aiEnabledLabel": {
     "message": "Sort bookmarks I add to the inbox folder in this browser"
@@ -455,7 +455,7 @@
     "message": "Model"
   },
   "aiModelHelp": {
-    "message": "Any model ID from openrouter.ai/models. Empty uses {1}, which is fast and cheap."
+    "message": "Any model ID from openrouter.ai/models. The default, {1}, is the most careful; Sonnet or Gemini Flash are faster and cheaper."
   },
   "aiAllowNewLabel": {
     "message": "Create a new folder when none of mine fits"
@@ -518,7 +518,7 @@
     "message": "Moved"
   },
   "aiLogFilterKept": {
-    "message": "Left in the inbox"
+    "message": "In the inbox"
   },
   "aiLogFilterErrors": {
     "message": "Failed"
@@ -533,7 +533,7 @@
     "message": "Delete the whole sorting log? Bookmarks are not changed."
   },
   "aiLogEmpty": {
-    "message": "Nothing here yet."
+    "message": "Nothing here yet. Bookmarks you add to the inbox folder will show up here once the AI has filed them."
   },
   "aiLogTotals": {
     "message": "{1} moved · {2} left in the inbox · {3} failed"
@@ -585,5 +585,29 @@
   },
   "aiErrReply": {
     "message": "The AI's answer could not be used, so the bookmark stayed in the inbox."
+  },
+  "aiResearchLabel": {
+    "message": "Research the site on the web before sorting"
+  },
+  "aiResearchHelp": {
+    "message": "The model reads the bookmarked page and searches the web when needed, then describes what the site is and what it is used for. More accurate, but slower (often 10–60 seconds) and a little more expensive."
+  },
+  "aiSiteAbout": {
+    "message": "About the site"
+  },
+  "aiSiteWhat": {
+    "message": "What it is"
+  },
+  "aiSitePurpose": {
+    "message": "Used for"
+  },
+  "aiSiteSources": {
+    "message": "Sources"
+  },
+  "aiCost": {
+    "message": "Cost: {1}"
+  },
+  "aiResearched": {
+    "message": "researched on the web"
   }
 }

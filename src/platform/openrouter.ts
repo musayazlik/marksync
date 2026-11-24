@@ -8,7 +8,15 @@ import type { ChatMessage } from '../core/ai-sort';
 const API = 'https://openrouter.ai/api/v1';
 /** Optional host permission, asked for when the user turns AI sorting on. */
 export const OPENROUTER_ORIGIN = 'https://openrouter.ai/*';
-const TIMEOUT_MS = 30_000;
+/** A model that browses can take a while; give up after this long. */
+const TIMEOUT_MS = 150_000;
+/**
+ * Chrome stops an extension service worker that waits more than 30 s for a
+ * fetch() response, or sits idle for 30 s. Answers are therefore streamed
+ * (OpenRouter sends headers and keep-alive comments at once), and a cheap
+ * extension API call every 20 s keeps the worker alive while the model works.
+ */
+const KEEPALIVE_MS = 20_000;
 
 export type OpenRouterErrorCode = 'auth' | 'credits' | 'rate-limit' | 'model' | 'permission' | 'network' | 'unknown';
 
@@ -36,12 +44,10 @@ function codeFor(status: number): OpenRouterErrorCode {
   return status >= 500 ? 'network' : 'unknown';
 }
 
-async function request(path: string, apiKey: string, init: RequestInit = {}): Promise<unknown> {
+async function send(path: string, apiKey: string, init: RequestInit, controller: AbortController): Promise<Response> {
   if (!(await hasOpenRouterPermission())) {
     throw new OpenRouterError('Marksync is not allowed to contact openrouter.ai.', 'permission');
   }
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
   let res: Response;
   try {
     res = await fetch(`${API}${path}`, {
@@ -59,48 +65,175 @@ async function request(path: string, apiKey: string, init: RequestInit = {}): Pr
       },
     });
   } catch (err) {
-    const aborted = err instanceof DOMException && err.name === 'AbortError';
-    throw new OpenRouterError(aborted ? 'OpenRouter did not answer in time.' : 'Could not reach OpenRouter.', 'network');
-  } finally {
-    clearTimeout(timer);
+    throw networkError(err);
   }
-  const body: unknown = await res.json().catch(() => undefined);
   if (!res.ok) {
-    const message = (body as { error?: { message?: unknown } } | undefined)?.error?.message;
-    throw new OpenRouterError(
-      typeof message === 'string' && message ? message.slice(0, 300) : `OpenRouter answered ${res.status}.`,
-      codeFor(res.status),
-      res.status,
-    );
+    const body: unknown = await res.json().catch(() => undefined);
+    throw new OpenRouterError(errorMessage(body) ?? `OpenRouter answered ${res.status}.`, codeFor(res.status), res.status);
   }
-  return body;
+  return res;
 }
 
-/** Sends a chat completion and returns the text of the first choice. */
-export async function chatCompletion(opts: { apiKey: string; model: string; messages: ChatMessage[] }): Promise<string> {
-  const body = (await request('/chat/completions', opts.apiKey, {
-    method: 'POST',
-    body: JSON.stringify({
-      model: opts.model,
-      messages: opts.messages,
-      temperature: 0,
-      max_tokens: 300,
-      // JSON mode; models without it still get the JSON-only instruction in the prompt.
-      response_format: { type: 'json_object' },
-    }),
-  })) as {
-    choices?: { message?: { content?: unknown }; error?: { message?: string } }[];
-    error?: { message?: string };
-  };
-  const choice = body?.choices?.[0];
-  if (choice?.error?.message) throw new OpenRouterError(choice.error.message.slice(0, 300), 'model');
-  const content = choice?.message?.content;
-  if (typeof content === 'string') return content;
-  // Some providers return content parts.
-  if (Array.isArray(content)) {
-    return content.map((p) => (typeof p === 'object' && p && 'text' in p ? String(p.text) : '')).join('');
+function networkError(err: unknown): OpenRouterError {
+  if (err instanceof OpenRouterError) return err;
+  const aborted = err instanceof DOMException && (err.name === 'AbortError' || err.name === 'TimeoutError');
+  return new OpenRouterError(aborted ? 'OpenRouter did not answer in time.' : 'Could not reach OpenRouter.', 'network');
+}
+
+function errorMessage(body: unknown): string | undefined {
+  const message = (body as { error?: { message?: unknown } } | undefined)?.error?.message;
+  return typeof message === 'string' && message ? message.slice(0, 300) : undefined;
+}
+
+/** Runs `task` with a timeout and the service-worker keep-alive. */
+async function guarded<T>(task: (controller: AbortController) => Promise<T>): Promise<T> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+  const keepAlive = setInterval(() => void browser.runtime.getPlatformInfo().catch(() => undefined), KEEPALIVE_MS);
+  try {
+    return await task(controller);
+  } catch (err) {
+    throw networkError(err);
+  } finally {
+    clearTimeout(timer);
+    clearInterval(keepAlive);
   }
-  throw new OpenRouterError('OpenRouter returned an empty answer.', 'model');
+}
+
+async function request(path: string, apiKey: string): Promise<unknown> {
+  return guarded(async (controller) => {
+    const res = await send(path, apiKey, {}, controller);
+    return res.json().catch(() => undefined);
+  });
+}
+
+export interface Completion {
+  text: string;
+  /** Pages the model read or found (url_citation annotations), http/https only. */
+  sources: { url: string; title?: string }[];
+  /** Cost in USD, when OpenRouter reports it. */
+  cost?: number;
+}
+
+type Delta = {
+  content?: unknown;
+  annotations?: { type?: string; url_citation?: { url?: unknown; title?: unknown } }[];
+};
+type Chunk = {
+  choices?: { delta?: Delta; message?: Delta; error?: { message?: string } }[];
+  usage?: { cost?: unknown };
+  error?: { message?: string };
+};
+
+function contentText(content: unknown): string {
+  if (typeof content === 'string') return content;
+  if (Array.isArray(content)) {
+    return content.map((p) => (typeof p === 'object' && p && 'text' in p ? String((p as { text: unknown }).text) : '')).join('');
+  }
+  return '';
+}
+
+/** Collects the reply from a chat completion, streamed (SSE) or plain JSON. */
+export class CompletionReader {
+  private text = '';
+  private sources = new Map<string, string | undefined>();
+  private cost: number | undefined;
+
+  add(chunk: Chunk): void {
+    const error = chunk.error?.message ?? chunk.choices?.[0]?.error?.message;
+    if (error) throw new OpenRouterError(error.slice(0, 300), 'model');
+    const part = chunk.choices?.[0]?.delta ?? chunk.choices?.[0]?.message;
+    if (part) {
+      this.text += contentText(part.content);
+      for (const a of part.annotations ?? []) {
+        const url = a.url_citation?.url;
+        if (a.type !== 'url_citation' || typeof url !== 'string' || !/^https?:\/\//i.test(url)) continue;
+        if (this.sources.size < 8 && !this.sources.has(url)) {
+          const title = a.url_citation?.title;
+          this.sources.set(url, typeof title === 'string' ? title.slice(0, 200) : undefined);
+        }
+      }
+    }
+    const cost = chunk.usage?.cost;
+    if (typeof cost === 'number' && Number.isFinite(cost)) this.cost = cost;
+  }
+
+  /** Feeds one line of a server-sent event stream. */
+  addLine(line: string): void {
+    // ": OPENROUTER PROCESSING" comments keep the connection alive.
+    if (!line.startsWith('data:')) return;
+    const data = line.slice(5).trim();
+    if (!data || data === '[DONE]') return;
+    let chunk: Chunk;
+    try {
+      chunk = JSON.parse(data) as Chunk;
+    } catch {
+      return;
+    }
+    this.add(chunk);
+  }
+
+  result(): Completion {
+    if (!this.text.trim()) throw new OpenRouterError('OpenRouter returned an empty answer.', 'model');
+    return {
+      text: this.text,
+      sources: [...this.sources].map(([url, title]) => (title ? { url, title } : { url })),
+      ...(this.cost !== undefined ? { cost: this.cost } : {}),
+    };
+  }
+}
+
+/**
+ * Sends a chat completion and returns the reply text. With `research`, the
+ * model may read the bookmarked page and search the web through OpenRouter's
+ * server tools before it answers.
+ */
+export async function chatCompletion(opts: {
+  apiKey: string;
+  model: string;
+  messages: ChatMessage[];
+  research?: boolean;
+}): Promise<Completion> {
+  const body: Record<string, unknown> = {
+    model: opts.model,
+    messages: opts.messages,
+    temperature: 0,
+    max_tokens: 2000,
+    stream: true,
+  };
+  if (opts.research) {
+    body.tools = [
+      // Reading a page with OpenRouter's own fetcher is free; pages are trimmed to keep the prompt small.
+      { type: 'openrouter:web_fetch', parameters: { engine: 'auto', max_content_tokens: 6000 } },
+      { type: 'openrouter:web_search', parameters: { engine: 'auto', max_results: 3, max_total_results: 6 } },
+    ];
+  } else {
+    // JSON mode; models without it still get the JSON-only instruction in the prompt.
+    body.response_format = { type: 'json_object' };
+  }
+
+  return guarded(async (controller) => {
+    const res = await send('/chat/completions', opts.apiKey, { method: 'POST', body: JSON.stringify(body) }, controller);
+    const reader = new CompletionReader();
+    if (!res.body || !(res.headers.get('content-type') ?? '').includes('text/event-stream')) {
+      reader.add((await res.json()) as Chunk);
+      return reader.result();
+    }
+    const stream = res.body.pipeThrough(new TextDecoderStream()).getReader();
+    let buffer = '';
+    for (;;) {
+      const { done, value } = await stream.read();
+      if (done) break;
+      buffer += value;
+      let newline: number;
+      while ((newline = buffer.indexOf('\n')) >= 0) {
+        reader.addLine(buffer.slice(0, newline).replace(/\r$/, ''));
+        buffer = buffer.slice(newline + 1);
+      }
+    }
+    if (buffer) reader.addLine(buffer);
+    return reader.result();
+  });
 }
 
 /** Checks an API key without spending credits. Returns the key's label, if any. */

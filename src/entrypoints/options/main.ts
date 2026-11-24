@@ -4,6 +4,7 @@ import { send } from '../../shared/messages';
 import {
   DEFAULT_AI_MODEL,
   getSettings,
+  SUGGESTED_AI_MODELS,
   openRouterKeyItem,
   settingsItem,
   statusItem,
@@ -11,7 +12,7 @@ import {
   type Status,
 } from '../../shared/state';
 import { OPENROUTER_ORIGIN } from '../../platform/openrouter';
-import { $, RELEASES_URL, statusTone, timeAgo, withBusy } from '../../shared/ui';
+import { $, emblemState, RELEASES_URL, setEmblem, showToast, statusTone, timeAgo, withBusy } from '../../shared/ui';
 import { detectBrowser } from '../../platform/browser-info';
 import type { BackupInfo } from '../../services/backup-service';
 import type { ImportMode, ImportResult } from '../../sync/importer';
@@ -28,16 +29,55 @@ const actionError = $('#action-error');
 /** The page opened right after installing (see background.ts). */
 const welcome = location.hash === '#welcome';
 
+let syncEnabled = true;
+let lastStatus: Status = { connected: false, syncing: false };
+
 function renderStatus(s: Status) {
-  $('#dot').className = `dot ${statusTone(s)}`;
+  lastStatus = s;
+  setEmblem($('#emblem'), emblemState(s, syncEnabled));
   $('#welcome').hidden = !welcome || s.connected;
   $('#account-text').textContent = s.connected ? (s.email ? t('connectedAs', s.email) : t('connected')) : t('notConnected');
   $('#connect').hidden = s.connected && s.error?.code !== 'auth';
   $('#connect').textContent = t(s.connected ? 'reconnect' : 'connectDrive');
   $('#disconnect').hidden = !s.connected;
-  $('#sync-text').textContent = s.connected
-    ? (s.syncing ? t('syncing') : t('lastSync', timeAgo(s.lastSyncAt))) + (s.error ? ` · ${errorText(s.error)}` : '')
-    : '';
+  $('#sync-text').textContent = !s.connected
+    ? t('popupIntro')
+    : !syncEnabled
+      ? t('syncOff')
+      : s.syncing
+        ? t('syncing')
+        : t('lastSync', timeAgo(s.lastSyncAt));
+  const error = $('#sync-error');
+  error.hidden = !s.connected || !s.error;
+  error.className = `notice small hero-error ${statusTone(s) === 'warn' ? 'warn' : 'error'}`;
+  if (s.error) error.textContent = errorText(s.error);
+}
+
+// ---------- section rail ----------
+
+/** Marks the section in view on the rail; the ribbon slides to it. */
+function initRail() {
+  const links = [...document.querySelectorAll<HTMLAnchorElement>('.rail a')];
+  const ribbon = $('.rail-ribbon');
+  const sections = links.map((a) => document.querySelector<HTMLElement>(a.hash)!);
+  const mark = (index: number) => {
+    links.forEach((a, i) => a.setAttribute('aria-current', String(i === index)));
+    const link = links[index]!;
+    ribbon.style.setProperty('--ribbon-y', `${link.offsetTop + (link.offsetHeight - 22) / 2}px`);
+  };
+  const update = () => {
+    // The last section whose top has passed a third of the window.
+    const line = window.innerHeight / 3;
+    let index = 0;
+    sections.forEach((sec, i) => {
+      if (sec.getBoundingClientRect().top <= line) index = i;
+    });
+    if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 4) index = sections.length - 1;
+    mark(index);
+  };
+  window.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('resize', update);
+  update();
 }
 
 // ---------- settings ----------
@@ -51,6 +91,7 @@ const fields = {
   deviceName: 'text',
   aiModel: 'text',
   aiAllowNewFolders: 'checkbox',
+  aiResearch: 'checkbox',
 } as const satisfies Partial<Record<keyof Settings, string>>;
 
 async function loadSettings() {
@@ -204,6 +245,9 @@ async function initAi() {
   aiEnabled.checked = s.aiSortEnabled;
   $<HTMLInputElement>('#aiModel').placeholder = DEFAULT_AI_MODEL;
   $('#ai-model-help').textContent = t('aiModelHelp', DEFAULT_AI_MODEL);
+  $('#ai-models').replaceChildren(
+    ...SUGGESTED_AI_MODELS.map((m) => Object.assign(document.createElement('option'), { value: m })),
+  );
   await loadAiFolders();
 }
 
@@ -415,7 +459,7 @@ void initAi().catch((err: unknown) => showError(err));
 if (import.meta.env.MODE !== 'production') {
   void send({ type: 'getRedirectUrl' }).then((url) => {
     const box = document.createElement('section');
-    box.className = 'card stack small';
+    box.className = 'notice stack small';
     const title = document.createElement('strong');
     title.textContent = 'Developer: OAuth redirect URI for this browser';
     const code = document.createElement('code');
@@ -427,11 +471,16 @@ if (import.meta.env.MODE !== 'production') {
     $('main').append(box);
   });
 }
-const showError = (err: unknown) => {
-  actionError.textContent = err instanceof Error ? err.message : String(err);
-  actionError.hidden = false;
-};
+const showError = (err: unknown) => showToast(actionError, err instanceof Error ? err.message : String(err));
 void loadBackups().catch(showError);
 void loadBrowsers().catch(showError);
+initRail();
 if (location.hash === '#import') $('#import').scrollIntoView();
 if (location.hash === '#ai') $('#ai').scrollIntoView();
+// The emblem and status line also show whether sync is off in this browser.
+const refreshSyncEnabled = async () => {
+  syncEnabled = (await getSettings()).syncEnabled;
+  renderStatus(lastStatus);
+};
+void refreshSyncEnabled();
+settingsItem.watch(() => void refreshSyncEnabled());

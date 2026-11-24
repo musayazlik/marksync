@@ -2,7 +2,7 @@ import { browser } from 'wxt/browser';
 import { send } from '../../shared/messages';
 import { errorText, localizePage, t, tn } from '../../shared/i18n';
 import { getSettings, settingsItem, statusItem, type Status } from '../../shared/state';
-import { $, statusTone, timeAgo, withBusy } from '../../shared/ui';
+import { $, emblemState, setEmblem, timeAgo, withBusy } from '../../shared/ui';
 
 localizePage();
 const actionError = $('#action-error');
@@ -12,16 +12,21 @@ let syncEnabled = true;
 
 function render() {
   const s = status;
-  $('#dot').className = `dot ${statusTone(s)}`;
+  setEmblem($('#emblem'), emblemState(s, syncEnabled));
   $('#disconnected').hidden = s.connected;
   $('#connected').hidden = !s.connected;
+  $('#email').textContent = s.connected ? (s.email ?? t('connected')) : t('notConnected');
+  $('#email').title = s.connected && s.email ? t('connectedAs', s.email) : '';
   if (!s.connected) return;
 
-  $('#email').textContent = s.email ? t('connectedAs', s.email) : t('connected');
-  const parts = [!syncEnabled ? t('syncOff') : s.syncing ? t('syncing') : t('lastSync', timeAgo(s.lastSyncAt))];
-  if (s.total !== undefined) parts.push(tn('items', s.total));
-  if (s.skipped) parts.push(tn('skippedItems', s.skipped));
-  $('#summary').textContent = parts.join(' · ');
+  $('#summary-main').textContent = !syncEnabled ? t('syncOff') : s.syncing ? t('syncing') : t('lastSync', timeAgo(s.lastSyncAt));
+  const facts: string[] = [];
+  if (s.total !== undefined) facts.push(tn('items', s.total));
+  if (s.skipped) facts.push(tn('skippedItems', s.skipped));
+  $('#summary').replaceChildren(
+    ...facts.map((text) => Object.assign(document.createElement('span'), { className: 'pill', textContent: text })),
+  );
+  $('#summary').hidden = facts.length === 0;
   $('#backup-summary').textContent = t('lastBackup', timeAgo(s.lastBackupAt));
 
   $<HTMLButtonElement>('#sync').disabled = !syncEnabled;
@@ -73,5 +78,9 @@ bind('#keep-local', () => send({ type: 'keepLocal' }));
 $('#open-options').addEventListener('click', () => void browser.runtime.openOptionsPage());
 $('#import').addEventListener('click', () => {
   void browser.tabs.create({ url: browser.runtime.getURL('/options.html#import') });
+  window.close();
+});
+$('#open-log').addEventListener('click', () => {
+  void browser.tabs.create({ url: browser.runtime.getURL('/sorter-log.html') });
   window.close();
 });

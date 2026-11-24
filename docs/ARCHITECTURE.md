@@ -167,8 +167,9 @@ the new bookmarks to all browsers.
 
 Off by default and set up per browser in Settings: an inbox folder, an
 OpenRouter API key (stored in `storage.local`, never uploaded), a model ID
-(default `google/gemini-3.5-flash-lite`) and whether new folders may be
-created. Turning it on asks for the optional host permission
+(default `anthropic/claude-opus-5.5`; Sonnet and Gemini Flash are suggested
+as faster, cheaper choices), whether the model may research the site on the
+web (on by default) and whether new folders may be created. Turning it on asks for the optional host permission
 `https://openrouter.ai/*` (and, in Firefox 140+, consent for `bookmarksInfo`).
 
 1. **Trigger**: a bookmark created in, or moved into, the inbox *in this
@@ -179,15 +180,23 @@ created. Turning it on asks for the optional host permission
 2. **Prompt** (`core/ai-sort.ts`): the bookmark's title and address without
    query string or fragment, and up to 300 folders (breadth-first) as
    `f12: Bookmarks bar / Work / Docs`. The bookmark text is marked as data.
-3. **Reply**: JSON `{folder, newFolder?, confidence, reason}`. Only offered
+   With research on, the request carries OpenRouter's `openrouter:web_fetch`
+   and `openrouter:web_search` server tools: the model reads the page and,
+   if needed, searches the web before answering. The answer is streamed, and
+   an extension API call every 20 s keeps the service worker alive, because
+   Chrome stops a worker that waits more than 30 s for a `fetch()` response.
+3. **Reply**: JSON `{folder, newFolder?, confidence, reason, site}`, where
+   `site` is `{name, category, summary, purpose}`: what the site is and what
+   it is used for, in the UI language. Only offered
    references are accepted; anything else is an error and the bookmark stays.
    Confidence below 0.35 or `folder: null` keeps it in the inbox. A proposed
    new folder that already exists under that parent becomes a move.
 4. **Act** (`sync/sorter.ts`): read the tree again; if the user moved the
    bookmark meanwhile, do nothing. Otherwise move it (creating the folder
    first if needed). The move is an ordinary local change and syncs.
-5. **Log**: every decision goes to `local:sortLog` (newest 500), shown on
-   `sorter-log.html` with filters, search and **Undo** (moves the bookmark
+5. **Log**: every decision goes to `local:sortLog` (newest 500) with the site
+   description, the pages the model cited (http/https only) and the cost
+   OpenRouter reported. `sorter-log.html` shows them with filters, search and **Undo** (moves the bookmark
    back to the inbox, removes a folder the model created if it is empty, and
    is not sorted again). The log is per browser and not synced.
 

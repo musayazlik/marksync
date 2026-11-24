@@ -10,176 +10,227 @@
   </head>
   <body>
     <!-- Text comes from src/public/_locales (see src/shared/i18n.ts). -->
-    <main class="stack">
-      <header class="row">
-        <img src="/icon/32.png" srcset="/icon/64.png 2x" width="32" height="32" alt="" />
-        <h1>Marksync</h1>
-        <a id="version" class="muted small" target="_blank" rel="noopener" data-i18n-title="versionNotes"></a>
-      </header>
-
-      <!-- Shown once, on the page opened right after installing. -->
-      <section id="welcome" class="card stack" aria-labelledby="welcome-h" hidden>
-        <h2 id="welcome-h" data-i18n="welcomeHeading"></h2>
-        <p data-i18n="welcomeConnect"></p>
-        <p class="muted small" data-i18n="welcomeNoDuplicates"></p>
-        <p class="muted small" data-i18n="privacyNote"></p>
-      </section>
-
-      <section class="card stack" aria-labelledby="account-h">
-        <h2 id="account-h" data-i18n="accountHeading"></h2>
-        <div class="row spread">
-          <div class="row">
-            <span id="dot" class="dot"></span>
-            <p id="account-text"></p>
-          </div>
-          <div class="row">
-            <button id="connect" class="primary" data-i18n="connectDrive"></button>
-            <button id="disconnect" class="danger" data-i18n="disconnect" hidden></button>
-          </div>
-        </div>
-        <p id="sync-text" class="muted small"></p>
-        <label class="stack small">
-          <span data-i18n="deviceNameLabel"></span>
-          <input id="deviceName" type="text" maxlength="60" />
-        </label>
-        <p class="muted small" data-i18n="deviceNameHelp"></p>
-      </section>
-
-      <section class="card stack" aria-labelledby="sync-h">
-        <h2 id="sync-h" data-i18n="syncHeading"></h2>
-        <label class="row"><input id="syncEnabled" type="checkbox" /> <span data-i18n="syncEnabledLabel"></span></label>
-        <label class="row">
-          <span data-i18n="syncIntervalLabel"></span>
-          <select id="syncIntervalMin">
-            <option value="1" data-i18n="interval1Min"></option>
-            <option value="5" data-i18n="interval5Min"></option>
-            <option value="15" data-i18n="interval15Min"></option>
-            <option value="60" data-i18n="interval1Hour"></option>
-          </select>
-        </label>
-        <p class="muted small" data-i18n="syncHelp"></p>
-      </section>
-
-      <section class="card stack" aria-labelledby="backup-h">
-        <div class="row spread">
-          <h2 id="backup-h" data-i18n="backupsHeading"></h2>
-          <div class="row">
-            <button id="export" data-i18n="exportHtml"></button>
-            <button id="backup-now" class="primary" data-i18n="backupNow"></button>
-          </div>
-        </div>
-        <label class="row"><input id="autoBackup" type="checkbox" /> <span data-i18n="autoBackupLabel"></span></label>
-        <label class="row">
-          <span data-i18n="backupEveryBefore"></span>
-          <select id="backupIntervalHours">
-            <option value="6" data-i18n="backupEvery6Hours"></option>
-            <option value="24" data-i18n="backupEveryDay"></option>
-            <option value="168" data-i18n="backupEveryWeek"></option>
-          </select>
-          <span data-i18n="backupKeepBefore"></span>
-          <select id="backupRetention">
-            <option value="10">10</option>
-            <option value="30">30</option>
-            <option value="90">90</option>
-          </select>
-          <span data-i18n="backupKeepAfter"></span>
-        </label>
-        <table id="backups">
-          <thead>
-            <tr><th data-i18n="columnDate"></th><th data-i18n="columnFrom"></th><th data-i18n="columnItems"></th><th></th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-        <p id="backups-empty" class="muted small" data-i18n="noBackups" hidden></p>
-        <p class="muted small" data-i18n="restoreHelp"></p>
-      </section>
-
-      <section id="import" class="card stack" aria-labelledby="import-h">
-        <h2 id="import-h" data-i18n="importHeading"></h2>
-        <p class="muted small" data-i18n="importIntro"></p>
-        <fieldset class="stack">
-          <legend class="small muted" data-i18n="importHow"></legend>
-          <label class="row">
-            <input type="radio" name="import-mode" value="merge" checked />
-            <span data-i18n="importModeMerge"></span>
-          </label>
-          <label class="row">
-            <input type="radio" name="import-mode" value="folder" />
-            <span data-i18n="importModeFolder"></span>
-          </label>
-        </fieldset>
-
-        <h3 data-i18n="importFromBrowserHeading"></h3>
-        <table id="browsers">
-          <thead>
-            <tr><th data-i18n="columnBrowser"></th><th data-i18n="columnBookmarks"></th><th data-i18n="columnUpdated"></th><th></th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-        <p id="browsers-empty" class="muted small" data-i18n="browsersEmpty" hidden></p>
-        <p id="browsers-offline" class="muted small" data-i18n="browsersOffline" hidden></p>
-
-        <h3 data-i18n="importFileHeading"></h3>
-        <p class="muted small">
-          <span data-i18n="importFileHelp"></span><br />
-          <span data-i18n="importFileChromium"></span><br />
-          <span data-i18n="importFileFirefox"></span><br />
-          <span data-i18n="importFileSafari"></span>
-        </p>
-        <div class="row">
-          <input id="import-file" type="file" accept=".html,.htm,text/html" />
-          <button id="import-file-btn" class="primary" data-i18n="importFileButton" disabled></button>
-        </div>
-
-        <p id="import-result" class="notice small" role="status" hidden></p>
-      </section>
-
-
-      <section id="ai" class="card stack" aria-labelledby="ai-h">
-        <div class="row spread">
-          <h2 id="ai-h" data-i18n="aiHeading"></h2>
-          <a class="small" href="./sorter-log.html" data-i18n="aiOpenLog"></a>
-        </div>
-        <p class="muted small" data-i18n="aiIntro"></p>
-        <p class="notice small" data-i18n="aiPrivacy"></p>
-        <label class="row"><input id="aiSortEnabled" type="checkbox" /> <span data-i18n="aiEnabledLabel"></span></label>
-
-        <label class="stack small">
-          <span data-i18n="aiInboxLabel"></span>
-          <select id="aiInboxFolderId">
-            <option value="" data-i18n="aiInboxNone"></option>
-          </select>
-        </label>
-
-        <div class="stack small">
-          <label for="ai-key" data-i18n="aiKeyLabel"></label>
+    <header class="hero">
+      <div class="hero-inner">
+        <svg id="emblem" class="emblem" data-state="off" viewBox="0 0 100 100" width="64" height="64" aria-hidden="true">
+          <rect class="bg" width="100" height="100" rx="26" />
+          <g class="arrows">
+            <path d="M21.8 60.3A30 30 0 0 1 74.6 32.8" />
+            <path d="M74.6 23.8L74.6 32.8L66.1 29.7" />
+            <path d="M78.2 39.7A30 30 0 0 1 25.4 67.2" />
+            <path d="M25.4 76.2L25.4 67.2L33.9 70.3" />
+          </g>
+          <path class="ribbon" d="M40 31H60V69L50 61.5L40 69Z" />
+        </svg>
+        <div class="hero-text">
           <div class="row wrap">
-            <input id="ai-key" type="password" autocomplete="off" spellcheck="false" data-i18n-placeholder="aiKeyPlaceholder" />
-            <button id="ai-key-save" data-i18n="aiKeySave"></button>
-            <button id="ai-key-test" data-i18n="aiTest"></button>
-            <button id="ai-key-remove" class="danger" data-i18n="aiKeyRemove" hidden></button>
+            <h1>Marksync</h1>
+            <a id="version" class="pill" target="_blank" rel="noopener" data-i18n-title="versionNotes"></a>
           </div>
-          <p id="ai-key-state" class="muted"></p>
-          <p class="muted" data-i18n="aiKeyHelp"></p>
+          <p id="account-text" class="hero-account"></p>
+          <p id="sync-text" class="muted"></p>
         </div>
-
-        <label class="stack small">
-          <span data-i18n="aiModelLabel"></span>
-          <input id="aiModel" type="text" maxlength="100" spellcheck="false" />
-        </label>
-        <p id="ai-model-help" class="muted small"></p>
-
-        <label class="row"><input id="aiAllowNewFolders" type="checkbox" /> <span data-i18n="aiAllowNewLabel"></span></label>
-
-        <p id="ai-status" class="notice small" role="status" hidden></p>
-        <div class="row">
-          <button id="ai-sort-now" class="primary" data-i18n="aiSortNow"></button>
+        <div class="hero-actions row">
+          <button id="connect" class="primary" data-i18n="connectDrive"></button>
+          <button id="disconnect" class="quiet" data-i18n="disconnect" hidden></button>
         </div>
-        <p id="ai-result" class="muted small" role="status" hidden></p>
-      </section>
+      </div>
+      <p id="sync-error" class="notice error small hero-error" hidden></p>
+    </header>
 
-      <p id="action-error" class="notice error small" hidden></p>
-    </main>
+    <div class="layout">
+      <nav class="rail" data-i18n-aria-label="optionsTitle">
+        <span class="rail-ribbon" aria-hidden="true"></span>
+        <a href="#sec-sync" data-i18n="syncHeading"></a>
+        <a href="#sec-backups" data-i18n="backupsHeading"></a>
+        <a href="#import" data-i18n="importHeading"></a>
+        <a href="#ai" data-i18n="aiHeading"></a>
+      </nav>
+
+      <main class="stack">
+        <!-- Shown once, on the page opened right after installing. -->
+        <section id="welcome" class="notice ok stack" aria-labelledby="welcome-h" hidden>
+          <h2 id="welcome-h" data-i18n="welcomeHeading"></h2>
+          <p data-i18n="welcomeConnect"></p>
+          <p class="muted small" data-i18n="welcomeNoDuplicates"></p>
+          <p class="muted small" data-i18n="privacyNote"></p>
+        </section>
+
+        <section id="sec-sync" class="section" aria-labelledby="sync-h">
+          <h2 id="sync-h" data-i18n="syncHeading"></h2>
+          <div class="panel">
+            <div class="setting">
+              <div class="setting-text">
+                <label for="syncEnabled" data-i18n="syncEnabledLabel"></label>
+                <p class="muted small" data-i18n="syncHelp"></p>
+              </div>
+              <input id="syncEnabled" type="checkbox" />
+            </div>
+            <div class="setting">
+              <div class="setting-text"><label for="syncIntervalMin" data-i18n="syncIntervalLabel"></label></div>
+              <select id="syncIntervalMin">
+                <option value="1" data-i18n="interval1Min"></option>
+                <option value="5" data-i18n="interval5Min"></option>
+                <option value="15" data-i18n="interval15Min"></option>
+                <option value="60" data-i18n="interval1Hour"></option>
+              </select>
+            </div>
+            <div class="setting">
+              <div class="setting-text">
+                <label for="deviceName" data-i18n="deviceNameLabel"></label>
+                <p class="muted small" data-i18n="deviceNameHelp"></p>
+              </div>
+              <input id="deviceName" type="text" maxlength="60" />
+            </div>
+          </div>
+        </section>
+
+        <section id="sec-backups" class="section" aria-labelledby="backup-h">
+          <div class="section-head">
+            <h2 id="backup-h" data-i18n="backupsHeading"></h2>
+            <div class="row">
+              <button id="export" data-i18n="exportHtml"></button>
+              <button id="backup-now" class="primary" data-i18n="backupNow"></button>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="setting">
+              <div class="setting-text"><label for="autoBackup" data-i18n="autoBackupLabel"></label></div>
+              <input id="autoBackup" type="checkbox" />
+            </div>
+            <div class="setting sentence">
+              <span data-i18n="backupEveryBefore"></span>
+              <select id="backupIntervalHours">
+                <option value="6" data-i18n="backupEvery6Hours"></option>
+                <option value="24" data-i18n="backupEveryDay"></option>
+                <option value="168" data-i18n="backupEveryWeek"></option>
+              </select>
+              <span data-i18n="backupKeepBefore"></span>
+              <select id="backupRetention">
+                <option value="10">10</option>
+                <option value="30">30</option>
+                <option value="90">90</option>
+              </select>
+              <span data-i18n="backupKeepAfter"></span>
+            </div>
+            <div class="panel-block">
+              <table id="backups">
+                <thead>
+                  <tr><th data-i18n="columnDate"></th><th data-i18n="columnFrom"></th><th data-i18n="columnItems"></th><th></th></tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+              <p id="backups-empty" class="empty muted small" data-i18n="noBackups" hidden></p>
+            </div>
+          </div>
+          <p class="muted small" data-i18n="restoreHelp"></p>
+        </section>
+
+        <section id="import" class="section" aria-labelledby="import-h">
+          <h2 id="import-h" data-i18n="importHeading"></h2>
+          <p class="muted" data-i18n="importIntro"></p>
+          <fieldset class="choices">
+            <legend class="small muted" data-i18n="importHow"></legend>
+            <label class="choice">
+              <input type="radio" name="import-mode" value="merge" checked />
+              <span data-i18n="importModeMerge"></span>
+            </label>
+            <label class="choice">
+              <input type="radio" name="import-mode" value="folder" />
+              <span data-i18n="importModeFolder"></span>
+            </label>
+          </fieldset>
+
+          <div class="panel">
+            <div class="panel-block">
+              <h3 data-i18n="importFromBrowserHeading"></h3>
+              <table id="browsers">
+                <thead>
+                  <tr><th data-i18n="columnBrowser"></th><th data-i18n="columnBookmarks"></th><th data-i18n="columnUpdated"></th><th></th></tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+              <p id="browsers-empty" class="empty muted small" data-i18n="browsersEmpty" hidden></p>
+              <p id="browsers-offline" class="empty muted small" data-i18n="browsersOffline" hidden></p>
+            </div>
+            <div class="panel-block stack">
+              <h3 data-i18n="importFileHeading"></h3>
+              <ul class="hints muted small">
+                <li data-i18n="importFileHelp"></li>
+                <li data-i18n="importFileChromium"></li>
+                <li data-i18n="importFileFirefox"></li>
+                <li data-i18n="importFileSafari"></li>
+              </ul>
+              <div class="row wrap">
+                <input id="import-file" type="file" accept=".html,.htm,text/html" />
+                <button id="import-file-btn" class="primary" data-i18n="importFileButton" disabled></button>
+              </div>
+            </div>
+          </div>
+          <p id="import-result" class="notice ok small" role="status" hidden></p>
+        </section>
+
+        <section id="ai" class="section" aria-labelledby="ai-h">
+          <div class="section-head">
+            <h2 id="ai-h" data-i18n="aiHeading"></h2>
+            <a class="button" href="./sorter-log.html" data-i18n="aiOpenLog"></a>
+          </div>
+          <p class="muted" data-i18n="aiIntro"></p>
+          <p class="notice small" data-i18n="aiPrivacy"></p>
+          <div class="panel">
+            <div class="setting">
+              <div class="setting-text"><label for="aiSortEnabled" data-i18n="aiEnabledLabel"></label></div>
+              <input id="aiSortEnabled" type="checkbox" />
+            </div>
+            <div class="setting">
+              <div class="setting-text"><label for="aiInboxFolderId" data-i18n="aiInboxLabel"></label></div>
+              <select id="aiInboxFolderId">
+                <option value="" data-i18n="aiInboxNone"></option>
+              </select>
+            </div>
+            <div class="setting stacked">
+              <div class="setting-text">
+                <label for="ai-key" data-i18n="aiKeyLabel"></label>
+                <p id="ai-key-state" class="muted small"></p>
+              </div>
+              <div class="key-row">
+                <input id="ai-key" type="password" autocomplete="off" spellcheck="false" data-i18n-placeholder="aiKeyPlaceholder" />
+                <button id="ai-key-save" data-i18n="aiKeySave"></button>
+                <button id="ai-key-test" data-i18n="aiTest"></button>
+                <button id="ai-key-remove" class="danger" data-i18n="aiKeyRemove" hidden></button>
+              </div>
+              <p class="muted small" data-i18n="aiKeyHelp"></p>
+            </div>
+            <div class="setting">
+              <div class="setting-text">
+                <label for="aiModel" data-i18n="aiModelLabel"></label>
+                <p id="ai-model-help" class="muted small"></p>
+              </div>
+              <input id="aiModel" type="text" maxlength="100" spellcheck="false" list="ai-models" />
+              <datalist id="ai-models"></datalist>
+            </div>
+            <div class="setting">
+              <div class="setting-text">
+                <label for="aiResearch" data-i18n="aiResearchLabel"></label>
+                <p class="muted small" data-i18n="aiResearchHelp"></p>
+              </div>
+              <input id="aiResearch" type="checkbox" />
+            </div>
+            <div class="setting">
+              <div class="setting-text"><label for="aiAllowNewFolders" data-i18n="aiAllowNewLabel"></label></div>
+              <input id="aiAllowNewFolders" type="checkbox" />
+            </div>
+          </div>
+          <p id="ai-status" class="notice small" role="status" hidden></p>
+          <div class="row wrap">
+            <button id="ai-sort-now" class="primary" data-i18n="aiSortNow"></button>
+            <p id="ai-result" class="muted small" role="status" hidden></p>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <p id="action-error" class="notice error small toast" role="alert" hidden></p>
     <script type="module" src="./main.ts"></script>
   </body>
 </html>

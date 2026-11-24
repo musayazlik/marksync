@@ -387,7 +387,7 @@
     "message": "Bir gelen kutusu klasörü seçin. Bu tarayıcıda o klasöre bir yer imi eklediğinizde, OpenRouter üzerindeki bir yapay zekâ modeli klasörleriniz arasından en uygun olanı seçer ve yer imini birkaç saniye sonra oraya taşır."
   },
   "aiPrivacy": {
-    "message": "Yalnızca bu açıkken: yer iminin başlığı, \"?\" işaretinden sonraki kısmı olmadan adresi ve klasörlerinizin adları OpenRouter'a ve seçtiğiniz modele gönderilir. Diğer tarayıcılar, orada da açmadığınız sürece hiçbir şey göndermez."
+    "message": "Yalnızca bu açıkken: yer iminin başlığı, \"?\" işaretinden sonraki kısmı olmadan adresi ve klasörlerinizin adları OpenRouter'a ve seçtiğiniz modele gönderilir. Web araştırması açıksa OpenRouter bu adresi de açar ve gerekirse web'de arama yapar. Diğer tarayıcılar, orada da açmadığınız sürece hiçbir şey göndermez."
   },
   "aiEnabledLabel": {
     "message": "Bu tarayıcıda gelen kutusuna eklediğim yer imlerini düzenle"
@@ -450,7 +450,7 @@
     "message": "Model"
   },
   "aiModelHelp": {
-    "message": "openrouter.ai/models listesindeki herhangi bir model kimliği. Boş bırakılırsa hızlı ve ucuz olan {1} kullanılır."
+    "message": "openrouter.ai/models listesindeki herhangi bir model kimliği. Varsayılan {1} en titiz olanıdır; Sonnet veya Gemini Flash daha hızlı ve ucuzdur."
   },
   "aiAllowNewLabel": {
     "message": "Hiçbir klasör uymuyorsa yeni klasör oluştur"
@@ -513,10 +513,10 @@
     "message": "Taşınanlar"
   },
   "aiLogFilterKept": {
-    "message": "Gelen kutusunda kalanlar"
+    "message": "Gelen kutusunda"
   },
   "aiLogFilterErrors": {
-    "message": "Başarısızlar"
+    "message": "Başarısız"
   },
   "aiLogSearch": {
     "message": "Başlık, adres veya klasör ara"
@@ -528,7 +528,7 @@
     "message": "Düzenleme kaydının tamamı silinsin mi? Yer imleri değişmez."
   },
   "aiLogEmpty": {
-    "message": "Henüz kayıt yok."
+    "message": "Henüz kayıt yok. Gelen kutusu klasörüne eklediğiniz yer imleri, yapay zekâ onları yerleştirdiğinde burada görünür."
   },
   "aiLogTotals": {
     "message": "{1} taşındı · {2} gelen kutusunda kaldı · {3} başarısız"
@@ -580,5 +580,29 @@
   },
   "aiErrReply": {
     "message": "Yapay zekânın yanıtı kullanılamadı, yer imi gelen kutusunda kaldı."
+  },
+  "aiResearchLabel": {
+    "message": "Düzenlemeden önce siteyi web'de araştır"
+  },
+  "aiResearchHelp": {
+    "message": "Model yer imli sayfayı okur, gerekirse web'de arama yapar; ardından sitenin ne olduğunu ve ne için kullanıldığını açıklar. Daha isabetlidir ama daha yavaştır (çoğunlukla 10–60 saniye) ve biraz daha pahalıdır."
+  },
+  "aiSiteAbout": {
+    "message": "Site hakkında"
+  },
+  "aiSiteWhat": {
+    "message": "Nedir"
+  },
+  "aiSitePurpose": {
+    "message": "Ne için kullanılır"
+  },
+  "aiSiteSources": {
+    "message": "Kaynaklar"
+  },
+  "aiCost": {
+    "message": "Maliyet: {1}"
+  },
+  "aiResearched": {
+    "message": "web'de araştırıldı"
   }
 }

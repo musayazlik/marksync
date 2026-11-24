@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.3.0](https://github.com/musayazlik/marksync/compare/v0.2.0...v0.3.0) (2026-11-24)
+
+
+### Features
+
+* **ai:** file bookmarks from an inbox folder with OpenRouter ([426a61c](https://github.com/musayazlik/marksync/commit/426a61cac9e58cb1738dfc4a7f902cdd03c263a6))
+* **ai:** research each site on the web and describe it in the sorting log ([6fb3f3b](https://github.com/musayazlik/marksync/commit/6fb3f3b1aa7b48953b82ee93772118e3fd2246fb))
+* **ui:** new look for Settings, the popup and the sorting log, with an animated sync status ([6fb3f3b](https://github.com/musayazlik/marksync/commit/6fb3f3b1aa7b48953b82ee93772118e3fd2246fb))
+* **ui:** the sorting log is a timeline grouped by day, with filter counts and a route from the inbox to the new folder ([6fb3f3b](https://github.com/musayazlik/marksync/commit/6fb3f3b1aa7b48953b82ee93772118e3fd2246fb))
+
 ## [0.2.0](https://github.com/musayazlik/marksync/compare/v0.1.0...v0.2.0) (2026-11-23)
 
 

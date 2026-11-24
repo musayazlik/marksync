@@ -1,7 +1,7 @@
 {
   "name": "marksync",
   "description": "Open-source bookmark sync for Chrome, Brave, Edge and Firefox, with Google Drive backups.",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "type": "module",
   "license": "MIT",

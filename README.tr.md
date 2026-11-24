@@ -21,7 +21,7 @@ oradadır. Üçüncü taraf bir sunucu yoktur; her şey Google Drive'ınızdaki
 - Başka tarayıcıdan içe aktarma (Marksync kurulu tarayıcıdan ya da herhangi bir tarayıcının HTML dosyasından), kopyasız birleştirme veya yeni klasöre koyma
 - Standart HTML yer imi dosyasına dışa aktarma
 - Türkçe ve İngilizce arayüz; eşitleme müdahale gerektirdiğinde araç çubuğu simgesinde uyarı rozeti
-- Kendi [OpenRouter](https://openrouter.ai) anahtarınızla isteğe bağlı yapay zekâ düzenlemesi: bir gelen kutusu klasörü seçin, oraya eklediğiniz yer imleri en uygun klasöre taşınsın; her karar Geri al seçeneğiyle bir kayıt sayfasında listelenir
+- Kendi [OpenRouter](https://openrouter.ai) anahtarınızla isteğe bağlı yapay zekâ düzenlemesi: bir gelen kutusu klasörü seçin, model (varsayılan Claude Opus) oraya eklediğiniz her yer imini araştırır, en uygun klasöre taşır ve sitenin ne olduğunu, ne için kullanıldığını açıklar; her karar Geri al seçeneğiyle bir kayıt sayfasında listelenir
 
 ## Desteklenen tarayıcılar
 

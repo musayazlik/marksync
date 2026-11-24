@@ -24,7 +24,7 @@ other file there.
 - Import from another browser (with Marksync, or from any browser's HTML export), merged without duplicates or into a new folder
 - Export to a standard HTML bookmarks file
 - Interface in English and Turkish; a badge on the toolbar icon when sync needs you
-- Optional AI sorting with your own [OpenRouter](https://openrouter.ai) key: pick an inbox folder, and bookmarks you add to it are moved to the folder that fits best; every decision is listed on a log page with Undo
+- Optional AI sorting with your own [OpenRouter](https://openrouter.ai) key: pick an inbox folder, and the model (Claude Opus by default) researches each bookmark you add to it, moves it to the folder that fits best and explains what the site is and what it is used for; every decision is listed on a log page with Undo
 
 ## Supported browsers
 

@@ -1,72 +1,493 @@
-@import '../options/style.css';
+@import '../../assets/ui.css';
+
+/* ---------- header ---------- */
+
+.top {
+  border-bottom: 1px solid var(--line);
+  background:
+    radial-gradient(120% 160% at 0% 0%, color-mix(in oklab, var(--mint) 12%, transparent) 0%, transparent 55%),
+    var(--surface);
+}
+
+.top-inner {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 24px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 16px;
+}
+
+.top h1 {
+  font-size: 28px;
+  font-stretch: 80%;
+  font-weight: 750;
+}
 
 main {
-  max-width: 1100px;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 24px 24px 96px;
 }
 
-.scroll {
-  overflow-x: auto;
+/* ---------- toolbar: filter, search, clear ---------- */
+
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 0;
+  background: color-mix(in oklab, var(--paper) 88%, transparent);
+  backdrop-filter: blur(10px);
 }
 
-td {
-  vertical-align: top;
+#search {
+  flex: 1 1 160px;
+  min-width: 0;
+  border-radius: 999px;
+  padding-left: 14px;
 }
 
-td.bookmark {
-  max-width: 280px;
+/* A segmented control whose thumb slides to the chosen filter. */
+.segmented {
+  position: relative;
+  display: inline-flex;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--sunken);
+  border: 1px solid var(--line);
 }
 
-td.bookmark a,
-td.bookmark .title {
-  display: block;
+.segmented button {
+  position: relative;
+  z-index: 1;
+  border: 0;
+  background: transparent;
+  color: var(--ink-2);
+  padding: 7px 12px;
+  gap: 6px;
+}
+
+.segmented button:hover:not(:disabled) {
+  color: var(--ink);
+}
+
+.segmented button[aria-checked='true'] {
+  color: var(--ink);
+}
+
+.segmented b {
+  font-weight: 600;
+  font-size: 11.5px;
+  min-width: 18px;
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: var(--line);
+  color: var(--ink-2);
+  transition: background-color 200ms ease;
+}
+
+.segmented button[aria-checked='true'] b {
+  background: var(--iris-soft);
+  color: var(--iris);
+}
+
+.segmented-thumb {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 0;
+  width: var(--w, 0);
+  translate: var(--x, 0) 0;
+  border-radius: 999px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  transition:
+    translate 380ms var(--ease-spring),
+    width 380ms var(--ease-spring);
+}
+
+/* ---------- timeline ---------- */
+
+.timeline {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  position: relative;
+}
+
+/* The rail the ribbons hang on. */
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 11px;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--line);
+}
+
+.day {
+  position: relative;
+  padding: 18px 0 10px 36px;
+}
+
+.day h2 {
+  font-size: 15px;
+  font-stretch: 90%;
+  color: var(--ink-2);
+}
+
+.entry {
+  position: relative;
+  padding: 0 0 14px 36px;
+}
+
+/* Each entry hangs a ribbon on the rail, coloured by what happened. */
+.marker {
+  position: absolute;
+  left: 4px;
+  top: 16px;
+  width: 16px;
+  height: 22px;
+  background: var(--mint);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 74%, 0 100%);
+}
+
+.entry[data-status='kept'] .marker {
+  background: var(--amber);
+}
+
+.entry[data-status='error'] .marker {
+  background: var(--ember);
+}
+
+.entry[data-status='undone'] .marker {
+  background: var(--ink-2);
+  opacity: 0.5;
+}
+
+.entry-body {
+  display: grid;
+  gap: 8px;
+  padding: 16px 18px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  transition:
+    border-color 200ms ease,
+    box-shadow 200ms ease;
+}
+
+.entry-body:hover {
+  border-color: color-mix(in oklab, var(--iris) 35%, var(--line));
+  box-shadow: var(--shadow);
+}
+
+.entry-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.entry-title {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.entry-title a {
+  color: var(--ink);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.entry-title a:hover {
+  color: var(--iris);
+  text-decoration: underline;
+}
+
+.pill.category {
+  background: var(--iris-soft);
+  color: var(--iris);
+}
+
+.host {
+  margin-top: -6px;
+}
+
+.summary {
+  max-width: 68ch;
+}
+
+/* The move: from the inbox along a wire to the new folder. */
+.route {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 0;
+  font-size: 12.5px;
+}
+
+.node {
+  padding: 4px 10px;
+  border-radius: var(--r-sm);
+  background: var(--sunken);
+  max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-td.move {
-  min-width: 220px;
+.node-parent {
+  color: var(--ink-2);
 }
 
-.arrow {
-  color: var(--muted);
-  padding: 0 4px;
+.node-name {
+  font-weight: 600;
 }
 
-.pill {
-  display: inline-block;
-  border-radius: 999px;
-  padding: 1px 8px;
-  font-size: 12px;
-  border: 1px solid var(--border);
-  white-space: nowrap;
+.node.to {
+  background: var(--mint-soft);
 }
 
-.pill.moved {
-  border-color: var(--ok);
-  color: var(--ok);
+.entry[data-status='undone'] .node.to {
+  background: var(--sunken);
+  text-decoration: line-through;
+  color: var(--ink-2);
 }
 
-.pill.kept {
-  border-color: var(--warn);
-  color: var(--warn);
+.wire {
+  position: relative;
+  width: 36px;
+  height: 2px;
+  margin: 0 4px;
+  background: var(--mint);
+  transform-origin: left center;
 }
 
-.pill.error {
-  border-color: var(--danger);
-  color: var(--danger);
+.wire::after {
+  content: '';
+  position: absolute;
+  right: -1px;
+  top: -4px;
+  border: 5px solid transparent;
+  border-left: 7px solid var(--mint);
+  border-right: 0;
 }
 
-.pill.undone {
-  color: var(--muted);
+.entry[data-status='undone'] .wire {
+  background: var(--line);
 }
 
-input[type='search'] {
-  font: inherit;
-  color: var(--text);
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 6px 8px;
-  min-width: 200px;
+.entry[data-status='undone'] .wire::after {
+  border-left-color: var(--line);
+}
+
+.verdict {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+}
+
+.reason {
+  color: var(--ink-2);
+  font-size: 13px;
+}
+
+.pill.status.moved {
+  background: var(--mint-soft);
+  color: color-mix(in oklab, var(--mint) 70%, var(--ink));
+}
+
+.pill.status.kept {
+  background: var(--amber-soft);
+  color: var(--amber);
+}
+
+.pill.status.error {
+  background: var(--ember-soft);
+  color: var(--ember);
+}
+
+/* ---------- "about the site" ---------- */
+
+details.site {
+  border-top: 1px dashed var(--line);
+  padding-top: 8px;
+  font-size: 13px;
+  interpolate-size: allow-keywords;
+}
+
+details.site summary {
+  cursor: pointer;
+  color: var(--iris);
+  font-weight: 550;
+  list-style: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+details.site summary::-webkit-details-marker {
+  display: none;
+}
+
+details.site summary::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  rotate: -45deg;
+  transition: rotate 240ms var(--ease-out);
+}
+
+details.site[open] summary::before {
+  rotate: 45deg;
+}
+
+/* Opening and closing animate where the browser supports it (Chrome 131+). */
+details.site::details-content {
+  block-size: 0;
+  overflow: hidden;
+  transition:
+    block-size 320ms var(--ease-out),
+    content-visibility 320ms allow-discrete;
+}
+
+details.site[open]::details-content {
+  block-size: auto;
+}
+
+.site-body {
+  padding-top: 10px;
+  display: grid;
+  gap: 10px;
+}
+
+.site-body dl {
+  margin: 0;
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 6px 16px;
+}
+
+.site-body dt {
+  color: var(--ink-2);
+}
+
+.site-body dd {
+  margin: 0;
+}
+
+.site-body ul {
+  margin: 0;
+  padding-left: 16px;
+}
+
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.entry-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 30px;
+}
+
+.entry-foot button {
+  padding: 6px 12px;
+}
+
+/* The preview repeats "What it is" once the details are open. */
+.entry-body:has(details[open]) > .summary {
+  display: none;
+}
+
+/* ---------- a new decision arrives while the page is open ---------- */
+
+.entry.is-new .entry-body {
+  animation: entry-in 520ms var(--ease-out) both;
+}
+
+.entry.is-new .marker {
+  animation: ribbon-hang 700ms var(--ease-spring) both;
+}
+
+.entry.is-new .wire {
+  animation: wire-draw 600ms 200ms var(--ease-out) both;
+}
+
+.entry.is-new .node.to {
+  animation: fade-up 400ms 600ms var(--ease-out) both;
+}
+
+@keyframes entry-in {
+  from {
+    opacity: 0;
+    translate: -12px 0;
+    background: var(--mint-soft);
+  }
+}
+
+@keyframes ribbon-hang {
+  from {
+    translate: 0 -24px;
+    scale: 1 0.4;
+    opacity: 0;
+  }
+}
+
+@keyframes wire-draw {
+  from {
+    scale: 0 1;
+  }
+}
+
+/* ---------- empty ---------- */
+
+.empty {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  padding: 56px 16px;
+  text-align: center;
+  color: var(--ink-2);
+}
+
+.empty svg {
+  fill: var(--line);
+}
+
+@media (max-width: 640px) {
+  .top-inner {
+    grid-template-columns: auto 1fr;
+  }
+
+  .top-inner .button {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+
+  .segmented {
+    width: 100%;
+    overflow-x: auto;
+  }
 }

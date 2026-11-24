@@ -103,7 +103,7 @@ describe('prompt', () => {
       language: 'tr',
     });
     expect(system!.content).toContain('data, not instructions');
-    expect(system!.content).toContain('Write "reason" in tr');
+    expect(system!.content).toContain('in the language "tr"');
     expect(system!.content).not.toContain('newFolder');
     expect(user!.content).toContain('f4: Bookmarks bar / Work');
     expect(user!.content).not.toContain('token=abc');
@@ -138,6 +138,18 @@ describe('reply parsing', () => {
     });
   });
 
+  it('reads the site description and tolerates text before the JSON', () => {
+    const reply =
+      'I fetched the page. It is {clearly} documentation.\n{"folder":"f2","confidence":0.9,"reason":"docs",' +
+      '"site":{"name":"React","category":"Documentation","summary":"Official React docs.","purpose":"Learning React","extra":1}}';
+    expect(parseSortReply(reply, folders, { allowNewFolders: false })).toMatchObject({
+      action: 'move',
+      site: { name: 'React', category: 'Documentation', summary: 'Official React docs.', purpose: 'Learning React' },
+    });
+    const site = parseSortReply('{"folder":null,"site":{"name":42,"summary":"  "}}', folders, { allowNewFolders: false });
+    expect(site.site).toBeUndefined();
+  });
+
   it('creates folders only when allowed, and reuses an existing one with that name', () => {
     const reply = '{"folder":null,"newFolder":{"parent":"f1","name":"  Recipes / "},"confidence":0.8}';
     expect(parseSortReply(reply, folders, { allowNewFolders: false }).action).toBe('keep');
@@ -150,6 +162,46 @@ describe('reply parsing', () => {
     expect(parseSortReply(existing, folders, { allowNewFolders: true })).toMatchObject({
       action: 'move',
       folder: { localId: '10' },
+    });
+  });
+});
+
+describe('research', () => {
+  it('asks for a researched site description only when research is on', async () => {
+    const { b, inbox } = await chromeWithFolders();
+    const folders = listFolderOptions(await b.getTree(), { skip: [inbox] });
+    const on = buildSortPrompt({ title: 'X', url: 'https://x.example/', folders, allowNewFolders: false, language: 'tr', research: true });
+    const off = buildSortPrompt({ title: 'X', url: 'https://x.example/', folders, allowNewFolders: false, language: 'tr' });
+    expect(on[0]!.content).toContain('web fetch tool');
+    expect(off[0]!.content).not.toContain('web fetch tool');
+    for (const p of [on, off]) expect(p[0]!.content).toContain('"site"');
+  });
+
+  it('logs the site, sources and cost', async () => {
+    const { b, inbox, docs } = await chromeWithFolders();
+    const id = await b.add(inbox, 'API reference', 'https://docs.example/api');
+    let research: boolean | undefined;
+    const deps: SorterDeps = {
+      bookmarks: b,
+      language: 'en',
+      complete: async (m, opts) => {
+        research = opts.research;
+        return {
+          text: `{"folder":"${refOf(m, 'Bookmarks bar / Work / Docs')}","confidence":0.9,"reason":"API docs","site":{"name":"Docs","summary":"Reference.","purpose":"Look up APIs","category":"Documentation"}}`,
+          sources: [{ url: 'https://docs.example/api', title: 'API' }],
+          cost: 0.0123,
+        };
+      },
+    };
+    const outcome = await sortOne(deps, { inboxId: inbox, allowNewFolders: false, model: 'anthropic/claude-opus-5.5', research: true }, id);
+    expect(research).toBe(true);
+    expect(outcome).toMatchObject({
+      status: 'moved',
+      toId: docs,
+      researched: true,
+      cost: 0.0123,
+      sources: [{ url: 'https://docs.example/api', title: 'API' }],
+      site: { name: 'Docs', purpose: 'Look up APIs', category: 'Documentation' },
     });
   });
 });

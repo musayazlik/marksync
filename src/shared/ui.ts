@@ -24,21 +24,54 @@ export function statusTone(s: Status): 'ok' | 'warn' | 'error' | '' {
   return 'ok';
 }
 
-/** Runs an action with the button disabled; shows errors next to it. */
+/** Shows a message in the floating error toast, which hides itself again. */
+let toastTimer: ReturnType<typeof setTimeout> | undefined;
+export function showToast(el: HTMLElement, message: string) {
+  el.textContent = message;
+  el.hidden = false;
+  // Restart the entrance animation for a new message.
+  el.style.animation = 'none';
+  void el.offsetWidth;
+  el.style.animation = '';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => (el.hidden = true), 8000);
+}
+
+/** Runs an action with the button disabled and a spinner on it; shows errors in the toast. */
 export async function withBusy(button: HTMLButtonElement, action: () => Promise<unknown>, errorEl?: HTMLElement) {
-  const label = button.textContent;
   button.disabled = true;
-  button.textContent = '…';
+  button.dataset.busy = '';
+  button.setAttribute('aria-busy', 'true');
   if (errorEl) errorEl.hidden = true;
   try {
     await action();
   } catch (err) {
-    if (errorEl) {
-      errorEl.textContent = err instanceof Error ? err.message : String(err);
-      errorEl.hidden = false;
-    }
+    if (errorEl) showToast(errorEl, err instanceof Error ? err.message : String(err));
   } finally {
     button.disabled = false;
-    button.textContent = label;
+    delete button.dataset.busy;
+    button.removeAttribute('aria-busy');
+  }
+}
+
+export type EmblemState = 'off' | 'ok' | 'syncing' | 'warn' | 'error';
+
+/** The emblem's state for a sync status. */
+export function emblemState(s: Status, syncEnabled = true): EmblemState {
+  if (!s.connected || !syncEnabled) return 'off';
+  if (s.syncing) return 'syncing';
+  const tone = statusTone(s);
+  return tone === 'warn' || tone === 'error' ? tone : 'ok';
+}
+
+/** Updates the status emblem; the ribbon settles with a small drop when a sync finishes. */
+export function setEmblem(el: Element, state: EmblemState) {
+  const html = el as HTMLElement;
+  const before = html.dataset.state;
+  html.dataset.state = state;
+  if (before === 'syncing' && state === 'ok') {
+    el.classList.remove('settled');
+    void html.getBoundingClientRect();
+    el.classList.add('settled');
   }
 }

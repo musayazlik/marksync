@@ -9,55 +9,47 @@
   </head>
   <body>
     <!-- Text comes from src/public/_locales (see src/shared/i18n.ts). -->
-    <main class="stack">
-      <header class="row spread">
-        <div class="row">
-          <img src="/icon/32.png" srcset="/icon/64.png 2x" width="32" height="32" alt="" />
+    <header class="top">
+      <div class="top-inner">
+        <svg class="emblem" data-state="ok" viewBox="0 0 100 100" width="40" height="40" aria-hidden="true">
+          <rect class="bg" width="100" height="100" rx="26" />
+          <g class="arrows">
+            <path d="M21.8 60.3A30 30 0 0 1 74.6 32.8" />
+            <path d="M74.6 23.8L74.6 32.8L66.1 29.7" />
+            <path d="M78.2 39.7A30 30 0 0 1 25.4 67.2" />
+            <path d="M25.4 76.2L25.4 67.2L33.9 70.3" />
+          </g>
+          <path class="ribbon" d="M40 31H60V69L50 61.5L40 69Z" />
+        </svg>
+        <div class="top-text">
           <h1 data-i18n="aiLogTitle"></h1>
+          <p class="muted small" id="intro"></p>
         </div>
-        <a class="small" href="./options.html#ai" data-i18n="aiLogBack"></a>
-      </header>
+        <a class="button" href="./options.html#ai" data-i18n="aiLogBack"></a>
+      </div>
+    </header>
 
-      <p class="muted small" id="intro"></p>
-
-      <section class="card stack">
-        <div class="row spread wrap">
-          <div class="row wrap">
-            <label class="row small">
-              <span data-i18n="aiLogShow"></span>
-              <select id="filter">
-                <option value="all" data-i18n="aiLogFilterAll"></option>
-                <option value="moved" data-i18n="aiLogFilterMoved"></option>
-                <option value="kept" data-i18n="aiLogFilterKept"></option>
-                <option value="error" data-i18n="aiLogFilterErrors"></option>
-              </select>
-            </label>
-            <input id="search" type="search" data-i18n-placeholder="aiLogSearch" data-i18n-aria-label="aiLogSearch" />
-          </div>
-          <button id="clear" class="danger" data-i18n="aiLogClear"></button>
+    <main>
+      <div class="toolbar">
+        <div class="segmented" role="radiogroup" id="filter" data-i18n-aria-label="aiLogShow">
+          <span class="segmented-thumb" aria-hidden="true"></span>
+          <button role="radio" data-filter="all"><span data-i18n="aiLogFilterAll"></span><b data-count="all"></b></button>
+          <button role="radio" data-filter="moved"><span data-i18n="aiLogFilterMoved"></span><b data-count="moved"></b></button>
+          <button role="radio" data-filter="kept"><span data-i18n="aiLogFilterKept"></span><b data-count="kept"></b></button>
+          <button role="radio" data-filter="error"><span data-i18n="aiLogFilterErrors"></span><b data-count="error"></b></button>
         </div>
-        <p id="totals" class="muted small"></p>
+        <input id="search" type="search" data-i18n-placeholder="aiLogSearch" data-i18n-aria-label="aiLogSearch" />
+        <button id="clear" class="quiet danger" data-i18n="aiLogClear"></button>
+      </div>
 
-        <div class="scroll">
-          <table id="log">
-            <thead>
-              <tr>
-                <th data-i18n="columnDate"></th>
-                <th data-i18n="columnBookmark"></th>
-                <th data-i18n="columnMove"></th>
-                <th data-i18n="columnReason"></th>
-                <th data-i18n="columnResult"></th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-        <p id="empty" class="muted small" data-i18n="aiLogEmpty" hidden></p>
-      </section>
-
-      <p id="action-error" class="notice error small" hidden></p>
+      <ol id="log" class="timeline"></ol>
+      <div id="empty" class="empty" hidden>
+        <svg viewBox="0 0 24 32" width="28" height="36" aria-hidden="true"><path d="M2 2h20v28l-10-7-10 7z" /></svg>
+        <p data-i18n="aiLogEmpty"></p>
+      </div>
     </main>
+
+    <p id="action-error" class="notice error small toast" role="alert" hidden></p>
     <script type="module" src="./main.ts"></script>
   </body>
 </html>

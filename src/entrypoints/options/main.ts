@@ -116,6 +116,7 @@ const reasonKey: Record<BackupInfo['reason'], string | undefined> = {
   scheduled: 'backupReasonScheduled',
   'before-restore': 'backupReasonBeforeRestore',
   'before-remote-delete': 'backupReasonBeforeRemoteDelete',
+  'before-cleanup': 'backupReasonBeforeCleanup',
 };
 
 function backupDate(b: BackupInfo): string {

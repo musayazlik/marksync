@@ -80,6 +80,10 @@ $('#import').addEventListener('click', () => {
   void browser.tabs.create({ url: browser.runtime.getURL('/options.html#import') });
   window.close();
 });
+$('#open-dupes').addEventListener('click', () => {
+  void browser.tabs.create({ url: browser.runtime.getURL('/duplicates.html') });
+  window.close();
+});
 $('#open-log').addEventListener('click', () => {
   void browser.tabs.create({ url: browser.runtime.getURL('/sorter-log.html') });
   window.close();

@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.0](https://github.com/musayazlik/marksync/compare/v0.3.0...v0.4.0) (2026-11-24)
+
+
+### Features
+
+* check bookmarks for dead links and offer the Wayback Machine copy ([a107e09](https://github.com/musayazlik/marksync/commit/a107e09482b334f519f145e99ae2bfc53c80e755)), closes [#7](https://github.com/musayazlik/marksync/issues/7)
+* find duplicate bookmarks and keep one copy of each ([ac7d597](https://github.com/musayazlik/marksync/commit/ac7d597bd2630c8a319bfd34c713df1a7eee5647)), closes [#6](https://github.com/musayazlik/marksync/issues/6)
+
 ## [0.3.0](https://github.com/musayazlik/marksync/compare/v0.2.0...v0.3.0) (2026-11-24)
 
 

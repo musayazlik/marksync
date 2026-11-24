@@ -17,6 +17,17 @@ import {
   removeBrowser,
 } from '../services/import-service';
 import { updateBadge } from '../services/badge';
+import {
+  clearSortLog,
+  listFolderChoices,
+  onBookmarkChanged,
+  onBookmarkCreated,
+  onBookmarkMoved,
+  onBookmarkRemoved,
+  sortInboxNow,
+  testOpenRouter,
+  undoSortEntry,
+} from '../services/sorter-service';
 import { isApplying, keepLocalBookmarks, resyncFromDrive, runSync, syncIfRemoteChanged } from '../services/sync-service';
 import type { Envelope, Request } from '../shared/messages';
 import { t } from '../shared/i18n';
@@ -113,6 +124,18 @@ export default defineBackground(() => {
   browser.bookmarks.onRemoved.addListener(onBookmarkEvent);
   browser.bookmarks.onChanged.addListener(onBookmarkEvent);
   browser.bookmarks.onMoved.addListener(onBookmarkEvent);
+
+  // AI sorting reacts only to changes made in this browser, never to what
+  // sync or an import writes (see services/sorter-service.ts).
+  const local = () => !isApplying() && !browserImporting;
+  browser.bookmarks.onCreated.addListener((id, node) => {
+    if (local()) void onBookmarkCreated(id, node).catch((err) => console.warn('[marksync] AI sorting', err));
+  });
+  browser.bookmarks.onMoved.addListener((id, info) => {
+    if (local()) void onBookmarkMoved(id, info).catch((err) => console.warn('[marksync] AI sorting', err));
+  });
+  browser.bookmarks.onChanged.addListener((id) => onBookmarkChanged(id));
+  browser.bookmarks.onRemoved.addListener((id) => onBookmarkRemoved(id));
   // Chromium only: the browser's own "Import bookmarks" dialog.
   browser.bookmarks.onChildrenReordered?.addListener(onBookmarkEvent);
   browser.bookmarks.onImportBegan?.addListener(() => (browserImporting = true));
@@ -174,6 +197,16 @@ export default defineBackground(() => {
         return redirectUrl();
       case 'settingsChanged':
         return scheduleAlarms();
+      case 'aiListFolders':
+        return listFolderChoices();
+      case 'aiTestKey':
+        return testOpenRouter();
+      case 'aiSortNow':
+        return sortInboxNow();
+      case 'aiUndo':
+        return undoSortEntry(req.id);
+      case 'aiClearLog':
+        return clearSortLog();
     }
   }
 
@@ -182,7 +215,8 @@ export default defineBackground(() => {
   const knownTypes = new Set<Request['type']>([
     'connect', 'disconnect', 'syncNow', 'checkNow', 'resyncFromDrive', 'keepLocal', 'backupNow', 'listBackups',
     'restoreBackup', 'deleteBackup', 'listBrowsers', 'removeBrowser', 'importFromBrowser', 'importHtml',
-    'exportHtml', 'getRedirectUrl', 'settingsChanged',
+    'exportHtml', 'getRedirectUrl', 'settingsChanged', 'aiListFolders', 'aiTestKey', 'aiSortNow', 'aiUndo',
+    'aiClearLog',
   ]);
 
   browser.runtime.onMessage.addListener((req: Request, sender, sendResponse) => {

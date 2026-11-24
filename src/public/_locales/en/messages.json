@@ -381,5 +381,209 @@
   },
   "errNoAnswer": {
     "message": "The background script did not answer."
+  },
+  "aiHeading": {
+    "message": "AI sorting (OpenRouter)"
+  },
+  "aiOpenLog": {
+    "message": "Open sorting log"
+  },
+  "aiIntro": {
+    "message": "Choose an inbox folder. When you add a bookmark to it in this browser, an AI model on OpenRouter picks the best matching folder among yours and moves the bookmark there a few seconds later."
+  },
+  "aiPrivacy": {
+    "message": "Only while this is on: the bookmark's title, its address without the part after \"?\" and the names of your folders are sent to OpenRouter and the model you choose. Other browsers send nothing unless you turn it on there too."
+  },
+  "aiEnabledLabel": {
+    "message": "Sort bookmarks I add to the inbox folder in this browser"
+  },
+  "aiInboxLabel": {
+    "message": "Inbox folder"
+  },
+  "aiInboxNone": {
+    "message": "Choose a folder…"
+  },
+  "aiInboxMissingOption": {
+    "message": "(deleted folder)"
+  },
+  "aiChooseInbox": {
+    "message": "Choose the inbox folder to start."
+  },
+  "aiInboxMissing": {
+    "message": "The inbox folder no longer exists in this browser. Choose another one."
+  },
+  "aiReady": {
+    "message": "Ready. Bookmarks you add to \"{1}\" are sorted a few seconds later."
+  },
+  "aiKeyLabel": {
+    "message": "OpenRouter API key"
+  },
+  "aiKeyPlaceholder": {
+    "message": "sk-or-v1-…"
+  },
+  "aiKeySave": {
+    "message": "Save key"
+  },
+  "aiKeyRemove": {
+    "message": "Remove key"
+  },
+  "aiTest": {
+    "message": "Test"
+  },
+  "aiKeySaved": {
+    "message": "Key saved: {1}"
+  },
+  "aiKeyNone": {
+    "message": "No key saved. You can create one at openrouter.ai/keys."
+  },
+  "aiKeyHelp": {
+    "message": "The key is stored only in this browser and is never uploaded to Google Drive."
+  },
+  "aiKeyInvalid": {
+    "message": "This does not look like an OpenRouter API key."
+  },
+  "aiConfirmRemoveKey": {
+    "message": "Remove the OpenRouter API key from this browser? AI sorting stops until you add a key again."
+  },
+  "aiTestOk": {
+    "message": "OpenRouter accepted the key."
+  },
+  "aiTestOkLabel": {
+    "message": "OpenRouter accepted the key ({1})."
+  },
+  "aiModelLabel": {
+    "message": "Model"
+  },
+  "aiModelHelp": {
+    "message": "Any model ID from openrouter.ai/models. Empty uses {1}, which is fast and cheap."
+  },
+  "aiAllowNewLabel": {
+    "message": "Create a new folder when none of mine fits"
+  },
+  "aiSortNow": {
+    "message": "Sort inbox now"
+  },
+  "aiSortNowResult": {
+    "message": "Moved {1}, left in the inbox {2}, failed {3}. Details are in the sorting log."
+  },
+  "aiNotReady": {
+    "message": "Turn on AI sorting, choose an inbox folder and save an API key first."
+  },
+  "aiPermissionMissing": {
+    "message": "Marksync is not allowed to contact openrouter.ai. Turn AI sorting off and on again to allow it."
+  },
+  "aiPermissionDenied": {
+    "message": "AI sorting needs permission to contact openrouter.ai."
+  },
+  "aiNoKey": {
+    "message": "Save an OpenRouter API key first."
+  },
+  "aiKeyRejected": {
+    "message": "OpenRouter rejected the key."
+  },
+  "aiUndo": {
+    "message": "Undo"
+  },
+  "aiUndoHint": {
+    "message": "Move the bookmark back to the inbox"
+  },
+  "aiUndoGone": {
+    "message": "The bookmark no longer exists."
+  },
+  "aiUndoMoved": {
+    "message": "The bookmark was moved again since then, so it stays where it is."
+  },
+  "aiUndoNoSource": {
+    "message": "The inbox folder no longer exists."
+  },
+  "aiUndoUnavailable": {
+    "message": "This entry cannot be undone."
+  },
+  "aiLogTitle": {
+    "message": "AI sorting log"
+  },
+  "aiLogBack": {
+    "message": "Settings"
+  },
+  "aiLogIntro": {
+    "message": "Every decision the AI made in this browser, newest first. The last {1} are kept."
+  },
+  "aiLogShow": {
+    "message": "Show"
+  },
+  "aiLogFilterAll": {
+    "message": "All"
+  },
+  "aiLogFilterMoved": {
+    "message": "Moved"
+  },
+  "aiLogFilterKept": {
+    "message": "Left in the inbox"
+  },
+  "aiLogFilterErrors": {
+    "message": "Failed"
+  },
+  "aiLogSearch": {
+    "message": "Search title, address or folder"
+  },
+  "aiLogClear": {
+    "message": "Clear log"
+  },
+  "aiLogConfirmClear": {
+    "message": "Delete the whole sorting log? Bookmarks are not changed."
+  },
+  "aiLogEmpty": {
+    "message": "Nothing here yet."
+  },
+  "aiLogTotals": {
+    "message": "{1} moved · {2} left in the inbox · {3} failed"
+  },
+  "columnBookmark": {
+    "message": "Bookmark"
+  },
+  "columnMove": {
+    "message": "From → To"
+  },
+  "columnReason": {
+    "message": "Reason"
+  },
+  "columnResult": {
+    "message": "Result"
+  },
+  "aiStatusMoved": {
+    "message": "Moved"
+  },
+  "aiStatusCreated": {
+    "message": "Moved to a new folder"
+  },
+  "aiStatusKept": {
+    "message": "Left in the inbox"
+  },
+  "aiStatusError": {
+    "message": "Failed"
+  },
+  "aiStatusUndone": {
+    "message": "Undone"
+  },
+  "aiConfidence": {
+    "message": "{1}% sure"
+  },
+  "aiErrAuth": {
+    "message": "OpenRouter rejected the API key."
+  },
+  "aiErrCredits": {
+    "message": "Not enough OpenRouter credits."
+  },
+  "aiErrRateLimit": {
+    "message": "Too many requests to OpenRouter. Try again later."
+  },
+  "aiErrModel": {
+    "message": "The model is unavailable or rejected the request. Check the model ID in Settings."
+  },
+  "aiErrNetwork": {
+    "message": "OpenRouter could not be reached."
+  },
+  "aiErrReply": {
+    "message": "The AI's answer could not be used, so the bookmark stayed in the inbox."
   }
 }

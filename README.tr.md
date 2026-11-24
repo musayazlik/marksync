@@ -21,6 +21,7 @@ oradadır. Üçüncü taraf bir sunucu yoktur; her şey Google Drive'ınızdaki
 - Başka tarayıcıdan içe aktarma (Marksync kurulu tarayıcıdan ya da herhangi bir tarayıcının HTML dosyasından), kopyasız birleştirme veya yeni klasöre koyma
 - Standart HTML yer imi dosyasına dışa aktarma
 - Türkçe ve İngilizce arayüz; eşitleme müdahale gerektirdiğinde araç çubuğu simgesinde uyarı rozeti
+- Kendi [OpenRouter](https://openrouter.ai) anahtarınızla isteğe bağlı yapay zekâ düzenlemesi: bir gelen kutusu klasörü seçin, oraya eklediğiniz yer imleri en uygun klasöre taşınsın; her karar Geri al seçeneğiyle bir kayıt sayfasında listelenir
 
 ## Desteklenen tarayıcılar
 
@@ -40,6 +41,10 @@ oradadır. Üçüncü taraf bir sunucu yoktur; her şey Google Drive'ınızdaki
 - Erişim token'ı oturum deposunda tutulur ve tarayıcı kapanınca silinir.
 - *Disconnect* yalnızca tıkladığınız tarayıcının bağlantısını keser; diğer tarayıcılarınız bağlı kalır.
   Marksync'in erişimini her yerden kaldırmak için https://myaccount.google.com/permissions adresini kullanın.
+- Yapay zekâ düzenlemesi varsayılan olarak kapalıdır. Yalnızca bir tarayıcıda açtığınızda (bu sırada
+  `openrouter.ai` için izin istenir), o tarayıcı gelen kutusuna eklediğiniz her yer iminin başlığını ve
+  adresini (sorgu kısmı olmadan) ve klasör adlarınızı OpenRouter'a ve seçtiğiniz modele gönderir.
+  OpenRouter anahtarınız o tarayıcının yerel deposunda kalır, Drive'a hiçbir zaman yüklenmez.
 
 ## Geliştirme
 

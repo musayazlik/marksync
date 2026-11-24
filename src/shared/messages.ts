@@ -2,6 +2,7 @@ import { browser } from 'wxt/browser';
 import { t } from './i18n';
 import type { BackupInfo } from '../services/backup-service';
 import type { BrowserInfo } from '../services/import-service';
+import type { SortNowResult } from '../services/sorter-service';
 import type { ImportMode, ImportResult } from '../sync/importer';
 
 /** Requests from the popup and options page to the background script. */
@@ -22,7 +23,12 @@ export type Request =
   | { type: 'importHtml'; html: string; mode: ImportMode; label: string }
   | { type: 'exportHtml' }
   | { type: 'getRedirectUrl' }
-  | { type: 'settingsChanged' };
+  | { type: 'settingsChanged' }
+  | { type: 'aiListFolders' }
+  | { type: 'aiTestKey' }
+  | { type: 'aiSortNow' }
+  | { type: 'aiUndo'; id: string }
+  | { type: 'aiClearLog' };
 
 export interface ResponseData {
   connect: string;
@@ -42,6 +48,11 @@ export interface ResponseData {
   exportHtml: string;
   getRedirectUrl: string;
   settingsChanged: void;
+  aiListFolders: { id: string; path: string }[];
+  aiTestKey: string;
+  aiSortNow: SortNowResult;
+  aiUndo: void;
+  aiClearLog: void;
 }
 
 export type Envelope<T> = { ok: true; data: T } | { ok: false; error: string };

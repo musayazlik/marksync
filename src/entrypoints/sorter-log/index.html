@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title data-i18n="aiLogTitle">Marksync</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="/icon/32.png" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <!-- Text comes from src/public/_locales (see src/shared/i18n.ts). -->
+    <main class="stack">
+      <header class="row spread">
+        <div class="row">
+          <img src="/icon/32.png" srcset="/icon/64.png 2x" width="32" height="32" alt="" />
+          <h1 data-i18n="aiLogTitle"></h1>
+        </div>
+        <a class="small" href="./options.html#ai" data-i18n="aiLogBack"></a>
+      </header>
+
+      <p class="muted small" id="intro"></p>
+
+      <section class="card stack">
+        <div class="row spread wrap">
+          <div class="row wrap">
+            <label class="row small">
+              <span data-i18n="aiLogShow"></span>
+              <select id="filter">
+                <option value="all" data-i18n="aiLogFilterAll"></option>
+                <option value="moved" data-i18n="aiLogFilterMoved"></option>
+                <option value="kept" data-i18n="aiLogFilterKept"></option>
+                <option value="error" data-i18n="aiLogFilterErrors"></option>
+              </select>
+            </label>
+            <input id="search" type="search" data-i18n-placeholder="aiLogSearch" data-i18n-aria-label="aiLogSearch" />
+          </div>
+          <button id="clear" class="danger" data-i18n="aiLogClear"></button>
+        </div>
+        <p id="totals" class="muted small"></p>
+
+        <div class="scroll">
+          <table id="log">
+            <thead>
+              <tr>
+                <th data-i18n="columnDate"></th>
+                <th data-i18n="columnBookmark"></th>
+                <th data-i18n="columnMove"></th>
+                <th data-i18n="columnReason"></th>
+                <th data-i18n="columnResult"></th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <p id="empty" class="muted small" data-i18n="aiLogEmpty" hidden></p>
+      </section>
+
+      <p id="action-error" class="notice error small" hidden></p>
+    </main>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

@@ -24,6 +24,7 @@ other file there.
 - Import from another browser (with Marksync, or from any browser's HTML export), merged without duplicates or into a new folder
 - Export to a standard HTML bookmarks file
 - Interface in English and Turkish; a badge on the toolbar icon when sync needs you
+- Optional AI sorting with your own [OpenRouter](https://openrouter.ai) key: pick an inbox folder, and bookmarks you add to it are moved to the folder that fits best; every decision is listed on a log page with Undo
 
 ## Supported browsers
 
@@ -83,6 +84,10 @@ You need a Google Cloud project with the Drive API and an OAuth client of type
 - Access tokens are kept in session storage and cleared when the browser closes.
 - *Disconnect* unlinks only the browser you click it in; your other browsers stay connected.
   To remove Marksync's access everywhere, use https://myaccount.google.com/permissions.
+- AI sorting is off by default. Only when you turn it on in a browser (which asks for permission
+  to contact `openrouter.ai`), that browser sends the title and address (without the query string)
+  of each bookmark you add to the inbox, plus your folder names, to OpenRouter and the model you
+  chose. Your OpenRouter key is kept in that browser's local storage and never uploaded to Drive.
 
 ## Contributing
 

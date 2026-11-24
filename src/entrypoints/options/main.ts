@@ -1,7 +1,16 @@
 import { browser } from 'wxt/browser';
 import { errorText, localizePage, t, tn } from '../../shared/i18n';
 import { send } from '../../shared/messages';
-import { getSettings, settingsItem, statusItem, type Settings, type Status } from '../../shared/state';
+import {
+  DEFAULT_AI_MODEL,
+  getSettings,
+  openRouterKeyItem,
+  settingsItem,
+  statusItem,
+  type Settings,
+  type Status,
+} from '../../shared/state';
+import { OPENROUTER_ORIGIN } from '../../platform/openrouter';
 import { $, RELEASES_URL, statusTone, timeAgo, withBusy } from '../../shared/ui';
 import { detectBrowser } from '../../platform/browser-info';
 import type { BackupInfo } from '../../services/backup-service';
@@ -40,6 +49,8 @@ const fields = {
   backupIntervalHours: 'number',
   backupRetention: 'number',
   deviceName: 'text',
+  aiModel: 'text',
+  aiAllowNewFolders: 'checkbox',
 } as const satisfies Partial<Record<keyof Settings, string>>;
 
 async function loadSettings() {
@@ -111,6 +122,167 @@ async function loadBackups() {
     tbody.append(tr);
   }
 }
+
+// ---------- AI sorting ----------
+
+const aiEnabled = $<HTMLInputElement>('#aiSortEnabled');
+const aiInbox = $<HTMLSelectElement>('#aiInboxFolderId');
+const aiKeyInput = $<HTMLInputElement>('#ai-key');
+/** OpenRouter keys look like "sk-or-v1-…"; anything else is rejected before saving. */
+const KEY_FORMAT = /^[\w-]{20,200}$/;
+let aiFolders: { id: string; path: string }[] = [];
+
+async function saveSetting<K extends keyof Settings>(key: K, value: Settings[K]) {
+  await settingsItem.setValue({ ...(await getSettings()), [key]: value });
+  await send({ type: 'settingsChanged' });
+}
+
+/**
+ * Asks for openrouter.ai, and in Firefox 140+ for consent to send bookmark
+ * data. Must be called directly in the click handler: browsers only show a
+ * permission prompt in response to a user action.
+ */
+function requestAiPermission(): Promise<boolean> {
+  const origins = [OPENROUTER_ORIGIN];
+  if (import.meta.env.FIREFOX) {
+    const withConsent = { origins, data_collection: ['bookmarksInfo'] } as Parameters<typeof browser.permissions.request>[0];
+    // Firefox before 140 does not know data_collection.
+    return browser.permissions.request(withConsent).catch(() => browser.permissions.request({ origins }));
+  }
+  return browser.permissions.request({ origins });
+}
+
+async function renderAiStatus() {
+  const s = await getSettings();
+  const key = await openRouterKeyItem.getValue();
+  const status = $('#ai-status');
+  const inbox = aiFolders.find((f) => f.id === s.aiInboxFolderId);
+  let text = '';
+  if (s.aiSortEnabled) {
+    if (!(await browser.permissions.contains({ origins: [OPENROUTER_ORIGIN] }))) text = t('aiPermissionMissing');
+    else if (!s.aiInboxFolderId) text = t('aiChooseInbox');
+    else if (!inbox) text = t('aiInboxMissing');
+    else if (!key) text = t('aiNoKey');
+    else text = t('aiReady', inbox.path);
+  }
+  status.textContent = text;
+  status.hidden = !text;
+  status.classList.toggle('warn', !!text && !(inbox && key));
+  $<HTMLButtonElement>('#ai-sort-now').disabled = !(s.aiSortEnabled && inbox && key);
+
+  $('#ai-key-state').textContent = key ? t('aiKeySaved', `${key.slice(0, 6)}…${key.slice(-4)}`) : t('aiKeyNone');
+  $('#ai-key-remove').hidden = !key;
+  $<HTMLButtonElement>('#ai-key-test').disabled = !key;
+}
+
+async function loadAiFolders() {
+  const s = await getSettings();
+  aiFolders = await send({ type: 'aiListFolders' });
+  const none = document.createElement('option');
+  none.value = '';
+  none.textContent = t('aiInboxNone');
+  const options = [none];
+  for (const f of aiFolders) {
+    const o = document.createElement('option');
+    o.value = f.id;
+    o.textContent = f.path;
+    options.push(o);
+  }
+  if (s.aiInboxFolderId && !aiFolders.some((f) => f.id === s.aiInboxFolderId)) {
+    const missing = document.createElement('option');
+    missing.value = s.aiInboxFolderId;
+    missing.textContent = t('aiInboxMissingOption');
+    options.push(missing);
+  }
+  aiInbox.replaceChildren(...options);
+  aiInbox.value = s.aiInboxFolderId;
+  await renderAiStatus();
+}
+
+async function initAi() {
+  const s = await getSettings();
+  aiEnabled.checked = s.aiSortEnabled;
+  $<HTMLInputElement>('#aiModel').placeholder = DEFAULT_AI_MODEL;
+  $('#ai-model-help').textContent = t('aiModelHelp', DEFAULT_AI_MODEL);
+  await loadAiFolders();
+}
+
+aiEnabled.addEventListener('change', () => {
+  actionError.hidden = true;
+  if (!aiEnabled.checked) {
+    void saveSetting('aiSortEnabled', false).then(renderAiStatus);
+    return;
+  }
+  // No await before this call: the permission prompt needs the user action.
+  void requestAiPermission()
+    .then(async (granted) => {
+      if (!granted) {
+        aiEnabled.checked = false;
+        throw new Error(t('aiPermissionDenied'));
+      }
+      await saveSetting('aiSortEnabled', true);
+    })
+    .catch(showError)
+    .finally(renderAiStatus);
+});
+aiInbox.addEventListener('change', () => void saveSetting('aiInboxFolderId', aiInbox.value).then(renderAiStatus));
+
+$('#ai-key-save').addEventListener('click', () =>
+  withBusy(
+    $<HTMLButtonElement>('#ai-key-save'),
+    async () => {
+      const key = aiKeyInput.value.trim();
+      if (!KEY_FORMAT.test(key)) throw new Error(t('aiKeyInvalid'));
+      await openRouterKeyItem.setValue(key);
+      aiKeyInput.value = '';
+      await renderAiStatus();
+    },
+    actionError,
+  ),
+);
+aiKeyInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') $<HTMLButtonElement>('#ai-key-save').click();
+});
+$('#ai-key-remove').addEventListener('click', () =>
+  withBusy(
+    $<HTMLButtonElement>('#ai-key-remove'),
+    async () => {
+      if (!confirm(t('aiConfirmRemoveKey'))) return;
+      await openRouterKeyItem.removeValue();
+      await renderAiStatus();
+    },
+    actionError,
+  ),
+);
+$('#ai-key-test').addEventListener('click', () =>
+  withBusy(
+    $<HTMLButtonElement>('#ai-key-test'),
+    async () => {
+      const label = await send({ type: 'aiTestKey' });
+      const result = $('#ai-result');
+      result.textContent = label ? t('aiTestOkLabel', label) : t('aiTestOk');
+      result.hidden = false;
+    },
+    actionError,
+  ),
+);
+$('#ai-sort-now').addEventListener('click', () =>
+  withBusy(
+    $<HTMLButtonElement>('#ai-sort-now'),
+    async () => {
+      const r = await send({ type: 'aiSortNow' });
+      const result = $('#ai-result');
+      result.textContent = t('aiSortNowResult', r.sorted, r.kept, r.failed);
+      result.hidden = false;
+    },
+    actionError,
+  ),
+);
+// Folders may have changed in another tab or the bookmark manager.
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') void loadAiFolders().catch(showError);
+});
+settingsItem.watch(() => void renderAiStatus());
 
 // ---------- import ----------
 
@@ -237,6 +409,7 @@ statusItem.watch((s) => {
   wasConnected = s.connected;
 });
 void loadSettings();
+void initAi().catch((err: unknown) => showError(err));
 // Development builds only: the OAuth redirect URI to register in Google Cloud.
 // The block is removed from store builds (`wxt build`, `wxt zip`).
 if (import.meta.env.MODE !== 'production') {
@@ -261,3 +434,4 @@ const showError = (err: unknown) => {
 void loadBackups().catch(showError);
 void loadBrowsers().catch(showError);
 if (location.hash === '#import') $('#import').scrollIntoView();
+if (location.hash === '#ai') $('#ai').scrollIntoView();

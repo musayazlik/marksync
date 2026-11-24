@@ -376,5 +376,209 @@
   },
   "errNoAnswer": {
     "message": "Eklentinin arka plan betiği yanıt vermedi."
+  },
+  "aiHeading": {
+    "message": "Yapay zekâ ile düzenleme (OpenRouter)"
+  },
+  "aiOpenLog": {
+    "message": "Düzenleme kaydını aç"
+  },
+  "aiIntro": {
+    "message": "Bir gelen kutusu klasörü seçin. Bu tarayıcıda o klasöre bir yer imi eklediğinizde, OpenRouter üzerindeki bir yapay zekâ modeli klasörleriniz arasından en uygun olanı seçer ve yer imini birkaç saniye sonra oraya taşır."
+  },
+  "aiPrivacy": {
+    "message": "Yalnızca bu açıkken: yer iminin başlığı, \"?\" işaretinden sonraki kısmı olmadan adresi ve klasörlerinizin adları OpenRouter'a ve seçtiğiniz modele gönderilir. Diğer tarayıcılar, orada da açmadığınız sürece hiçbir şey göndermez."
+  },
+  "aiEnabledLabel": {
+    "message": "Bu tarayıcıda gelen kutusuna eklediğim yer imlerini düzenle"
+  },
+  "aiInboxLabel": {
+    "message": "Gelen kutusu klasörü"
+  },
+  "aiInboxNone": {
+    "message": "Bir klasör seçin…"
+  },
+  "aiInboxMissingOption": {
+    "message": "(silinmiş klasör)"
+  },
+  "aiChooseInbox": {
+    "message": "Başlamak için gelen kutusu klasörünü seçin."
+  },
+  "aiInboxMissing": {
+    "message": "Gelen kutusu klasörü bu tarayıcıda artık yok. Başka bir klasör seçin."
+  },
+  "aiReady": {
+    "message": "Hazır. \"{1}\" klasörüne eklediğiniz yer imleri birkaç saniye sonra düzenlenir."
+  },
+  "aiKeyLabel": {
+    "message": "OpenRouter API anahtarı"
+  },
+  "aiKeyPlaceholder": {
+    "message": "sk-or-v1-…"
+  },
+  "aiKeySave": {
+    "message": "Anahtarı kaydet"
+  },
+  "aiKeyRemove": {
+    "message": "Anahtarı kaldır"
+  },
+  "aiTest": {
+    "message": "Dene"
+  },
+  "aiKeySaved": {
+    "message": "Kayıtlı anahtar: {1}"
+  },
+  "aiKeyNone": {
+    "message": "Kayıtlı anahtar yok. openrouter.ai/keys adresinden oluşturabilirsiniz."
+  },
+  "aiKeyHelp": {
+    "message": "Anahtar yalnızca bu tarayıcıda saklanır, Google Drive'a hiçbir zaman yüklenmez."
+  },
+  "aiKeyInvalid": {
+    "message": "Bu bir OpenRouter API anahtarına benzemiyor."
+  },
+  "aiConfirmRemoveKey": {
+    "message": "OpenRouter API anahtarı bu tarayıcıdan kaldırılsın mı? Yeniden anahtar ekleyene kadar düzenleme durur."
+  },
+  "aiTestOk": {
+    "message": "OpenRouter anahtarı kabul etti."
+  },
+  "aiTestOkLabel": {
+    "message": "OpenRouter anahtarı kabul etti ({1})."
+  },
+  "aiModelLabel": {
+    "message": "Model"
+  },
+  "aiModelHelp": {
+    "message": "openrouter.ai/models listesindeki herhangi bir model kimliği. Boş bırakılırsa hızlı ve ucuz olan {1} kullanılır."
+  },
+  "aiAllowNewLabel": {
+    "message": "Hiçbir klasör uymuyorsa yeni klasör oluştur"
+  },
+  "aiSortNow": {
+    "message": "Gelen kutusunu şimdi düzenle"
+  },
+  "aiSortNowResult": {
+    "message": "Taşınan {1}, gelen kutusunda kalan {2}, başarısız {3}. Ayrıntılar düzenleme kaydında."
+  },
+  "aiNotReady": {
+    "message": "Önce yapay zekâ ile düzenlemeyi açın, gelen kutusu klasörünü seçin ve bir API anahtarı kaydedin."
+  },
+  "aiPermissionMissing": {
+    "message": "Marksync'in openrouter.ai ile bağlantı kurma izni yok. İzin vermek için düzenlemeyi kapatıp yeniden açın."
+  },
+  "aiPermissionDenied": {
+    "message": "Yapay zekâ ile düzenleme için openrouter.ai ile bağlantı izni gerekiyor."
+  },
+  "aiNoKey": {
+    "message": "Önce bir OpenRouter API anahtarı kaydedin."
+  },
+  "aiKeyRejected": {
+    "message": "OpenRouter anahtarı reddetti."
+  },
+  "aiUndo": {
+    "message": "Geri al"
+  },
+  "aiUndoHint": {
+    "message": "Yer imini gelen kutusuna geri taşı"
+  },
+  "aiUndoGone": {
+    "message": "Yer imi artık yok."
+  },
+  "aiUndoMoved": {
+    "message": "Yer imi o zamandan beri yeniden taşınmış, bu yüzden olduğu yerde kalıyor."
+  },
+  "aiUndoNoSource": {
+    "message": "Gelen kutusu klasörü artık yok."
+  },
+  "aiUndoUnavailable": {
+    "message": "Bu kayıt geri alınamaz."
+  },
+  "aiLogTitle": {
+    "message": "Yapay zekâ düzenleme kaydı"
+  },
+  "aiLogBack": {
+    "message": "Ayarlar"
+  },
+  "aiLogIntro": {
+    "message": "Yapay zekânın bu tarayıcıda verdiği tüm kararlar, en yeni en üstte. Son {1} kayıt saklanır."
+  },
+  "aiLogShow": {
+    "message": "Göster"
+  },
+  "aiLogFilterAll": {
+    "message": "Tümü"
+  },
+  "aiLogFilterMoved": {
+    "message": "Taşınanlar"
+  },
+  "aiLogFilterKept": {
+    "message": "Gelen kutusunda kalanlar"
+  },
+  "aiLogFilterErrors": {
+    "message": "Başarısızlar"
+  },
+  "aiLogSearch": {
+    "message": "Başlık, adres veya klasör ara"
+  },
+  "aiLogClear": {
+    "message": "Kaydı temizle"
+  },
+  "aiLogConfirmClear": {
+    "message": "Düzenleme kaydının tamamı silinsin mi? Yer imleri değişmez."
+  },
+  "aiLogEmpty": {
+    "message": "Henüz kayıt yok."
+  },
+  "aiLogTotals": {
+    "message": "{1} taşındı · {2} gelen kutusunda kaldı · {3} başarısız"
+  },
+  "columnBookmark": {
+    "message": "Yer imi"
+  },
+  "columnMove": {
+    "message": "Nereden → Nereye"
+  },
+  "columnReason": {
+    "message": "Gerekçe"
+  },
+  "columnResult": {
+    "message": "Sonuç"
+  },
+  "aiStatusMoved": {
+    "message": "Taşındı"
+  },
+  "aiStatusCreated": {
+    "message": "Yeni klasöre taşındı"
+  },
+  "aiStatusKept": {
+    "message": "Gelen kutusunda kaldı"
+  },
+  "aiStatusError": {
+    "message": "Başarısız"
+  },
+  "aiStatusUndone": {
+    "message": "Geri alındı"
+  },
+  "aiConfidence": {
+    "message": "%{1} emin"
+  },
+  "aiErrAuth": {
+    "message": "OpenRouter API anahtarını reddetti."
+  },
+  "aiErrCredits": {
+    "message": "OpenRouter krediniz yetersiz."
+  },
+  "aiErrRateLimit": {
+    "message": "OpenRouter'a çok fazla istek gönderildi. Daha sonra tekrar deneyin."
+  },
+  "aiErrModel": {
+    "message": "Model kullanılamıyor veya isteği reddetti. Ayarlardaki model kimliğini kontrol edin."
+  },
+  "aiErrNetwork": {
+    "message": "OpenRouter'a ulaşılamadı."
+  },
+  "aiErrReply": {
+    "message": "Yapay zekânın yanıtı kullanılamadı, yer imi gelen kutusunda kaldı."
   }
 }

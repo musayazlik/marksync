@@ -135,6 +135,49 @@
       </section>
 
 
+      <section id="ai" class="card stack" aria-labelledby="ai-h">
+        <div class="row spread">
+          <h2 id="ai-h" data-i18n="aiHeading"></h2>
+          <a class="small" href="./sorter-log.html" data-i18n="aiOpenLog"></a>
+        </div>
+        <p class="muted small" data-i18n="aiIntro"></p>
+        <p class="notice small" data-i18n="aiPrivacy"></p>
+        <label class="row"><input id="aiSortEnabled" type="checkbox" /> <span data-i18n="aiEnabledLabel"></span></label>
+
+        <label class="stack small">
+          <span data-i18n="aiInboxLabel"></span>
+          <select id="aiInboxFolderId">
+            <option value="" data-i18n="aiInboxNone"></option>
+          </select>
+        </label>
+
+        <div class="stack small">
+          <label for="ai-key" data-i18n="aiKeyLabel"></label>
+          <div class="row wrap">
+            <input id="ai-key" type="password" autocomplete="off" spellcheck="false" data-i18n-placeholder="aiKeyPlaceholder" />
+            <button id="ai-key-save" data-i18n="aiKeySave"></button>
+            <button id="ai-key-test" data-i18n="aiTest"></button>
+            <button id="ai-key-remove" class="danger" data-i18n="aiKeyRemove" hidden></button>
+          </div>
+          <p id="ai-key-state" class="muted"></p>
+          <p class="muted" data-i18n="aiKeyHelp"></p>
+        </div>
+
+        <label class="stack small">
+          <span data-i18n="aiModelLabel"></span>
+          <input id="aiModel" type="text" maxlength="100" spellcheck="false" />
+        </label>
+        <p id="ai-model-help" class="muted small"></p>
+
+        <label class="row"><input id="aiAllowNewFolders" type="checkbox" /> <span data-i18n="aiAllowNewLabel"></span></label>
+
+        <p id="ai-status" class="notice small" role="status" hidden></p>
+        <div class="row">
+          <button id="ai-sort-now" class="primary" data-i18n="aiSortNow"></button>
+        </div>
+        <p id="ai-result" class="muted small" role="status" hidden></p>
+      </section>
+
       <p id="action-error" class="notice error small" hidden></p>
     </main>
     <script type="module" src="./main.ts"></script>

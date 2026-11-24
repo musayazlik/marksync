@@ -44,6 +44,9 @@ export default defineConfig({
       'https://www.googleapis.com/*',
       'https://openidconnect.googleapis.com/*',
     ],
+    // AI sorting is opt-in: openrouter.ai is asked for only when the user
+    // turns it on in Settings, so installs and updates show no new warning.
+    optional_host_permissions: ['https://openrouter.ai/*'],
     action: {
       default_title: '__MSG_extName__',
       default_icon: {
@@ -65,7 +68,9 @@ export default defineConfig({
             gecko: {
               id: geckoId(mode),
               strict_min_version: '128.0',
-              data_collection_permissions: { required: ['none'] },
+              // AI sorting sends bookmark titles, addresses and folder names
+              // to OpenRouter, so Firefox asks for consent when it is turned on.
+              data_collection_permissions: { required: ['none'], optional: ['bookmarksInfo'] },
             },
           },
         }

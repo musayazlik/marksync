@@ -14,14 +14,17 @@ src/
     types.ts     Data model: SyncRecord, SyncState, BackupFile
     records.ts   Diff with the last sync, first-sync matching, merge, sanitize, restore
     netscape.ts  HTML export that every browser can import
+    ai-sort.ts   AI sorting: folder list, prompt, checking the model's reply
   sync/        Talks to the bookmarks API through an interface
     local-tree.ts  Read the local tree (Chromium/Firefox roots) and apply a state to it
     engine.ts      One sync run: load → diff → merge → apply → upload
+    sorter.ts      File one inbox bookmark with the model's answer; undo
   platform/    Browser and Google specifics
     identity.ts    Google sign-in with launchWebAuthFlow
     drive.ts       Google Drive v3 REST client
+    openrouter.ts  OpenRouter chat completions client (AI sorting)
   services/    Wires the engine to Drive and extension storage
-  entrypoints/ background (events, alarms, messages), popup, options
+  entrypoints/ background (events, alarms, messages), popup, options, sorter-log
 tests/         In-memory Chromium and Firefox fakes, end-to-end sync tests
 ```
 
@@ -159,6 +162,37 @@ reusing folders with the same name and skipping bookmarks whose URL already
 exists in that folder; or **folder**, everything under a new
 "Imported from ..." folder. Imports run with sync on hold; the next sync sends
 the new bookmarks to all browsers.
+
+## AI sorting (optional)
+
+Off by default and set up per browser in Settings: an inbox folder, an
+OpenRouter API key (stored in `storage.local`, never uploaded), a model ID
+(default `google/gemini-3.5-flash-lite`) and whether new folders may be
+created. Turning it on asks for the optional host permission
+`https://openrouter.ai/*` (and, in Firefox 140+, consent for `bookmarksInfo`).
+
+1. **Trigger**: a bookmark created in, or moved into, the inbox *in this
+   browser* (`services/sorter-service.ts`). Changes written by sync or an
+   import are ignored, so two browsers with AI sorting on never handle the
+   same bookmark. After 5 s of quiet (the star dialog may still rename or
+   move it), the bookmark is queued; bookmarks are sorted one at a time.
+2. **Prompt** (`core/ai-sort.ts`): the bookmark's title and address without
+   query string or fragment, and up to 300 folders (breadth-first) as
+   `f12: Bookmarks bar / Work / Docs`. The bookmark text is marked as data.
+3. **Reply**: JSON `{folder, newFolder?, confidence, reason}`. Only offered
+   references are accepted; anything else is an error and the bookmark stays.
+   Confidence below 0.35 or `folder: null` keeps it in the inbox. A proposed
+   new folder that already exists under that parent becomes a move.
+4. **Act** (`sync/sorter.ts`): read the tree again; if the user moved the
+   bookmark meanwhile, do nothing. Otherwise move it (creating the folder
+   first if needed). The move is an ordinary local change and syncs.
+5. **Log**: every decision goes to `local:sortLog` (newest 500), shown on
+   `sorter-log.html` with filters, search and **Undo** (moves the bookmark
+   back to the inbox, removes a folder the model created if it is empty, and
+   is not sorted again). The log is per browser and not synced.
+
+"Sort inbox now" handles bookmarks already waiting in the inbox (50 per
+click) and stops at the first key, credit or permission error.
 
 ## Known limits / roadmap
 

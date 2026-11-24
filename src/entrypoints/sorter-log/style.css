@@ -1,0 +1,72 @@
+@import '../options/style.css';
+
+main {
+  max-width: 1100px;
+}
+
+.scroll {
+  overflow-x: auto;
+}
+
+td {
+  vertical-align: top;
+}
+
+td.bookmark {
+  max-width: 280px;
+}
+
+td.bookmark a,
+td.bookmark .title {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+td.move {
+  min-width: 220px;
+}
+
+.arrow {
+  color: var(--muted);
+  padding: 0 4px;
+}
+
+.pill {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 1px 8px;
+  font-size: 12px;
+  border: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.pill.moved {
+  border-color: var(--ok);
+  color: var(--ok);
+}
+
+.pill.kept {
+  border-color: var(--warn);
+  color: var(--warn);
+}
+
+.pill.error {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.pill.undone {
+  color: var(--muted);
+}
+
+input[type='search'] {
+  font: inherit;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 8px;
+  min-width: 200px;
+}

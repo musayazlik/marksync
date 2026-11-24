@@ -11,7 +11,18 @@ export interface Settings {
   backupRetention: number;
   /** Name of this browser in backups and import lists; empty = detected. */
   deviceName: string;
+  /** AI sorting: bookmarks added to the inbox folder in this browser are filed by a model on OpenRouter. */
+  aiSortEnabled: boolean;
+  /** Local ID of the inbox folder in this browser; empty = none chosen. */
+  aiInboxFolderId: string;
+  /** OpenRouter model ID, e.g. "google/gemini-3.5-flash-lite". */
+  aiModel: string;
+  /** Let the model create a new folder when none of the existing ones fits. */
+  aiAllowNewFolders: boolean;
 }
+
+/** Cheap and fast; any OpenRouter model ID can be entered in Settings. */
+export const DEFAULT_AI_MODEL = 'google/gemini-3.5-flash-lite';
 
 export const DEFAULT_SETTINGS: Settings = {
   syncEnabled: true,
@@ -20,6 +31,10 @@ export const DEFAULT_SETTINGS: Settings = {
   backupIntervalHours: 24,
   backupRetention: 30,
   deviceName: '',
+  aiSortEnabled: false,
+  aiInboxFolderId: '',
+  aiModel: DEFAULT_AI_MODEL,
+  aiAllowNewFolders: false,
 };
 
 export type ErrorCode = 'auth' | 'mass-delete' | 'config' | 'network' | 'unknown';
@@ -73,6 +88,39 @@ export const remoteVersionItem = storage.defineItem<string>('local:remoteVersion
 export const deviceIdItem = storage.defineItem<string>('local:deviceId', {
   init: () => crypto.randomUUID(),
 });
+/**
+ * The user's OpenRouter API key. Kept in this browser only (never uploaded to
+ * Drive), and read only by the background script.
+ */
+export const openRouterKeyItem = storage.defineItem<string>('local:openRouterKey');
+
+/** One AI sorting decision, shown on the sorting log page. */
+export interface SortLogEntry {
+  id: string;
+  at: number;
+  /** Local bookmark ID in this browser. */
+  bookmarkId: string;
+  title: string;
+  url?: string;
+  status: 'moved' | 'created' | 'kept' | 'error';
+  fromId?: string;
+  fromPath?: string;
+  toId?: string;
+  toPath?: string;
+  reason?: string;
+  confidence?: number;
+  model: string;
+  error?: string;
+  /** 'auth' | 'credits' | 'rate-limit' | 'model' | 'permission' | 'network' | 'reply' | 'unknown'. */
+  errorCode?: string;
+  /** Set when the user moved the bookmark back with Undo. */
+  undoneAt?: number;
+}
+
+/** Newest first; written only by the background script. */
+export const sortLogItem = storage.defineItem<SortLogEntry[]>('local:sortLog', { fallback: [] });
+export const SORT_LOG_MAX = 500;
+
 /** Drive file and content hash of this browser's last uploaded snapshot. */
 export const snapshotMetaItem = storage.defineItem<{ fileId?: string; hash?: string }>('local:snapshotMeta', {
   fallback: {},
@@ -80,6 +128,9 @@ export const snapshotMetaItem = storage.defineItem<{ fileId?: string; hash?: str
 
 const clampInt = (v: unknown, min: number, max: number, fallback: number) =>
   typeof v === 'number' && Number.isFinite(v) ? Math.min(max, Math.max(min, Math.round(v))) : fallback;
+
+/** OpenRouter model IDs look like "vendor/model-name:variant". */
+export const MODEL_ID = /^[\w.-]+\/[\w.:-]+$/;
 
 /** Stored settings, with every value checked and clamped to a safe range. */
 export async function getSettings(): Promise<Settings> {
@@ -92,6 +143,11 @@ export async function getSettings(): Promise<Settings> {
     backupIntervalHours: clampInt(s.backupIntervalHours, 1, 24 * 30, d.backupIntervalHours),
     backupRetention: clampInt(s.backupRetention, 1, 365, d.backupRetention),
     deviceName: typeof s.deviceName === 'string' ? s.deviceName.slice(0, 60) : d.deviceName,
+    aiSortEnabled: typeof s.aiSortEnabled === 'boolean' ? s.aiSortEnabled : d.aiSortEnabled,
+    aiInboxFolderId:
+      typeof s.aiInboxFolderId === 'string' && s.aiInboxFolderId.length <= 100 ? s.aiInboxFolderId : d.aiInboxFolderId,
+    aiModel: typeof s.aiModel === 'string' && s.aiModel.length <= 100 && MODEL_ID.test(s.aiModel.trim()) ? s.aiModel.trim() : d.aiModel,
+    aiAllowNewFolders: typeof s.aiAllowNewFolders === 'boolean' ? s.aiAllowNewFolders : d.aiAllowNewFolders,
   };
 }
 

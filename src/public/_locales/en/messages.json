@@ -609,5 +609,89 @@
   },
   "aiResearched": {
     "message": "researched on the web"
+  },
+  "dupTitle": {
+    "message": "Duplicate bookmarks"
+  },
+  "dupIntro": {
+    "message": "Pages bookmarked more than once, even when the copies differ only in http or https, a trailing slash, or tracking parameters such as utm_source. Choose the copy to keep; the others are removed in every browser."
+  },
+  "dupOpen": {
+    "message": "Find duplicates"
+  },
+  "dupSettingLabel": {
+    "message": "Duplicate bookmarks"
+  },
+  "dupSettingHelp": {
+    "message": "Find pages you bookmarked more than once and keep one copy of each."
+  },
+  "dupScanAgain": {
+    "message": "Scan again"
+  },
+  "dupScanning": {
+    "message": "Looking for duplicates…"
+  },
+  "dupGroups_one": {
+    "message": "{1} page bookmarked more than once"
+  },
+  "dupGroups_other": {
+    "message": "{1} pages bookmarked more than once"
+  },
+  "dupExtra_one": {
+    "message": "{1} extra copy"
+  },
+  "dupExtra_other": {
+    "message": "{1} extra copies"
+  },
+  "dupRemove_one": {
+    "message": "Remove 1 copy"
+  },
+  "dupRemove_other": {
+    "message": "Remove {1} copies"
+  },
+  "dupCopies_one": {
+    "message": "1 copy"
+  },
+  "dupCopies_other": {
+    "message": "{1} copies"
+  },
+  "dupKeep": {
+    "message": "Keep"
+  },
+  "dupWillRemove": {
+    "message": "Remove"
+  },
+  "dupIncludeGroup": {
+    "message": "Clean up this page"
+  },
+  "dupAdded": {
+    "message": "Added {1}"
+  },
+  "dupConfirm": {
+    "message": "Remove {1} bookmarks? They are removed in every browser that syncs with Marksync. A backup is saved to Google Drive first."
+  },
+  "dupConfirmNoBackup": {
+    "message": "Remove {1} bookmarks from this browser? Marksync is not connected to Google Drive, so no backup can be saved first."
+  },
+  "dupDone_one": {
+    "message": "Removed 1 bookmark."
+  },
+  "dupDone_other": {
+    "message": "Removed {1} bookmarks."
+  },
+  "dupDoneBackup": {
+    "message": "A backup was saved to Google Drive first; you can restore it in Settings."
+  },
+  "dupSkipped_one": {
+    "message": "1 was left alone because it changed or was already gone."
+  },
+  "dupSkipped_other": {
+    "message": "{1} were left alone because they changed or were already gone."
+  },
+  "dupNone": {
+    "message": "No duplicates: every page is bookmarked once."
+  },
+  "backupReasonBeforeCleanup": {
+    "message": "before removing duplicates"
   }
 }

@@ -10,6 +10,8 @@ export interface BookmarkNode {
   url?: string;
   /** Firefox: 'bookmark' | 'folder' | 'separator'. */
   type?: string;
+  /** When the bookmark was created, in milliseconds since the epoch. */
+  dateAdded?: number;
   /** Chrome 134+: 'bookmarks-bar' | 'other' | 'mobile' | 'managed'. */
   folderType?: string;
   /**

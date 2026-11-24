@@ -165,8 +165,12 @@ main {
   min-width: 0;
 }
 
-.setting-text label {
+.setting-text label,
+.setting-title {
   font-weight: 550;
+}
+
+.setting-text label {
   cursor: pointer;
 }
 

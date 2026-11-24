@@ -604,5 +604,89 @@
   },
   "aiResearched": {
     "message": "web'de araştırıldı"
+  },
+  "dupTitle": {
+    "message": "Yinelenen yer imleri"
+  },
+  "dupIntro": {
+    "message": "Birden fazla kez kaydedilmiş sayfalar; kopyalar yalnızca http/https, sondaki eğik çizgi ya da utm_source gibi izleme parametreleriyle farklı olsa bile. Tutulacak kopyayı seçin; diğerleri tüm tarayıcılardan kaldırılır."
+  },
+  "dupOpen": {
+    "message": "Yinelenenleri bul"
+  },
+  "dupSettingLabel": {
+    "message": "Yinelenen yer imleri"
+  },
+  "dupSettingHelp": {
+    "message": "Birden fazla kez kaydettiğiniz sayfaları bulun ve her birinden bir kopya tutun."
+  },
+  "dupScanAgain": {
+    "message": "Yeniden tara"
+  },
+  "dupScanning": {
+    "message": "Yinelenenler aranıyor…"
+  },
+  "dupGroups_one": {
+    "message": "{1} sayfa birden fazla kez kayıtlı"
+  },
+  "dupGroups_other": {
+    "message": "{1} sayfa birden fazla kez kayıtlı"
+  },
+  "dupExtra_one": {
+    "message": "{1} fazla kopya"
+  },
+  "dupExtra_other": {
+    "message": "{1} fazla kopya"
+  },
+  "dupRemove_one": {
+    "message": "1 kopyayı kaldır"
+  },
+  "dupRemove_other": {
+    "message": "{1} kopyayı kaldır"
+  },
+  "dupCopies_one": {
+    "message": "1 kopya"
+  },
+  "dupCopies_other": {
+    "message": "{1} kopya"
+  },
+  "dupKeep": {
+    "message": "Kalacak"
+  },
+  "dupWillRemove": {
+    "message": "Kaldırılacak"
+  },
+  "dupIncludeGroup": {
+    "message": "Bu sayfayı temizle"
+  },
+  "dupAdded": {
+    "message": "Eklenme: {1}"
+  },
+  "dupConfirm": {
+    "message": "{1} yer imi kaldırılsın mı? Marksync ile eşitlenen tüm tarayıcılardan kaldırılırlar. Önce Google Drive'a bir yedek kaydedilir."
+  },
+  "dupConfirmNoBackup": {
+    "message": "{1} yer imi bu tarayıcıdan kaldırılsın mı? Marksync Google Drive'a bağlı değil, bu yüzden önce yedek alınamaz."
+  },
+  "dupDone_one": {
+    "message": "1 yer imi kaldırıldı."
+  },
+  "dupDone_other": {
+    "message": "{1} yer imi kaldırıldı."
+  },
+  "dupDoneBackup": {
+    "message": "Önce Google Drive'a bir yedek kaydedildi; Ayarlar'dan geri yükleyebilirsiniz."
+  },
+  "dupSkipped_one": {
+    "message": "1 tanesi değiştiği ya da zaten silindiği için olduğu gibi bırakıldı."
+  },
+  "dupSkipped_other": {
+    "message": "{1} tanesi değiştiği ya da zaten silindiği için olduğu gibi bırakıldı."
+  },
+  "dupNone": {
+    "message": "Yinelenen yok: her sayfa bir kez kayıtlı."
+  },
+  "backupReasonBeforeCleanup": {
+    "message": "yinelenenler kaldırılmadan önce"
   }
 }

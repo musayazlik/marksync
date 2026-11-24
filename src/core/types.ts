@@ -71,7 +71,7 @@ export interface BackupFile {
   kind: 'marksync-backup';
   createdAt: number;
   source: string;
-  reason: 'manual' | 'scheduled' | 'before-restore' | 'before-remote-delete';
+  reason: 'manual' | 'scheduled' | 'before-restore' | 'before-remote-delete' | 'before-cleanup';
   count: number;
   /** Live records only; clocks are ignored on restore. */
   records: RecordMap;

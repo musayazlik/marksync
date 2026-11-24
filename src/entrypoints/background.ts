@@ -17,6 +17,7 @@ import {
   removeBrowser,
 } from '../services/import-service';
 import { updateBadge } from '../services/badge';
+import { removeDuplicates, scanDuplicates } from '../services/dedupe-service';
 import {
   clearSortLog,
   listFolderChoices,
@@ -207,6 +208,10 @@ export default defineBackground(() => {
         return undoSortEntry(req.id);
       case 'aiClearLog':
         return clearSortLog();
+      case 'dupScan':
+        return scanDuplicates();
+      case 'dupRemove':
+        return removeDuplicates(req.expected);
     }
   }
 
@@ -216,7 +221,7 @@ export default defineBackground(() => {
     'connect', 'disconnect', 'syncNow', 'checkNow', 'resyncFromDrive', 'keepLocal', 'backupNow', 'listBackups',
     'restoreBackup', 'deleteBackup', 'listBrowsers', 'removeBrowser', 'importFromBrowser', 'importHtml',
     'exportHtml', 'getRedirectUrl', 'settingsChanged', 'aiListFolders', 'aiTestKey', 'aiSortNow', 'aiUndo',
-    'aiClearLog',
+    'aiClearLog', 'dupScan', 'dupRemove',
   ]);
 
   browser.runtime.onMessage.addListener((req: Request, sender, sendResponse) => {

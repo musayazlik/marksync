@@ -15,16 +15,18 @@ src/
     records.ts   Diff with the last sync, first-sync matching, merge, sanitize, restore
     netscape.ts  HTML export that every browser can import
     ai-sort.ts   AI sorting: folder list, prompt, checking the model's reply
+    dedupe.ts    Duplicate finder: URL normalization and grouping
   sync/        Talks to the bookmarks API through an interface
     local-tree.ts  Read the local tree (Chromium/Firefox roots) and apply a state to it
     engine.ts      One sync run: load → diff → merge → apply → upload
     sorter.ts      File one inbox bookmark with the model's answer; undo
+    dedupe.ts      Remove the chosen duplicate copies (re-checked first)
   platform/    Browser and Google specifics
     identity.ts    Google sign-in with launchWebAuthFlow
     drive.ts       Google Drive v3 REST client
     openrouter.ts  OpenRouter chat completions client (AI sorting)
   services/    Wires the engine to Drive and extension storage
-  entrypoints/ background (events, alarms, messages), popup, options, sorter-log
+  entrypoints/ background (events, alarms, messages), popup, options, sorter-log, duplicates
 tests/         In-memory Chromium and Firefox fakes, end-to-end sync tests
 ```
 
@@ -162,6 +164,22 @@ reusing folders with the same name and skipping bookmarks whose URL already
 exists in that folder; or **folder**, everything under a new
 "Imported from ..." folder. Imports run with sync on hold; the next sync sends
 the new bookmarks to all browsers.
+
+## Duplicate finder
+
+`duplicates.html` lists every page bookmarked more than once. Addresses are
+compared after `core/dedupe.ts` `normalizeUrl`: http and https are equal, the
+host is compared without case, default ports, a trailing slash, the fragment
+(except app routes like `#/inbox`) and tracking parameters (`utm_*`,
+`fbclid`, `gclid`, …) are ignored, and the remaining parameters are sorted.
+`www.` is kept, since it can be a different site. Non-web addresses, managed
+bookmarks and Opera's Trash and Speed Dial are skipped.
+
+The oldest copy is suggested to keep (then the one filed deepest). Removing
+takes a backup first when connected to Drive (reason `before-cleanup`), then
+removes each chosen copy only if it still normalizes to the address it was
+listed under. Removals are ordinary local changes and sync everywhere; the
+mass-delete guard still applies.
 
 ## AI sorting (optional)
 

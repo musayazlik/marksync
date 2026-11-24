@@ -1,0 +1,258 @@
+@import '../../assets/ui.css';
+
+.top {
+  border-bottom: 1px solid var(--line);
+  background:
+    radial-gradient(120% 160% at 0% 0%, color-mix(in oklab, var(--iris) 10%, transparent) 0%, transparent 55%),
+    var(--surface);
+}
+
+.top-inner {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 24px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 16px;
+}
+
+.top h1 {
+  font-size: 28px;
+  font-stretch: 80%;
+  font-weight: 750;
+}
+
+.top-text p {
+  max-width: 64ch;
+}
+
+main {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 16px 24px 96px;
+  display: grid;
+  gap: 14px;
+}
+
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 0;
+  background: color-mix(in oklab, var(--paper) 88%, transparent);
+  backdrop-filter: blur(10px);
+}
+
+.summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+#result {
+  animation: fade-up 300ms var(--ease-out);
+}
+
+.groups {
+  display: grid;
+  gap: 14px;
+}
+
+/* ---------- one page bookmarked several times ---------- */
+
+.group {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  transition:
+    opacity 200ms ease,
+    border-color 200ms ease;
+}
+
+.group-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.address {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 15px;
+}
+
+.address strong {
+  font-weight: 650;
+}
+
+.copies {
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+}
+
+.copies li {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition:
+    grid-template-rows 300ms var(--ease-out),
+    opacity 300ms ease;
+}
+
+.copies li > .copy {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.copy {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition: background-color 160ms ease;
+}
+
+.copy:hover {
+  background: var(--sunken);
+}
+
+.copy-text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.copy-title {
+  font-weight: 550;
+  overflow-wrap: anywhere;
+}
+
+.copy-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+
+.copy-url {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Keep / Remove follow the chosen copy. */
+.tag {
+  font-size: 11.5px;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 2px 9px;
+  white-space: nowrap;
+}
+
+.tag.keep {
+  display: none;
+  background: var(--mint-soft);
+  color: color-mix(in oklab, var(--mint) 70%, var(--ink));
+}
+
+.tag.drop {
+  color: var(--ember);
+}
+
+.copy:has(input:checked) {
+  background: color-mix(in oklab, var(--mint-soft) 60%, transparent);
+}
+
+.copy:has(input:checked) .tag.keep {
+  display: inline-block;
+}
+
+.copy:has(input:checked) .tag.drop {
+  display: none;
+}
+
+.copy:not(:has(input:checked)) .copy-title {
+  text-decoration: line-through;
+  text-decoration-color: color-mix(in oklab, var(--ember) 60%, transparent);
+}
+
+/* A group left out of the clean-up: nothing in it changes. */
+.group.skipped {
+  opacity: 0.55;
+}
+
+.group.skipped .tag {
+  display: none !important;
+}
+
+.group.skipped .copy:not(:has(input:checked)) .copy-title {
+  text-decoration: none;
+}
+
+.group.skipped .copy:has(input:checked) {
+  background: transparent;
+}
+
+/* Copies being removed fold away. */
+.copies li.leaving {
+  grid-template-rows: 0fr;
+  opacity: 0;
+}
+
+/* ---------- scanning, nothing found ---------- */
+
+.empty {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  padding: 56px 16px;
+  text-align: center;
+  color: var(--ink-2);
+}
+
+.empty svg {
+  fill: var(--mint);
+}
+
+.spinner {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 3px solid var(--line);
+  border-top-color: var(--iris);
+  animation: spin 800ms linear infinite;
+}
+
+@media (max-width: 640px) {
+  .top-inner {
+    grid-template-columns: auto 1fr;
+  }
+
+  .top-inner .button {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+
+  .copy {
+    grid-template-columns: auto 1fr;
+  }
+
+  .copy .tag {
+    grid-column: 2;
+    justify-self: start;
+  }
+}

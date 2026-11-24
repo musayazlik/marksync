@@ -1,6 +1,8 @@
 import { browser } from 'wxt/browser';
 import { t } from './i18n';
 import type { BackupInfo } from '../services/backup-service';
+import type { DuplicateGroup } from '../core/dedupe';
+import type { RemoveDuplicatesResult } from '../services/dedupe-service';
 import type { BrowserInfo } from '../services/import-service';
 import type { SortNowResult } from '../services/sorter-service';
 import type { ImportMode, ImportResult } from '../sync/importer';
@@ -28,7 +30,9 @@ export type Request =
   | { type: 'aiTestKey' }
   | { type: 'aiSortNow' }
   | { type: 'aiUndo'; id: string }
-  | { type: 'aiClearLog' };
+  | { type: 'aiClearLog' }
+  | { type: 'dupScan' }
+  | { type: 'dupRemove'; expected: Record<string, string> };
 
 export interface ResponseData {
   connect: string;
@@ -53,6 +57,8 @@ export interface ResponseData {
   aiSortNow: SortNowResult;
   aiUndo: void;
   aiClearLog: void;
+  dupScan: DuplicateGroup[];
+  dupRemove: RemoveDuplicatesResult;
 }
 
 export type Envelope<T> = { ok: true; data: T } | { ok: false; error: string };

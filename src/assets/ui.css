@@ -3,9 +3,10 @@
  *
  * Font: Bricolage Grotesque (SIL Open Font License, see public/fonts/OFL.txt).
  *
- * Colours come from the icon: deep "ink" indigo, the mint bookmark ribbon and
- * the iris sync arrows. The ribbon shape is the recurring device: it marks the
- * current section, the status of a log entry and the animated status emblem.
+ * Colours come from the logo, two bookmarks in iris blue and lavender, plus a
+ * deep "ink" indigo for text and mint for things that went well. The bookmark
+ * shape is the recurring device: it marks the current section, the status of a
+ * log entry and the animated status emblem.
  */
 
 @font-face {
@@ -37,7 +38,7 @@
   --ink: #1b1640;
   --ink-2: #625e86;
   --line: #e3e0f2;
-  --iris: #4f55e8;
+  --iris: #4051ea;
   --iris-soft: #e8e9fd;
   --on-iris: #ffffff;
   --mint: #2fc489;
@@ -532,66 +533,70 @@ td:last-child {
 /* ---------- status emblem ---------- */
 
 /*
- * The icon redrawn in SVG: a ribbon between two arrows. data-state is set from
- * the sync status: the arrows turn while syncing, the ribbon settles when a
- * sync finishes, and the ribbon takes the colour of a warning or error.
+ * The logo redrawn in SVG: a front bookmark and the one behind it. data-state
+ * is set from the sync status: while syncing the two lean towards each other,
+ * the back one settles with a small drop when a sync finishes, and it takes
+ * the colour of a warning or error.
  */
 .emblem {
   flex: none;
   display: block;
+  overflow: visible;
 }
 
-.emblem .bg {
-  fill: var(--ink);
-}
-
-@media (prefers-color-scheme: dark) {
-  .emblem .bg {
-    fill: #241d57;
-  }
-}
-
-.emblem .arrows {
-  fill: none;
-  stroke: #7d83ff;
-  stroke-width: 6;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  transform-origin: 50px 50px;
-}
-
-.emblem .ribbon {
-  fill: var(--mint);
-  transform-origin: 50px 30px;
+.emblem .front {
+  fill: #4051ea;
   transition: fill 300ms ease;
 }
 
-.emblem[data-state='off'] .ribbon {
+.emblem .back {
+  fill: #a5abfa;
+  transform-origin: 57px 60px;
+  transition: fill 300ms ease;
+}
+
+@media (prefers-color-scheme: dark) {
+  .emblem .front {
+    fill: #6170ff;
+  }
+}
+
+.emblem[data-state='off'] .front {
   fill: #8f8bb5;
 }
 
-.emblem[data-state='off'] .arrows {
-  stroke: #5b5690;
+.emblem[data-state='off'] .back {
+  fill: #cfcce4;
 }
 
-.emblem[data-state='warn'] .ribbon {
+@media (prefers-color-scheme: dark) {
+  .emblem[data-state='off'] .front {
+    fill: #5b5690;
+  }
+
+  .emblem[data-state='off'] .back {
+    fill: #3a3570;
+  }
+}
+
+.emblem[data-state='warn'] .back {
   fill: #f0b453;
 }
 
-.emblem[data-state='error'] .ribbon {
+.emblem[data-state='error'] .back {
   fill: #ff6b74;
 }
 
-.emblem[data-state='syncing'] .arrows {
-  animation: spin 1.1s var(--ease-out) infinite;
+.emblem[data-state='syncing'] .front {
+  animation: sync-front 1.1s ease-in-out infinite;
 }
 
-.emblem[data-state='syncing'] .ribbon {
-  animation: ribbon-breathe 1.1s ease-in-out infinite;
+.emblem[data-state='syncing'] .back {
+  animation: sync-back 1.1s ease-in-out infinite;
 }
 
-.emblem.settled .ribbon {
-  animation: ribbon-drop 620ms var(--ease-spring);
+.emblem.settled .back {
+  animation: bookmark-drop 620ms var(--ease-spring);
 }
 
 /* ---------- motion ---------- */
@@ -602,13 +607,20 @@ td:last-child {
   }
 }
 
-@keyframes ribbon-breathe {
+/* The two bookmarks move along the line of the gap between them. */
+@keyframes sync-front {
   50% {
-    scale: 0.92 0.96;
+    translate: 1.3px 1.5px;
   }
 }
 
-@keyframes ribbon-drop {
+@keyframes sync-back {
+  50% {
+    translate: -1.3px -1.5px;
+  }
+}
+
+@keyframes bookmark-drop {
   0% {
     translate: 0 -10px;
     scale: 1 0.8;

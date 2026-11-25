@@ -1,3 +1,5 @@
+<img src="docs/logo.svg" alt="" width="72" height="72">
+
 # Marksync
 
 [![CI](https://github.com/musayazlik/marksync/actions/workflows/ci.yml/badge.svg)](https://github.com/musayazlik/marksync/actions/workflows/ci.yml)

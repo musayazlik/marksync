@@ -64,7 +64,7 @@ export function emblemState(s: Status, syncEnabled = true): EmblemState {
   return tone === 'warn' || tone === 'error' ? tone : 'ok';
 }
 
-/** Updates the status emblem; the ribbon settles with a small drop when a sync finishes. */
+/** Updates the status emblem; the back bookmark settles with a small drop when a sync finishes. */
 export function setEmblem(el: Element, state: EmblemState) {
   const html = el as HTMLElement;
   const before = html.dataset.state;

@@ -6,6 +6,18 @@ export const RELEASES_URL = 'https://github.com/musayazlik/marksync/releases';
 
 export const $ = <T extends HTMLElement = HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
 
+/** Lets a masked address be shown by click or keyboard (Enter / Space). */
+export function revealOnClick(el: HTMLElement, toggle: () => void) {
+  el.setAttribute('role', 'button');
+  el.tabIndex = 0;
+  el.addEventListener('click', toggle);
+  el.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    toggle();
+  });
+}
+
 export function timeAgo(ms: number | undefined): string {
   if (!ms) return t('timeNever');
   const s = Math.round((Date.now() - ms) / 1000);
@@ -19,13 +31,13 @@ export function timeAgo(ms: number | undefined): string {
 
 export function statusTone(s: Status): 'ok' | 'warn' | 'error' | '' {
   if (!s.connected) return '';
-  if (s.error?.code === 'mass-delete' || s.error?.code === 'network') return 'warn';
+  if (s.error?.code === 'mass-delete' || s.error?.code === 'network' || s.error?.code === 'locked') return 'warn';
   if (s.error) return 'error';
   return 'ok';
 }
 
 /** Shows a message in the floating error toast, which hides itself again. */
-let toastTimer: ReturnType<typeof setTimeout> | undefined;
+const toastTimers = new WeakMap<HTMLElement, ReturnType<typeof setTimeout>>();
 export function showToast(el: HTMLElement, message: string) {
   el.textContent = message;
   el.hidden = false;
@@ -33,8 +45,11 @@ export function showToast(el: HTMLElement, message: string) {
   el.style.animation = 'none';
   void el.offsetWidth;
   el.style.animation = '';
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => (el.hidden = true), 8000);
+  clearTimeout(toastTimers.get(el));
+  toastTimers.set(
+    el,
+    setTimeout(() => (el.hidden = true), 8000),
+  );
 }
 
 /** Runs an action with the button disabled and a spinner on it; shows errors in the toast. */

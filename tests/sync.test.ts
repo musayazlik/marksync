@@ -187,3 +187,44 @@ describe('sync between Brave and Firefox', () => {
     await expectSame();
   });
 });
+
+describe('when the sync file is created again', () => {
+  // Happens when the Marksync folder is deleted in Drive, or after an
+  // encryption reset: browsers that remember the old file must not upload
+  // their bookmarks a second time under new IDs.
+  it('matches instead of duplicating, whichever browser comes first', async () => {
+    const dev = await brave.bookmarks.add(brave.bookmarks.root('toolbar'), 'Dev');
+    await brave.bookmarks.add(dev, 'GitHub', 'https://github.com');
+    await brave.bookmarks.add(brave.bookmarks.root('other'), 'News', 'https://news.ycombinator.com');
+    await sync(brave);
+    await sync(firefox);
+    await expectSame();
+
+    // The file is gone and Brave starts over (reset clears its sync history).
+    remote.state = null;
+    brave.local.state = { mapping: {}, mirror: {}, keep: [] };
+    await sync(brave);
+    // Firefox still remembers the old file.
+    await sync(firefox);
+    await sync(brave);
+
+    const expected = ['toolbar/Dev/', 'toolbar/Dev/GitHub <https://github.com>', 'other/News <https://news.ycombinator.com>'];
+    expect(await dump(brave)).toEqual(expected);
+    expect(await dump(firefox)).toEqual(expected);
+    expect(liveRecords(remote.state!.records)).toHaveLength(3);
+  });
+
+  it('keeps working with older files that have no generation ID', async () => {
+    await brave.bookmarks.add(brave.bookmarks.root('toolbar'), 'GitHub', 'https://github.com');
+    await sync(brave);
+    const { epoch: _, ...legacy } = remote.state!;
+    remote.state = legacy;
+    await sync(firefox);
+    await firefox.bookmarks.add('toolbar_____', 'MDN', 'https://developer.mozilla.org');
+    await sync(firefox);
+    await sync(brave);
+    await expectSame();
+    expect(remote.state!.epoch).toBeUndefined();
+    expect(liveRecords(remote.state!.records)).toHaveLength(2);
+  });
+});

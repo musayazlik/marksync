@@ -1,5 +1,5 @@
 import type { SyncState } from '../core/types';
-import { DriveClient, DriveError, quote } from '../platform/drive';
+import { DriveClient, DriveError, quote, type DriveCodec } from '../platform/drive';
 import { getAccessToken, invalidateToken } from '../platform/identity';
 import { t } from '../shared/i18n';
 import { driveIdsItem } from '../shared/state';
@@ -31,8 +31,15 @@ export interface AppFolders {
   browsersFolderId: string;
 }
 
+let codec: DriveCodec | undefined;
+/** Set once by services/encryption-service.ts (kept apart to avoid an import cycle). */
+export function setDriveCodec(c: DriveCodec): void {
+  codec = c;
+}
+
+/** Drive access for Marksync's files; encrypts and decrypts them when encryption is on. */
 export function driveClient(): DriveClient {
-  return new DriveClient(getAccessToken, invalidateToken);
+  return new DriveClient(getAccessToken, invalidateToken, codec);
 }
 
 const isNotFound = (err: unknown) => err instanceof DriveError && err.status === 404;

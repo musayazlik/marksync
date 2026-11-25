@@ -1,5 +1,6 @@
 import { browser } from 'wxt/browser';
 import { toNetscapeHtml } from '../core/netscape';
+import { deviceLabel } from '../platform/browser-info';
 import { connect, disconnect, redirectUrl } from '../platform/identity';
 import {
   backupIfDue,
@@ -19,9 +20,21 @@ import {
 import { updateBadge } from '../services/badge';
 import { removeDuplicates, scanDuplicates } from '../services/dedupe-service';
 import { fixAllLinks, fixLink, markInterruptedScan, startLinkScan, stopLinkScan } from '../services/links-service';
+import { applyBulk, cancelBulk, discardBulk, resumeBulk, startBulk } from '../services/bulk-service';
+// Also installs the encryption codec for every Drive client (see drive-store.ts).
+import {
+  disableEncryption,
+  enableEncryption,
+  encryptionStatus,
+  lockEncryption,
+  resetEncryption,
+  unlockEncryption,
+} from '../services/encryption-service';
 import {
   clearSortLog,
   listFolderChoices,
+  listModels,
+  refreshUsage,
   onBookmarkChanged,
   onBookmarkCreated,
   onBookmarkMoved,
@@ -107,6 +120,8 @@ export default defineBackground(() => {
   }
   statusItem.watch(() => void refreshBadge());
   settingsItem.watch(() => void refreshBadge());
+  // Every start of the service worker: a bulk sorting run that was cut off carries on.
+  void resumeBulk().catch((err) => console.warn('[marksync] bulk sorting could not resume', err));
   browser.runtime.onStartup.addListener(() => {
     void scheduleAlarms();
     void syncAndPublish();
@@ -206,6 +221,44 @@ export default defineBackground(() => {
         return listFolderChoices();
       case 'aiTestKey':
         return testOpenRouter();
+      case 'aiListModels':
+        return listModels(req.refresh === true);
+      case 'aiUsage':
+        return refreshUsage();
+      case 'aiBulkStart':
+        if (typeof req.folderId !== 'string' || !req.folderId) throw new Error(t('aiBulkEmpty'));
+        return startBulk(req.folderId, req.research === true);
+      case 'aiBulkCancel':
+        return cancelBulk();
+      case 'aiBulkApply':
+        if (!Array.isArray(req.bookmarkIds) || !req.bookmarkIds.every((id) => typeof id === 'string')) return { moved: 0, failed: 0 };
+        return applyBulk(req.bookmarkIds.slice(0, 1000));
+      case 'aiBulkDiscard':
+        return discardBulk();
+      case 'encStatus':
+        return encryptionStatus();
+      case 'encEnable': {
+        const status = await enableEncryption(String(req.passphrase ?? ''), await deviceLabel());
+        void syncAndPublish();
+        return status;
+      }
+      case 'encUnlock': {
+        const status = await unlockEncryption(String(req.passphrase ?? ''));
+        void syncAndPublish();
+        return status;
+      }
+      case 'encLock':
+        return lockEncryption();
+      case 'encDisable': {
+        const status = await disableEncryption();
+        void syncAndPublish();
+        return status;
+      }
+      case 'encReset': {
+        const result = await resetEncryption();
+        void syncAndPublish();
+        return result;
+      }
       case 'aiSortNow':
         return sortInboxNow();
       case 'aiUndo':
@@ -233,7 +286,9 @@ export default defineBackground(() => {
     'connect', 'disconnect', 'syncNow', 'checkNow', 'resyncFromDrive', 'keepLocal', 'backupNow', 'listBackups',
     'restoreBackup', 'deleteBackup', 'listBrowsers', 'removeBrowser', 'importFromBrowser', 'importHtml',
     'exportHtml', 'getRedirectUrl', 'settingsChanged', 'aiListFolders', 'aiTestKey', 'aiSortNow', 'aiUndo',
-    'aiClearLog', 'dupScan', 'dupRemove', 'linkScan', 'linkStop', 'linkFix', 'linkFixAll',
+    'aiClearLog', 'aiListModels', 'aiUsage', 'aiBulkStart', 'aiBulkCancel', 'aiBulkApply', 'aiBulkDiscard',
+    'dupScan', 'dupRemove', 'linkScan', 'linkStop', 'linkFix', 'linkFixAll',
+    'encStatus', 'encEnable', 'encUnlock', 'encLock', 'encDisable', 'encReset',
   ]);
 
   browser.runtime.onMessage.addListener((req: Request, sender, sendResponse) => {

@@ -35,6 +35,8 @@ export interface LocalState {
   keep: string[];
   /** Chromium only: local ID of the folder that stands in for Bookmarks Menu. */
   menuFolderId?: string;
+  /** Generation of the sync file the mirror belongs to (see SyncState.epoch). */
+  epoch?: string;
 }
 
 export interface LocalStore {
@@ -136,7 +138,19 @@ const isMass = (deletions: number, before: number) =>
 async function attemptSync(deps: SyncDeps, opts: SyncOptions): Promise<SyncResult> {
   const newId = deps.newId ?? (() => crypto.randomUUID());
   const remote = await deps.remote.load();
-  const state = await deps.local.load();
+  const stored = await deps.local.load();
+  const remoteEpoch = typeof remote?.state.epoch === 'string' ? remote.state.epoch.slice(0, 100) : undefined;
+  // The sync file was created again since this browser last synced: its
+  // history belongs to the old file. Start over like a first sync, so the
+  // bookmarks are matched with the new file instead of uploaded twice, and
+  // nothing counts as deleted.
+  const restarted =
+    remote !== null && remoteEpoch !== undefined && remoteEpoch !== stored.epoch && Object.keys(stored.mirror).length > 0;
+  const state: LocalState = restarted
+    ? { mapping: {}, mirror: {}, keep: [], ...(stored.menuFolderId ? { menuFolderId: stored.menuFolderId } : {}) }
+    : stored;
+  // A new file gets a new generation; an existing one keeps its own (older files have none).
+  const epoch = remote ? remoteEpoch : newId();
   const { snapshot, special } = await readLocal(deps.bookmarks, state.menuFolderId);
   const wallClock = (deps.now ?? Date.now)();
 
@@ -201,6 +215,7 @@ async function attemptSync(deps: SyncDeps, opts: SyncOptions): Promise<SyncResul
     mirror: merged,
     keep: [...applied.skipped],
     ...(applied.menuFolderId ? { menuFolderId: applied.menuFolderId } : {}),
+    ...(epoch ? { epoch } : {}),
   });
 
   // Upload when anything changed, including when bad remote records were
@@ -217,6 +232,7 @@ async function attemptSync(deps: SyncDeps, opts: SyncOptions): Promise<SyncResul
         updatedAt: now,
         updatedBy: deps.deviceLabel,
         ...(confirmedDeletionAt !== undefined ? { confirmedDeletionAt } : {}),
+        ...(epoch ? { epoch } : {}),
       },
       remote?.version ?? null,
     );

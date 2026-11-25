@@ -450,7 +450,7 @@
     "message": "Model"
   },
   "aiModelHelp": {
-    "message": "openrouter.ai/models listesindeki herhangi bir model kimliği. Varsayılan {1} en titiz olanıdır; Sonnet veya Gemini Flash daha hızlı ve ucuzdur."
+    "message": "OpenRouter listesinden bir model seçin ya da herhangi bir model kimliği yazın. Varsayılan {1} en titiz olanıdır; Sonnet veya Gemini Flash daha hızlı ve ucuzdur."
   },
   "aiAllowNewLabel": {
     "message": "Hiçbir klasör uymuyorsa yeni klasör oluştur"
@@ -871,5 +871,392 @@
   },
   "linkChanged": {
     "message": "Bu yer imi denetimden sonra değiştirilmiş, bu yüzden olduğu gibi bırakıldı. Yeni durumunu görmek için yeniden denetleyin."
+  },
+  "aiModelSearchPlaceholder": {
+    "message": "Model ara: claude, gemini, gpt…"
+  },
+  "aiModelFilters": {
+    "message": "Modelleri filtrele"
+  },
+  "aiModelFilterAll": {
+    "message": "Tümü"
+  },
+  "aiModelFilterFree": {
+    "message": "Ücretsiz"
+  },
+  "aiModelFilterTools": {
+    "message": "Web araştırması"
+  },
+  "aiModelsRefresh": {
+    "message": "Listeyi yenile"
+  },
+  "aiModelFree": {
+    "message": "Ücretsiz"
+  },
+  "aiModelPrice": {
+    "message": "1M token: {1} giriş · {2} çıkış"
+  },
+  "aiModelContext": {
+    "message": "{1} bağlam"
+  },
+  "aiModelToolsHint": {
+    "message": "Sayfayı okuyup web'de arama yapabilir (Araştırma seçeneği)"
+  },
+  "aiModelUnknown": {
+    "message": "OpenRouter listesinde yok"
+  },
+  "aiModelNoTools": {
+    "message": "Bu model araç kullanamıyor; Araştırma açık olsa da yalnızca başlık ve adrese bakarak karar verir."
+  },
+  "aiModelUseCustom": {
+    "message": "Model kimliği olarak “{1}” kullan"
+  },
+  "aiModelsNone": {
+    "message": "“{1}” ile eşleşen model yok."
+  },
+  "aiModelsNoneFilter": {
+    "message": "Bu filtreye uyan model yok."
+  },
+  "aiModelsLoading": {
+    "message": "OpenRouter'dan modeller yükleniyor…"
+  },
+  "aiModelsOffline": {
+    "message": "OpenRouter'ın tüm model listesi için yapay zekâ ile düzenlemeyi açın. O zamana kadar önerilen modeller gösteriliyor."
+  },
+  "aiModelsFailed": {
+    "message": "Model listesi alınamadı: {1}"
+  },
+  "aiModelsShown": {
+    "message": "{2} modelden {1} tanesi gösteriliyor. Listeyi daraltmak için arayın."
+  },
+  "aiModelsCount_one": {
+    "message": "{1} model"
+  },
+  "aiModelsCount_other": {
+    "message": "{1} model"
+  },
+  "usageRefresh": {
+    "message": "Yenile"
+  },
+  "usageUpdated": {
+    "message": "{1} güncellendi. Yenilemek için tıklayın."
+  },
+  "usageModel": {
+    "message": "Model: {1}"
+  },
+  "usageFailed": {
+    "message": "Kullanım okunamadı: {1}"
+  },
+  "usageFreeTier": {
+    "message": "Ücretsiz katman: ücretli modeller için kredi yükleyin."
+  },
+  "usageLoading": {
+    "message": "Yükleniyor…"
+  },
+  "usageKeyLimit": {
+    "message": "Anahtar limiti"
+  },
+  "usageAccount": {
+    "message": "Hesap bakiyesi"
+  },
+  "usagePayg": {
+    "message": "Limitsiz"
+  },
+  "usageToday": {
+    "message": "Bugün"
+  },
+  "usageWeek": {
+    "message": "Bu hafta"
+  },
+  "usageMonth": {
+    "message": "Bu ay"
+  },
+  "usageLeft": {
+    "message": "kaldı"
+  },
+  "usageLeftOf": {
+    "message": "{2} içinden {1} kaldı"
+  },
+  "usageSpentOf": {
+    "message": "{2} içinden {1} harcandı"
+  },
+  "usageSpentTotal": {
+    "message": "toplam harcandı"
+  },
+  "usageNoLimit": {
+    "message": "Bu anahtarın harcama limiti yok."
+  },
+  "usageResetDaily": {
+    "message": "her gün sıfırlanır"
+  },
+  "usageResetWeekly": {
+    "message": "her hafta sıfırlanır"
+  },
+  "usageResetMonthly": {
+    "message": "her ay sıfırlanır"
+  },
+  "usageTopUp": {
+    "message": "Kredi yükle ↗"
+  },
+  "aiErrBudget": {
+    "message": "Bu ayın yapay zekâ bütçesi doldu; yer imi gelen kutusunda kaldı."
+  },
+  "aiBudgetLabel": {
+    "message": "Aylık bütçe"
+  },
+  "aiBudgetHelpOff": {
+    "message": "0 = sınır yok. Bu tarayıcıdaki yapay zekâ düzenlemesi bu ay {1} harcadı."
+  },
+  "aiBudgetHelpOn": {
+    "message": "Bu ay {2} bütçenin {1} kadarı harcandı. Bütçe dolunca düzenleme durur."
+  },
+  "aiBudgetHelpOver": {
+    "message": "{2} bütçenin {1} kadarı harcandı: düzenleme {3} tarihine kadar durdu. Hemen devam etmek için bütçeyi artırın."
+  },
+  "aiBudgetStopped": {
+    "message": "Durdu: aylık bütçe doldu."
+  },
+  "usageBudgetLabel": {
+    "message": "Marksync bu ay"
+  },
+  "usageBudgetOf": {
+    "message": "{2} içinden {1}"
+  },
+  "usageBudgetNone": {
+    "message": "{1} · sınırsız"
+  },
+  "usageBudgetNear": {
+    "message": "Aylık bütçenin %{1} kadarı kullanıldı."
+  },
+  "usageBudgetOver": {
+    "message": "Bütçe doldu: yeni yer imleri {1} tarihine kadar gelen kutusunda kalır."
+  },
+  "findPlaceholder": {
+    "message": "Yer imlerinde ara"
+  },
+  "findLabel": {
+    "message": "Yer imlerinde ara"
+  },
+  "findNone": {
+    "message": "“{1}” ile eşleşen yer imi yok."
+  },
+  "findCount_one": {
+    "message": "1 yer imi"
+  },
+  "findCount_other": {
+    "message": "{1} yer imi"
+  },
+  "findMore": {
+    "message": "{2} sonuçtan {1} tanesi gösteriliyor. Daraltmak için bir kelime daha ekleyin."
+  },
+  "findHint": {
+    "message": "Enter yeni sekmede açar · Shift+Enter bu sekmede · Ctrl+Enter arka planda"
+  },
+  "aiBulkHeading": {
+    "message": "Bir klasörü toplu düzenle"
+  },
+  "aiBulkIntro": {
+    "message": "Seçtiğiniz klasördeki her yer imi için yapay zekâ bir klasör önerir (en fazla 100). Listeyi inceleyip uygulayana kadar hiçbir şey taşınmaz; her taşıma düzenleme kaydından geri alınabilir."
+  },
+  "aiBulkFolderLabel": {
+    "message": "Düzenlenecek klasörü seçin…"
+  },
+  "aiBulkResearch": {
+    "message": "Siteleri araştır (daha yavaş, daha pahalı)"
+  },
+  "aiBulkStart": {
+    "message": "Önerileri hazırla"
+  },
+  "aiBulkChooseFolder": {
+    "message": "Önce düzenlenecek klasörü seçin."
+  },
+  "aiBulkBusy": {
+    "message": "Önce mevcut önerileri uygulayın ya da vazgeçin."
+  },
+  "aiBulkEmpty": {
+    "message": "Bu klasörde düzenlenecek yer imi yok (alt klasörler dahil değildir)."
+  },
+  "aiBulkNotReady": {
+    "message": "Öneriler henüz hazır değil."
+  },
+  "aiBulkPlanningTitle": {
+    "message": "“{1}” inceleniyor…"
+  },
+  "aiBulkReadyTitle": {
+    "message": "“{1}” için öneriler"
+  },
+  "aiBulkDoneTitle": {
+    "message": "“{1}” düzenlendi"
+  },
+  "aiBulkProgress": {
+    "message": "{2} yer iminden {1} tanesi"
+  },
+  "aiBulkSummary": {
+    "message": "{1} taşınacak · {2} yerinde kalacak · {3} hata"
+  },
+  "aiBulkCostHint": {
+    "message": "Bu çalışma için OpenRouter'ın ücretlendirdiği tutar"
+  },
+  "aiBulkWaiting": {
+    "message": "{1} yer imi daha soruluyor…"
+  },
+  "aiBulkKeep": {
+    "message": "Yerinde kalır"
+  },
+  "aiBulkNewFolder": {
+    "message": "Yeni klasör"
+  },
+  "aiBulkSelectAll": {
+    "message": "Tümünü seç"
+  },
+  "aiBulkSelected": {
+    "message": "{2} öneriden {1} tanesi seçili"
+  },
+  "aiBulkApply_one": {
+    "message": "1 yer imini taşı"
+  },
+  "aiBulkApply_other": {
+    "message": "{1} yer imini taşı"
+  },
+  "aiBulkStop": {
+    "message": "Durdur"
+  },
+  "aiBulkDiscard": {
+    "message": "Vazgeç"
+  },
+  "aiBulkClose": {
+    "message": "Kapat"
+  },
+  "aiBulkConfirmDiscard": {
+    "message": "Bu öneriler silinsin mi? Henüz hiçbir şey taşınmadı."
+  },
+  "aiBulkStoppedCancel": {
+    "message": "{2} yer iminden {1} tanesinden sonra durduruldu. Şimdiye kadarki önerileri uygulayabilirsiniz."
+  },
+  "aiBulkStoppedError": {
+    "message": "Durdu: {1}"
+  },
+  "aiBulkDone": {
+    "message": "{1} yer imi taşındı, {2} tanesi taşınamadı. Her taşımayı düzenleme kaydından geri alabilirsiniz."
+  },
+  "emailShow": {
+    "message": "Tam adresi göstermek için tıklayın"
+  },
+  "emailHide": {
+    "message": "Adresi gizlemek için tıklayın"
+  },
+  "encHeading": {
+    "message": "Şifreleme"
+  },
+  "encIntro": {
+    "message": "Yer imlerinizi Google Drive'da yalnızca sizin bildiğiniz bir parolayla şifreleyin. Böylece Google ya da Drive'ınıza erişen biri yalnızca okunamaz veri görür. Her tarayıcı parolayı bir kez sorar."
+  },
+  "encNeedsConnect": {
+    "message": "Önce Google Drive'a bağlanın."
+  },
+  "encPassLabel": {
+    "message": "Parola"
+  },
+  "encPassAgain": {
+    "message": "Parola (tekrar)"
+  },
+  "encStrengthHint": {
+    "message": "En az {1} karakter. Birbiriyle ilgisiz birkaç kelime hem uzun hem de akılda kalıcı bir parola olur."
+  },
+  "encStrengthShort": {
+    "message": "Çok kısa: en az {1} karakter."
+  },
+  "encStrengthWeak": {
+    "message": "Zayıf: uzatın ya da farklı türde karakterler ekleyin."
+  },
+  "encStrengthFair": {
+    "message": "Fena değil. Daha uzunu daha iyi."
+  },
+  "encStrengthStrong": {
+    "message": "Güçlü."
+  },
+  "encMismatch": {
+    "message": "İki parola aynı değil."
+  },
+  "encUnderstand": {
+    "message": "Parolayı unutursam Drive'daki şifreli verilerin (yedekler dahil) kurtarılamayacağını anlıyorum. Yer imlerim tarayıcılarımda kalır."
+  },
+  "encEnable": {
+    "message": "Şifrelemeyi aç"
+  },
+  "encEnabledToast": {
+    "message": "Şifreleme açıldı. Diğer tarayıcılarınız parolayı soracak."
+  },
+  "encLockedText": {
+    "message": "Bu hesapta şifreleme açık. Bu tarayıcıyı eşitlemek için parolayı girin; o zamana kadar buradan hiçbir şey yüklenmez."
+  },
+  "encUnlock": {
+    "message": "Kilidi aç"
+  },
+  "encForgot": {
+    "message": "Parolamı unuttum…"
+  },
+  "encOnTitle": {
+    "message": "Uçtan uca şifreleme açık"
+  },
+  "encSince": {
+    "message": "{1} tarihinden beri"
+  },
+  "encSinceBy": {
+    "message": "{1} tarihinden beri, {2} üzerinde açıldı"
+  },
+  "encOnWhat": {
+    "message": "Şifrelenenler: eşitleme dosyası, tüm yedekler ve tarayıcılarınızın yer imi listeleri (AES-256-GCM; anahtar parolanızdan PBKDF2 ile türetilir)."
+  },
+  "encOnNot": {
+    "message": "Şifrelenmeyenler: dosya adları ve tarihleri, listelerde görünen tarayıcı adları ve yer imi sayıları."
+  },
+  "encOnOthers": {
+    "message": "Parola tarayıcılarınızdan hiç çıkmaz; anahtar yalnızca bu tarayıcıda saklanır."
+  },
+  "encLock": {
+    "message": "Bu tarayıcıda parolayı unut"
+  },
+  "encDisable": {
+    "message": "Şifrelemeyi kapat"
+  },
+  "encDisableConfirm": {
+    "message": "Şifreleme tüm tarayıcılar için kapatılsın mı? Yer imleriniz ve yedekleriniz Drive'da yeniden şifresiz saklanacak."
+  },
+  "encResetWord": {
+    "message": "SIFIRLA"
+  },
+  "encResetConfirm": {
+    "message": "Bu işlem Drive'daki şifreli eşitleme dosyasını, şifreli yedekleri ve tarayıcı listelerini siler. Bunlar geri getirilemez. Tarayıcılarınızdaki yer imlerine dokunulmaz; eşitleme bu tarayıcıdan yeniden başlar. Devam etmek için {1} yazın."
+  },
+  "encResetDone": {
+    "message": "Şifreleme sıfırlandı: {1} şifreli dosya silindi. Eşitleme bu tarayıcıdan yeniden başlıyor."
+  },
+  "encBadgeOn": {
+    "message": "Açık"
+  },
+  "encBadgeOff": {
+    "message": "Kapalı"
+  },
+  "encBadgeLocked": {
+    "message": "Kilitli"
+  },
+  "encAlreadyOn": {
+    "message": "Bu hesapta şifreleme zaten açık. Kilidi açmak için parolayı girin."
+  },
+  "encPassphraseShort": {
+    "message": "Parola en az {1} karakter olmalı."
+  },
+  "encWrongPassphrase": {
+    "message": "Parola yanlış."
+  },
+  "errLocked": {
+    "message": "Şifreleme açık: bu tarayıcıyı eşitlemek için Ayarlar'da parolayı girin."
+  },
+  "errDecrypt": {
+    "message": "Drive'daki bir dosyanın şifresi çözülemedi. Marksync dışında değiştirilmiş olabilir."
+  },
+  "errEncryptionFile": {
+    "message": "Drive'daki şifreleme ayarları (encryption.json) bozuk."
   }
 }

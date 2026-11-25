@@ -2,17 +2,29 @@ import { browser } from 'wxt/browser';
 import { errorText, localizePage, t, tn } from '../../shared/i18n';
 import { send } from '../../shared/messages';
 import {
+  encryptionStatusItem,
+  type EncryptionStatus,
+  aiBulkItem,
+  aiSpendItem,
+  aiUsageItem,
   DEFAULT_AI_MODEL,
   getSettings,
+  MODEL_ID,
   SUGGESTED_AI_MODELS,
   openRouterKeyItem,
   settingsItem,
   statusItem,
+  type BulkJob,
+  type BulkProposal,
   type Settings,
   type Status,
 } from '../../shared/state';
 import { OPENROUTER_ORIGIN } from '../../platform/openrouter';
-import { $, emblemState, RELEASES_URL, setEmblem, showToast, statusTone, timeAgo, withBusy } from '../../shared/ui';
+import { maskEmail } from '../../core/mask';
+import { MIN_PASSPHRASE, passphraseStrength } from '../../core/crypto';
+import { budgetState, currentSpend, nextMonthStart } from '../../core/budget';
+import { formatTokens, formatUsd, searchModels, type ModelFilter, type ModelInfo } from '../../core/openrouter-data';
+import { $, emblemState, revealOnClick, RELEASES_URL, setEmblem, showToast, statusTone, timeAgo, withBusy } from '../../shared/ui';
 import { detectBrowser } from '../../platform/browser-info';
 import type { BackupInfo } from '../../services/backup-service';
 import type { ImportMode, ImportResult } from '../../sync/importer';
@@ -31,12 +43,22 @@ const welcome = location.hash === '#welcome';
 
 let syncEnabled = true;
 let lastStatus: Status = { connected: false, syncing: false };
+/** The account address is masked until clicked. */
+let emailShown = false;
 
 function renderStatus(s: Status) {
   lastStatus = s;
   setEmblem($('#emblem'), emblemState(s, syncEnabled));
   $('#welcome').hidden = !welcome || s.connected;
-  $('#account-text').textContent = s.connected ? (s.email ? t('connectedAs', s.email) : t('connected')) : t('notConnected');
+  const account = $('#account-text');
+  account.textContent = s.connected
+    ? s.email
+      ? t('connectedAs', emailShown ? s.email : maskEmail(s.email))
+      : t('connected')
+    : t('notConnected');
+  account.title = s.connected && s.email ? t(emailShown ? 'emailHide' : 'emailShow') : '';
+  account.classList.toggle('revealable', !!(s.connected && s.email));
+  account.setAttribute('aria-pressed', String(emailShown));
   $('#connect').hidden = s.connected && s.error?.code !== 'auth';
   $('#connect').textContent = t(s.connected ? 'reconnect' : 'connectDrive');
   $('#disconnect').hidden = !s.connected;
@@ -52,6 +74,12 @@ function renderStatus(s: Status) {
   error.className = `notice small hero-error ${statusTone(s) === 'warn' ? 'warn' : 'error'}`;
   if (s.error) error.textContent = errorText(s.error);
 }
+
+revealOnClick($('#account-text'), () => {
+  if (!lastStatus.email) return;
+  emailShown = !emailShown;
+  renderStatus(lastStatus);
+});
 
 // ---------- section rail ----------
 
@@ -89,9 +117,9 @@ const fields = {
   backupIntervalHours: 'number',
   backupRetention: 'number',
   deviceName: 'text',
-  aiModel: 'text',
   aiAllowNewFolders: 'checkbox',
   aiResearch: 'checkbox',
+  aiMonthlyBudget: 'number',
 } as const satisfies Partial<Record<keyof Settings, string>>;
 
 async function loadSettings() {
@@ -238,18 +266,29 @@ async function loadAiFolders() {
   }
   aiInbox.replaceChildren(...options);
   aiInbox.value = s.aiInboxFolderId;
+  // Bulk sorting can start from any folder; the inbox is offered too.
+  const bulkFolder = $<HTMLSelectElement>('#bulk-folder');
+  const keep = bulkFolder.value;
+  const choose = document.createElement('option');
+  choose.value = '';
+  choose.textContent = t('aiBulkFolderLabel');
+  bulkFolder.replaceChildren(
+    choose,
+    ...aiFolders.map((f) => Object.assign(document.createElement('option'), { value: f.id, textContent: f.path })),
+  );
+  bulkFolder.value = aiFolders.some((f) => f.id === keep) ? keep : '';
   await renderAiStatus();
 }
 
 async function initAi() {
   const s = await getSettings();
   aiEnabled.checked = s.aiSortEnabled;
-  $<HTMLInputElement>('#aiModel').placeholder = DEFAULT_AI_MODEL;
   $('#ai-model-help').textContent = t('aiModelHelp', DEFAULT_AI_MODEL);
-  $('#ai-models').replaceChildren(
-    ...SUGGESTED_AI_MODELS.map((m) => Object.assign(document.createElement('option'), { value: m })),
-  );
-  await loadAiFolders();
+  currentModel = s.aiModel;
+  researchOn = s.aiResearch;
+  renderModels();
+  $<HTMLInputElement>('#bulk-research').checked = false;
+  await Promise.all([loadAiFolders(), loadModels(), renderBudget(), aiBulkItem.getValue().then((j) => renderBulk(j ?? undefined))]);
 }
 
 aiEnabled.addEventListener('change', () => {
@@ -266,6 +305,7 @@ aiEnabled.addEventListener('change', () => {
         throw new Error(t('aiPermissionDenied'));
       }
       await saveSetting('aiSortEnabled', true);
+      void loadModels();
     })
     .catch(showError)
     .finally(renderAiStatus);
@@ -279,6 +319,7 @@ $('#ai-key-save').addEventListener('click', () =>
       const key = aiKeyInput.value.trim();
       if (!KEY_FORMAT.test(key)) throw new Error(t('aiKeyInvalid'));
       await openRouterKeyItem.setValue(key);
+      await aiUsageItem.removeValue();
       aiKeyInput.value = '';
       await renderAiStatus();
     },
@@ -294,6 +335,7 @@ $('#ai-key-remove').addEventListener('click', () =>
     async () => {
       if (!confirm(t('aiConfirmRemoveKey'))) return;
       await openRouterKeyItem.removeValue();
+      await aiUsageItem.removeValue();
       await renderAiStatus();
     },
     actionError,
@@ -317,7 +359,7 @@ $('#ai-sort-now').addEventListener('click', () =>
     async () => {
       const r = await send({ type: 'aiSortNow' });
       const result = $('#ai-result');
-      result.textContent = t('aiSortNowResult', r.sorted, r.kept, r.failed);
+      result.textContent = t('aiSortNowResult', r.sorted, r.kept, r.failed) + (r.budgetStopped ? ` ${t('aiBudgetStopped')}` : '');
       result.hidden = false;
     },
     actionError,
@@ -327,7 +369,273 @@ $('#ai-sort-now').addEventListener('click', () =>
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') void loadAiFolders().catch(showError);
 });
-settingsItem.watch(() => void renderAiStatus());
+/** Under the budget field: what AI sorting spent this month, against the cap. */
+async function renderBudget() {
+  const [s, stored] = await Promise.all([getSettings(), aiSpendItem.getValue()]);
+  const b = budgetState(currentSpend(stored).usd, s.aiMonthlyBudget);
+  const help = $('#ai-budget-help');
+  help.classList.toggle('warn-text', b.state === 'near');
+  help.classList.toggle('error-text', b.state === 'over');
+  help.textContent =
+    b.state === 'off'
+      ? t('aiBudgetHelpOff', formatUsd(b.spent))
+      : b.state === 'over'
+        ? t('aiBudgetHelpOver', formatUsd(b.spent), formatUsd(b.budget), nextMonthStart().toLocaleDateString())
+        : t('aiBudgetHelpOn', formatUsd(b.spent), formatUsd(b.budget));
+}
+aiSpendItem.watch(() => void renderBudget());
+
+settingsItem.watch((s) => {
+  void renderAiStatus();
+  void renderBudget();
+  if (s && (s.aiModel !== currentModel || s.aiResearch !== researchOn)) {
+    currentModel = s.aiModel;
+    researchOn = s.aiResearch;
+    renderModels();
+  }
+});
+
+// ---------- AI model picker ----------
+
+const modelSearch = $<HTMLInputElement>('#ai-model-search');
+const modelList = $<HTMLUListElement>('#ai-model-list');
+/** At most this many rows are drawn; the search narrows the rest. */
+const RENDER_MAX = 120;
+let models: ModelInfo[] = [];
+let modelsState: 'loading' | 'ok' | 'offline' | 'failed' = 'loading';
+let modelsError = '';
+let modelFilter: ModelFilter = 'all';
+let currentModel = DEFAULT_AI_MODEL;
+let researchOn = true;
+/** Options drawn in the list, in order; the keyboard highlight moves over them. */
+let options: HTMLLIElement[] = [];
+let active = -1;
+
+/** Shown until the full list is loaded (or when openrouter.ai is not allowed yet). */
+const suggested = (): ModelInfo[] =>
+  SUGGESTED_AI_MODELS.map((id) => ({ id, name: id, context: 0, free: false, tools: true, created: 0 }));
+
+/** "Anthropic: Claude Opus 5.5" → ["Claude Opus 5.5", "Anthropic"]. */
+function splitName(m: ModelInfo): [string, string] {
+  const i = m.name.indexOf(': ');
+  return i > 0 ? [m.name.slice(i + 2), m.name.slice(0, i)] : [m.name, m.id.split('/')[0] ?? ''];
+}
+
+const el = <K extends keyof HTMLElementTagNameMap>(tag: K, className: string, text?: string) => {
+  const node = document.createElement(tag);
+  node.className = className;
+  if (text !== undefined) node.textContent = text;
+  return node;
+};
+
+/** Marks models that can read pages and search the web. */
+function globe(): SVGSVGElement {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('viewBox', '0 0 16 16');
+  svg.setAttribute('width', '12');
+  svg.setAttribute('height', '12');
+  svg.setAttribute('aria-hidden', 'true');
+  // Static markup, no user data.
+  svg.innerHTML =
+    '<circle cx="8" cy="8" r="6.3"/><path d="M1.7 8h12.6M8 1.7c1.9 1.8 2.7 3.9 2.7 6.3S9.9 12.5 8 14.3M8 1.7C6.1 3.5 5.3 5.6 5.3 8s.8 4.5 2.7 6.3"/>';
+  return svg;
+}
+
+function priceLabel(m: ModelInfo): string {
+  if (m.free) return t('aiModelFree');
+  if (m.prompt === undefined) return '';
+  return t('aiModelPrice', formatUsd(m.prompt), formatUsd(m.completion ?? 0));
+}
+
+function modelPills(m: ModelInfo, full: boolean): HTMLElement[] {
+  if (!m.created && !m.context) return [];
+  const pills: HTMLElement[] = [];
+  // Rows in the list are compact; the full wording is in the tooltip and on the chosen model.
+  const price = priceLabel(m);
+  if (price) {
+    const compact = m.free || full ? price : `${formatUsd(m.prompt!)} / ${formatUsd(m.completion ?? 0)}`;
+    const pill = el('span', m.free ? 'pill free' : 'pill price', compact);
+    pill.title = price;
+    pills.push(pill);
+  }
+  if (m.context) {
+    const context = t('aiModelContext', formatTokens(m.context));
+    const pill = el('span', 'pill', full ? context : formatTokens(m.context));
+    pill.title = context;
+    pills.push(pill);
+  }
+  if (m.tools) {
+    const tools = el('span', 'pill tools');
+    tools.append(globe());
+    if (full) tools.append(t('aiModelFilterTools'));
+    tools.title = t('aiModelToolsHint');
+    if (!full) tools.setAttribute('aria-label', t('aiModelToolsHint'));
+    pills.push(tools);
+  }
+  return pills;
+}
+
+function renderCurrent() {
+  const box = $('#ai-model-current');
+  const known = (modelsState === 'ok' ? models : suggested()).find((m) => m.id === currentModel);
+  const [name, vendor] = known ? splitName(known) : [currentModel, ''];
+  const head = el('div', 'model-current-head');
+  head.append(el('span', 'model-ribbon'), el('div', 'model-current-text'));
+  const text = head.lastElementChild!;
+  text.append(el('strong', 'model-current-name', name), el('code', 'model-current-id', currentModel));
+  if (vendor && known?.name !== known?.id) text.prepend(el('span', 'model-current-vendor muted small', vendor));
+  const pills = el('div', 'model-pills');
+  if (known) pills.append(...modelPills(known, true));
+  else if (modelsState === 'ok') pills.append(el('span', 'pill warn', t('aiModelUnknown')));
+  box.replaceChildren(head);
+  if (pills.childElementCount) box.append(pills);
+  if (researchOn && known && known.created && !known.tools) {
+    box.append(el('p', 'notice warn small', t('aiModelNoTools')));
+  }
+}
+
+function setActive(index: number, scroll = true) {
+  options[active]?.classList.remove('active');
+  active = options.length ? Math.max(0, Math.min(index, options.length - 1)) : -1;
+  const option = options[active];
+  if (!option) {
+    modelSearch.removeAttribute('aria-activedescendant');
+    return;
+  }
+  option.classList.add('active');
+  modelSearch.setAttribute('aria-activedescendant', option.id);
+  if (scroll) option.scrollIntoView({ block: 'nearest' });
+}
+
+function optionFor(m: ModelInfo, index: number, custom = false): HTMLLIElement {
+  const li = el('li', custom ? 'model-option custom' : 'model-option');
+  li.id = `model-opt-${index}`;
+  li.role = 'option';
+  li.dataset.id = m.id;
+  li.setAttribute('aria-selected', String(m.id === currentModel));
+  const main = el('span', 'model-main');
+  if (custom) {
+    main.append(el('span', 'model-name', t('aiModelUseCustom', m.id)));
+  } else {
+    const [name, vendor] = splitName(m);
+    main.append(el('span', 'model-name', name), el('span', 'model-id', m.id));
+    if (vendor) main.title = `${vendor}: ${name}`;
+  }
+  const meta = el('span', 'model-meta');
+  meta.append(...modelPills(m, false));
+  li.append(el('span', 'model-mark'), main, meta);
+  return li;
+}
+
+function renderModels() {
+  renderCurrent();
+  const query = modelSearch.value.trim();
+  const pool = modelsState === 'ok' ? models : suggested();
+  const found = searchModels(pool, query, modelFilter);
+  const rows: HTMLLIElement[] = [];
+  // Any ID from openrouter.ai/models can still be typed in.
+  if (MODEL_ID.test(query) && !pool.some((m) => m.id === query)) {
+    rows.push(optionFor({ id: query, name: query, context: 0, free: false, tools: true, created: 0 }, 0, true));
+  }
+  for (const m of found.slice(0, RENDER_MAX)) rows.push(optionFor(m, rows.length));
+  options = rows;
+  if (rows.length) modelList.replaceChildren(...rows);
+  else modelList.replaceChildren(el('li', 'model-empty muted small', query ? t('aiModelsNone', query) : t('aiModelsNoneFilter')));
+
+  const count = $('#ai-model-count');
+  count.classList.toggle('warn-text', modelsState === 'failed');
+  count.textContent =
+    modelsState === 'loading'
+      ? t('aiModelsLoading')
+      : modelsState === 'offline'
+        ? t('aiModelsOffline')
+        : modelsState === 'failed'
+          ? t('aiModelsFailed', modelsError)
+          : found.length > RENDER_MAX
+            ? t('aiModelsShown', RENDER_MAX, found.length)
+            : tn('aiModelsCount', found.length);
+  modelList.setAttribute('aria-busy', String(modelsState === 'loading'));
+
+  // Without a search the chosen model is highlighted and scrolled into view.
+  const selected = rows.findIndex((r) => r.dataset.id === currentModel);
+  active = -1;
+  if (query) setActive(0, false);
+  else if (selected >= 0) {
+    setActive(selected, false);
+    const row = rows[selected]!;
+    modelList.scrollTop = row.offsetTop - (modelList.clientHeight - row.offsetHeight) / 2;
+  } else modelList.scrollTop = 0;
+}
+
+async function loadModels(refresh = false) {
+  if (!(await browser.permissions.contains({ origins: [OPENROUTER_ORIGIN] }))) {
+    modelsState = 'offline';
+    renderModels();
+    return;
+  }
+  if (!models.length) {
+    modelsState = 'loading';
+    renderModels();
+  }
+  try {
+    models = await send({ type: 'aiListModels', refresh });
+    modelsState = 'ok';
+  } catch (err) {
+    modelsError = err instanceof Error ? err.message : String(err);
+    if (!models.length) modelsState = 'failed';
+  }
+  renderModels();
+}
+
+function chooseModel(id: string) {
+  if (!MODEL_ID.test(id)) return;
+  const changed = id !== currentModel;
+  currentModel = id;
+  for (const o of options) o.setAttribute('aria-selected', String(o.dataset.id === id));
+  if (modelSearch.value.trim() === id) modelSearch.value = '';
+  renderModels();
+  if (!changed) return;
+  const box = $('#ai-model-current');
+  box.classList.remove('chosen');
+  void box.offsetWidth;
+  box.classList.add('chosen');
+  void saveSetting('aiModel', id).catch(showError);
+}
+
+modelSearch.addEventListener('input', () => renderModels());
+modelSearch.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    setActive(active < 0 ? 0 : active + (e.key === 'ArrowDown' ? 1 : -1));
+  } else if (e.key === 'Home' && e.ctrlKey) {
+    setActive(0);
+  } else if (e.key === 'End' && e.ctrlKey) {
+    setActive(options.length - 1);
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    const id = options[active]?.dataset.id;
+    if (id) chooseModel(id);
+  } else if (e.key === 'Escape' && modelSearch.value) {
+    e.preventDefault();
+    modelSearch.value = '';
+    renderModels();
+  }
+});
+modelList.addEventListener('click', (e) => {
+  const option = (e.target as HTMLElement).closest<HTMLLIElement>('.model-option');
+  if (option?.dataset.id) chooseModel(option.dataset.id);
+});
+for (const chip of document.querySelectorAll<HTMLButtonElement>('.model-filters .chip')) {
+  chip.addEventListener('click', () => {
+    modelFilter = chip.dataset.filter as ModelFilter;
+    for (const c of document.querySelectorAll('.model-filters .chip')) c.setAttribute('aria-pressed', String(c === chip));
+    renderModels();
+    modelSearch.focus();
+  });
+}
+$('#ai-model-refresh').addEventListener('click', () =>
+  withBusy($<HTMLButtonElement>('#ai-model-refresh'), () => loadModels(true), actionError),
+);
 
 // ---------- import ----------
 
@@ -449,12 +757,13 @@ statusItem.watch((s) => {
   // Connected or disconnected elsewhere (e.g. from the popup): the backup
   // and browser lists belong to the account, so load them again.
   if (wasConnected !== undefined && s.connected !== wasConnected) {
-    void Promise.all([loadBackups(), loadBrowsers()]).catch(showError);
+    void Promise.all([loadBackups(), loadBrowsers(), loadEncryption()]).catch(showError);
   }
   wasConnected = s.connected;
 });
 void loadSettings();
 void initAi().catch((err: unknown) => showError(err));
+void loadEncryption().catch((err: unknown) => showError(err));
 // Development builds only: the OAuth redirect URI to register in Google Cloud.
 // The block is removed from store builds (`wxt build`, `wxt zip`).
 if (import.meta.env.MODE !== 'production') {
@@ -485,3 +794,319 @@ const refreshSyncEnabled = async () => {
 };
 void refreshSyncEnabled();
 settingsItem.watch(() => void refreshSyncEnabled());
+
+// ---------- bulk sorting ----------
+
+/** Proposals at or above this confidence start out ticked. */
+const BULK_AUTO_SELECT = 0.6;
+let bulkJobId = '';
+const bulkChosen = new Set<string>();
+/** Proposals already shown once, so a later untick is not undone by the next update. */
+const bulkSeen = new Set<string>();
+
+const movable = (p: BulkProposal) => (p.status === 'moved' || p.status === 'created') && !p.appliedAt;
+
+/** "Bookmarks bar / Work / Docs" → "… / Work / Docs". */
+function shortPath(path: string): string {
+  const parts = path.split(' / ');
+  return parts.length > 2 ? `… / ${parts.slice(-2).join(' / ')}` : path;
+}
+
+function bulkRow(p: BulkProposal, job: BulkJob): HTMLLIElement {
+  const li = el('li', 'bulk-row');
+  const kind = p.appliedAt
+    ? 'applied'
+    : p.applyError
+      ? 'failed'
+      : p.status === 'created'
+        ? 'create'
+        : p.status === 'moved'
+          ? 'move'
+          : p.status === 'kept'
+            ? 'keep'
+            : 'error';
+  li.dataset.kind = kind;
+
+  const tick = document.createElement('input');
+  tick.type = 'checkbox';
+  tick.className = 'tick';
+  tick.dataset.id = p.bookmarkId;
+  tick.checked = bulkChosen.has(p.bookmarkId);
+  tick.disabled = !movable(p) || job.state !== 'ready';
+  // Rows without a move keep the column, so everything lines up.
+  if (!movable(p)) tick.style.visibility = 'hidden';
+  tick.setAttribute('aria-label', p.title);
+
+  const main = el('div', 'bulk-main');
+  main.append(el('span', 'bulk-title', p.title || p.url || ''));
+  let host = '';
+  try {
+    host = new URL(p.url ?? '').hostname.replace(/^www\./, '');
+  } catch {
+    // Not an address: show the title only.
+  }
+  const sub = el('span', 'bulk-sub', [host, p.applyError ?? (p.status === 'error' ? p.error : p.reason)].filter(Boolean).join(' · '));
+  if (p.reason) sub.title = p.reason;
+  main.append(sub);
+
+  const target = el('div', 'bulk-target');
+  if (kind === 'keep') target.append(el('span', 'muted small', t('aiBulkKeep')));
+  else if (kind === 'error' || kind === 'failed') target.append(el('span', 'pill warn', t('aiStatusError')));
+  else {
+    target.append(el('span', 'bulk-arrow', '→'));
+    const path = el('span', 'bulk-path', shortPath(p.toPath ?? ''));
+    path.title = p.toPath ?? '';
+    target.append(path);
+    if (p.newFolder) target.append(el('span', 'pill free', t('aiBulkNewFolder')));
+    if (kind === 'applied') target.append(el('span', 'pill done', '✓'));
+    else if (p.confidence !== undefined) target.append(el('span', 'pill', t('aiConfidence', Math.round(p.confidence * 100))));
+  }
+  li.append(tick, main, target);
+  return li;
+}
+
+function renderBulk(job: BulkJob | undefined) {
+  const run = $('#bulk-run');
+  const start = $<HTMLButtonElement>('#bulk-start');
+  run.hidden = !job;
+  start.disabled = !!job && job.state !== 'done';
+  start.title = start.disabled ? t('aiBulkBusy') : '';
+  if (!job) {
+    bulkJobId = '';
+    return;
+  }
+  if (job.id !== bulkJobId) {
+    bulkJobId = job.id;
+    bulkChosen.clear();
+    bulkSeen.clear();
+  }
+  for (const p of job.proposals) {
+    if (bulkSeen.has(p.bookmarkId)) continue;
+    bulkSeen.add(p.bookmarkId);
+    if (movable(p) && (p.confidence ?? 0) >= BULK_AUTO_SELECT) bulkChosen.add(p.bookmarkId);
+  }
+  for (const id of [...bulkChosen]) {
+    const p = job.proposals.find((x) => x.bookmarkId === id);
+    if (!p || !movable(p)) bulkChosen.delete(id);
+  }
+
+  const done = job.total - job.queue.length;
+  const moves = job.proposals.filter((p) => p.status === 'moved' || p.status === 'created').length;
+  const keeps = job.proposals.filter((p) => p.status === 'kept').length;
+  const errors = job.proposals.filter((p) => p.status === 'error').length;
+  const planning = job.state === 'planning';
+
+  $('#bulk-title').textContent = t(
+    planning ? 'aiBulkPlanningTitle' : job.state === 'done' ? 'aiBulkDoneTitle' : 'aiBulkReadyTitle',
+    job.folderPath,
+  );
+  $('#bulk-meta').textContent = planning
+    ? t('aiBulkProgress', done, job.total)
+    : t('aiBulkSummary', moves, keeps, errors);
+  $('#bulk-cost').textContent = formatUsd(job.cost);
+  $('#bulk-cost').title = t('aiBulkCostHint');
+  const gauge = $('#bulk-gauge');
+  gauge.hidden = !planning;
+  const pct = job.total ? Math.round((done / job.total) * 100) : 0;
+  gauge.setAttribute('aria-valuenow', String(pct));
+  gauge.querySelector<HTMLElement>('span')!.style.width = `${pct}%`;
+
+  const note = $('#bulk-note');
+  const noteText =
+    job.state === 'done' && job.applied
+      ? t('aiBulkDone', job.applied.moved, job.applied.failed)
+      : job.stopped === 'budget'
+        ? t('aiErrBudget')
+        : job.stopped === 'error'
+          ? t('aiBulkStoppedError', job.stopMessage ?? '')
+          : job.stopped === 'cancelled'
+            ? t('aiBulkStoppedCancel', done, job.total)
+            : '';
+  note.hidden = !noteText;
+  note.textContent = noteText;
+  note.className = `notice small ${job.state === 'done' ? 'ok' : job.stopped === 'cancelled' ? '' : 'warn'}`;
+
+  const list = $('#bulk-list');
+  const rows = job.proposals.map((p) => bulkRow(p, job));
+  if (planning) {
+    const waiting = el('li', 'bulk-row waiting');
+    waiting.append(el('span', 'bulk-spinner'), el('span', 'muted small', t('aiBulkWaiting', job.queue.length)));
+    rows.push(waiting);
+  }
+  list.replaceChildren(...rows);
+
+  const candidates = job.proposals.filter(movable);
+  $('#bulk-toolbar').hidden = !candidates.length || job.state === 'done';
+  const all = $<HTMLInputElement>('#bulk-all');
+  all.checked = candidates.length > 0 && candidates.every((p) => bulkChosen.has(p.bookmarkId));
+  all.indeterminate = !all.checked && candidates.some((p) => bulkChosen.has(p.bookmarkId));
+  all.disabled = job.state !== 'ready';
+  $('#bulk-selected').textContent = t('aiBulkSelected', bulkChosen.size, candidates.length);
+
+  const apply = $<HTMLButtonElement>('#bulk-apply');
+  apply.hidden = job.state === 'done';
+  apply.textContent = tn('aiBulkApply', bulkChosen.size);
+  apply.disabled = job.state !== 'ready' || bulkChosen.size === 0;
+  $('#bulk-stop').hidden = !planning;
+  const discard = $<HTMLButtonElement>('#bulk-discard');
+  discard.hidden = planning || job.state === 'applying';
+  discard.textContent = t(job.state === 'done' ? 'aiBulkClose' : 'aiBulkDiscard');
+  $('#bulk-log').hidden = job.state !== 'done';
+}
+
+aiBulkItem.watch((job) => renderBulk(job ?? undefined));
+
+$('#bulk-list').addEventListener('change', (e) => {
+  const tick = e.target as HTMLInputElement;
+  if (!tick.classList.contains('tick') || !tick.dataset.id) return;
+  if (tick.checked) bulkChosen.add(tick.dataset.id);
+  else bulkChosen.delete(tick.dataset.id);
+  void aiBulkItem.getValue().then((j) => renderBulk(j ?? undefined));
+});
+$('#bulk-all').addEventListener('change', async () => {
+  const job = await aiBulkItem.getValue();
+  if (!job) return;
+  const on = $<HTMLInputElement>('#bulk-all').checked;
+  for (const p of job.proposals.filter(movable)) {
+    if (on) bulkChosen.add(p.bookmarkId);
+    else bulkChosen.delete(p.bookmarkId);
+  }
+  renderBulk(job);
+});
+$('#bulk-start').addEventListener('click', () =>
+  withBusy(
+    $<HTMLButtonElement>('#bulk-start'),
+    async () => {
+      const folderId = $<HTMLSelectElement>('#bulk-folder').value;
+      if (!folderId) throw new Error(t('aiBulkChooseFolder'));
+      await send({ type: 'aiBulkStart', folderId, research: $<HTMLInputElement>('#bulk-research').checked });
+      $('#bulk-run').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    },
+    actionError,
+  ),
+);
+$('#bulk-stop').addEventListener('click', () =>
+  withBusy($<HTMLButtonElement>('#bulk-stop'), () => send({ type: 'aiBulkCancel' }), actionError),
+);
+$('#bulk-apply').addEventListener('click', () =>
+  withBusy(
+    $<HTMLButtonElement>('#bulk-apply'),
+    async () => {
+      if (!bulkChosen.size) return;
+      await send({ type: 'aiBulkApply', bookmarkIds: [...bulkChosen] });
+    },
+    actionError,
+  ),
+);
+$('#bulk-discard').addEventListener('click', () =>
+  withBusy(
+    $<HTMLButtonElement>('#bulk-discard'),
+    async () => {
+      const job = await aiBulkItem.getValue();
+      const pending = job?.proposals.filter(movable).length ?? 0;
+      if (job?.state !== 'done' && pending && !confirm(t('aiBulkConfirmDiscard'))) return;
+      await send({ type: 'aiBulkDiscard' });
+    },
+    actionError,
+  ),
+);
+
+// ---------- encryption ----------
+
+const encPass = $<HTMLInputElement>('#enc-pass');
+const encPass2 = $<HTMLInputElement>('#enc-pass2');
+const encUnderstand = $<HTMLInputElement>('#enc-understand');
+const strengthKeys = ['encStrengthShort', 'encStrengthWeak', 'encStrengthFair', 'encStrengthStrong'] as const;
+
+function renderEncryption(e: EncryptionStatus, connected: boolean) {
+  $('#enc-offline').hidden = connected;
+  $('#enc-off').hidden = !connected || e.state !== 'off';
+  $('#enc-locked').hidden = !connected || e.state !== 'locked';
+  $('#enc-on').hidden = !connected || e.state !== 'on';
+  const badge = $('#enc-badge');
+  badge.hidden = !connected;
+  badge.className = `pill enc-${e.state}`;
+  badge.textContent = t(e.state === 'on' ? 'encBadgeOn' : e.state === 'locked' ? 'encBadgeLocked' : 'encBadgeOff');
+  const since = e.createdAt ? new Date(e.createdAt).toLocaleDateString() : '';
+  const meta = e.createdBy ? t('encSinceBy', since, e.createdBy) : since ? t('encSince', since) : '';
+  $('#enc-on-meta').textContent = meta;
+  $('#enc-locked-meta').textContent = meta;
+}
+
+async function loadEncryption() {
+  const status = await statusItem.getValue();
+  renderEncryption(await encryptionStatusItem.getValue(), status.connected);
+  if (!status.connected) return;
+  // Ask Drive: another browser may have turned it on or off.
+  renderEncryption(await send({ type: 'encStatus' }), true);
+}
+encryptionStatusItem.watch((e) => {
+  void statusItem.getValue().then((s) => renderEncryption(e ?? { state: 'off' }, s.connected));
+});
+
+function checkPassphrase() {
+  const p = encPass.value;
+  const level = passphraseStrength(p);
+  document.querySelector<HTMLElement>('.meter')!.dataset.level = String(p ? level : 0);
+  const text = $('#enc-meter-text');
+  const mismatch = encPass2.value !== '' && encPass2.value !== p;
+  text.textContent = !p ? t('encStrengthHint', MIN_PASSPHRASE) : mismatch ? t('encMismatch') : t(strengthKeys[level], MIN_PASSPHRASE);
+  text.classList.toggle('warn-text', mismatch || (p !== '' && level < 2));
+  $<HTMLButtonElement>('#enc-enable').disabled = level === 0 || p !== encPass2.value || !encUnderstand.checked;
+}
+for (const input of [encPass, encPass2, encUnderstand]) input.addEventListener('input', checkPassphrase);
+checkPassphrase();
+
+$('#enc-off').addEventListener('submit', (e) => {
+  e.preventDefault();
+  void withBusy(
+    $<HTMLButtonElement>('#enc-enable'),
+    async () => {
+      const passphrase = encPass.value;
+      if (passphrase !== encPass2.value) throw new Error(t('encMismatch'));
+      renderEncryption(await send({ type: 'encEnable', passphrase }), true);
+      encPass.value = encPass2.value = '';
+      encUnderstand.checked = false;
+      checkPassphrase();
+      showToast($('#action-ok'), t('encEnabledToast'));
+    },
+    actionError,
+  );
+});
+$('#enc-locked').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const input = $<HTMLInputElement>('#enc-unlock-pass');
+  void withBusy(
+    $<HTMLButtonElement>('#enc-unlock'),
+    async () => {
+      renderEncryption(await send({ type: 'encUnlock', passphrase: input.value }), true);
+      input.value = '';
+    },
+    actionError,
+  );
+});
+$('#enc-lock').addEventListener('click', () =>
+  withBusy($<HTMLButtonElement>('#enc-lock'), async () => renderEncryption(await send({ type: 'encLock' }), true), actionError),
+);
+$('#enc-disable').addEventListener('click', () => {
+  if (!confirm(t('encDisableConfirm'))) return;
+  void withBusy(
+    $<HTMLButtonElement>('#enc-disable'),
+    async () => renderEncryption(await send({ type: 'encDisable' }), true),
+    actionError,
+  );
+});
+$('#enc-reset').addEventListener('click', () => {
+  // Deletes data that cannot be recovered: the user types a word to confirm.
+  const word = t('encResetWord');
+  if (prompt(t('encResetConfirm', word))?.trim().toLocaleUpperCase() !== word.toLocaleUpperCase()) return;
+  void withBusy(
+    $<HTMLButtonElement>('#enc-reset'),
+    async () => {
+      const { deleted } = await send({ type: 'encReset' });
+      showToast($('#action-ok'), t('encResetDone', deleted));
+      await loadEncryption();
+    },
+    actionError,
+  );
+});

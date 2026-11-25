@@ -8,6 +8,7 @@ import { patchStatus, remoteVersionItem, statusItem, syncStateItem, type ErrorCo
 import type { BookmarkNode, BookmarksApi } from '../sync/bookmarks-api';
 import { MassDeleteError, syncOnce, type SyncOptions, type SyncResult } from '../sync/engine';
 import { createBackup } from './backup-service';
+import { LockedError } from './errors';
 import { DriveRemoteStore, driveClient } from './drive-store';
 
 let tail: Promise<unknown> = Promise.resolve();
@@ -70,6 +71,7 @@ export function describeError(err: unknown): NonNullable<Status['error']> {
   const message = err instanceof Error ? err.message : String(err);
   let code: ErrorCode = 'unknown';
   if (err instanceof AuthRequiredError) code = 'auth';
+  else if (err instanceof LockedError) code = 'locked';
   else if (err instanceof ConfigError) code = 'config';
   else if (err instanceof MassDeleteError) {
     return { code: 'mass-delete', message, deletions: err.deletions, total: err.total, source: err.source };

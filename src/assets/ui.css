@@ -172,6 +172,13 @@ a:hover {
   display: none !important;
 }
 
+/* A masked e-mail address that shows in full on click. */
+.revealable {
+  cursor: pointer;
+  text-decoration: underline dotted color-mix(in oklab, currentColor 40%, transparent);
+  text-underline-offset: 3px;
+}
+
 /* ---------- buttons ---------- */
 
 button,

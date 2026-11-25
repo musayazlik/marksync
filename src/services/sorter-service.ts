@@ -1,8 +1,20 @@
 import { browser } from 'wxt/browser';
 import { listFolderOptions } from '../core/ai-sort';
-import { chatCompletion, checkKey, hasOpenRouterPermission, OpenRouterError } from '../platform/openrouter';
+import { addSpend, budgetState, currentSpend } from '../core/budget';
+import type { KeyUsage, ModelInfo } from '../core/openrouter-data';
+import {
+  chatCompletion,
+  checkKey,
+  fetchKeyUsage,
+  fetchModels,
+  hasOpenRouterPermission,
+  OpenRouterError,
+} from '../platform/openrouter';
 import { t } from '../shared/i18n';
 import {
+  aiModelsItem,
+  aiSpendItem,
+  aiUsageItem,
   getSettings,
   openRouterKeyItem,
   SORT_LOG_MAX,
@@ -55,7 +67,7 @@ function writeLog(change: (log: SortLogEntry[]) => SortLogEntry[]): Promise<Sort
   return write;
 }
 
-function addLog(outcome: SortOutcome): Promise<SortLogEntry[]> {
+export function addLog(outcome: SortOutcome): Promise<SortLogEntry[]> {
   const entry: SortLogEntry = { id: crypto.randomUUID(), at: Date.now(), ...outcome };
   return writeLog((log) => [entry, ...log]);
 }
@@ -72,18 +84,24 @@ interface Ready {
   model: string;
   allowNewFolders: boolean;
   research: boolean;
+  /** Monthly cap in USD, 0 = none. */
+  budget: number;
 }
 
 /** The settings needed to sort, or null when AI sorting is off or incomplete. */
 async function readiness(): Promise<Ready | null> {
-  const [s, apiKey] = await Promise.all([getSettings(), openRouterKeyItem.getValue()]);
+  const [s, apiKey, cache] = await Promise.all([getSettings(), openRouterKeyItem.getValue(), aiModelsItem.getValue()]);
   if (!s.aiSortEnabled || !s.aiInboxFolderId || !apiKey) return null;
+  // A model that cannot use tools would reject the research request; it
+  // decides from the title and address instead.
+  const known = cache?.models.find((m) => m.id === s.aiModel);
   return {
     inboxId: s.aiInboxFolderId,
     apiKey,
     model: s.aiModel,
     allowNewFolders: s.aiAllowNewFolders,
-    research: s.aiResearch,
+    research: s.aiResearch && (known?.tools ?? true),
+    budget: s.aiMonthlyBudget,
   };
 }
 
@@ -91,8 +109,21 @@ async function waitWhileSyncApplies() {
   for (let i = 0; i < 20 && isApplying(); i++) await new Promise((r) => setTimeout(r, 500));
 }
 
+/** True when this month's AI spending has reached the cap. */
+export async function overBudget(ready: { budget: number }): Promise<boolean> {
+  if (!(ready.budget > 0)) return false;
+  return budgetState(currentSpend(await aiSpendItem.getValue()).usd, ready.budget).state === 'over';
+}
+
+let spendWrites: Promise<unknown> = Promise.resolve();
+export function recordSpend(cost: number | undefined): Promise<unknown> {
+  spendWrites = spendWrites.catch(() => undefined).then(async () => aiSpendItem.setValue(addSpend(await aiSpendItem.getValue(), cost)));
+  return spendWrites;
+}
+
 async function sortBookmark(id: string, ready: Ready): Promise<SortOutcome | null> {
   await waitWhileSyncApplies();
+  const blocked = (await overBudget(ready)) ? { code: 'budget' as const, message: t('aiErrBudget') } : undefined;
   const bookmarks = localBookmarks();
   const special = await detectSpecialRoots(bookmarks);
   const outcome = await sortOne(
@@ -108,10 +139,16 @@ async function sortBookmark(id: string, ready: Ready): Promise<SortOutcome | nul
       allowNewFolders: ready.allowNewFolders,
       model: ready.model,
       research: ready.research,
+      ...(blocked ? { blocked } : {}),
     },
     id,
   );
-  if (outcome) await addLog(outcome);
+  if (outcome) {
+    // Every request the model answered (or failed) counts, with the cost OpenRouter reported.
+    if (outcome.errorCode !== 'budget') await recordSpend(outcome.cost);
+    await addLog(outcome);
+    if (outcome.cost !== undefined || outcome.status === 'error') usageSoon();
+  }
   return outcome;
 }
 
@@ -165,6 +202,8 @@ export interface SortNowResult {
   sorted: number;
   kept: number;
   failed: number;
+  /** True when the monthly budget ran out before the inbox was empty. */
+  budgetStopped?: boolean;
 }
 
 /** Sorts the bookmarks already waiting in the inbox. */
@@ -173,6 +212,7 @@ export function sortInboxNow(): Promise<SortNowResult> {
     const ready = await readiness();
     if (!ready) throw new Error(t('aiNotReady'));
     if (!(await hasOpenRouterPermission())) throw new Error(t('aiPermissionMissing'));
+    if (await overBudget(ready)) throw new Error(t('aiErrBudget'));
     const children = await localBookmarks().getChildren(ready.inboxId);
     const result: SortNowResult = { sorted: 0, kept: 0, failed: 0 };
     for (const child of children.filter((c) => c.url !== undefined).slice(0, SORT_NOW_MAX)) {
@@ -180,6 +220,10 @@ export function sortInboxNow(): Promise<SortNowResult> {
       pending.delete(child.id);
       const outcome = await sortBookmark(child.id, ready);
       if (!outcome) continue;
+      if (outcome.errorCode === 'budget') {
+        result.budgetStopped = true;
+        break;
+      }
       if (outcome.status === 'moved' || outcome.status === 'created') result.sorted++;
       else if (outcome.status === 'kept') result.kept++;
       else {
@@ -238,4 +282,51 @@ export async function testOpenRouter(): Promise<string> {
     if (err instanceof OpenRouterError && err.code === 'auth') throw new Error(t('aiKeyRejected'));
     throw err;
   }
+}
+
+// ---------- OpenRouter models and usage ----------
+
+/** The model list changes a few times a week; a few hours old is fresh enough. */
+const MODELS_MAX_AGE_MS = 6 * 60 * 60 * 1000;
+
+function permissionError(err: unknown): never {
+  if (err instanceof OpenRouterError && err.code === 'permission') throw new Error(t('aiPermissionMissing'));
+  if (err instanceof OpenRouterError && err.code === 'auth') throw new Error(t('aiKeyRejected'));
+  throw err;
+}
+
+/** OpenRouter's models for the picker in Settings, from the cache when it is fresh. */
+export async function listModels(refresh = false): Promise<ModelInfo[]> {
+  const cache = await aiModelsItem.getValue();
+  if (!refresh && cache && Date.now() - cache.fetchedAt < MODELS_MAX_AGE_MS && cache.models.length) return cache.models;
+  try {
+    const models = await fetchModels();
+    await aiModelsItem.setValue({ fetchedAt: Date.now(), models });
+    return models;
+  } catch (err) {
+    // An older list beats none when OpenRouter is briefly unreachable.
+    if (cache?.models.length && !(err instanceof OpenRouterError && err.code === 'permission')) return cache.models;
+    return permissionError(err);
+  }
+}
+
+/** Reads the key's limit and spending from OpenRouter and keeps it for the popup. */
+export async function refreshUsage(): Promise<KeyUsage> {
+  const apiKey = await openRouterKeyItem.getValue();
+  if (!apiKey) throw new Error(t('aiNoKey'));
+  try {
+    const usage = await fetchKeyUsage(apiKey);
+    // The key may have been removed while the request ran.
+    if ((await openRouterKeyItem.getValue()) === apiKey) await aiUsageItem.setValue(usage);
+    return usage;
+  } catch (err) {
+    return permissionError(err);
+  }
+}
+
+/** After paid requests, OpenRouter's numbers lag a little: refresh shortly after the last one. */
+let usageTimer: ReturnType<typeof setTimeout> | undefined;
+export function usageSoon() {
+  clearTimeout(usageTimer);
+  usageTimer = setTimeout(() => void refreshUsage().catch(() => undefined), 8_000);
 }

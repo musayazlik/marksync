@@ -21,6 +21,8 @@ export function badgeFor(status: Status, settings: Pick<Settings, 'syncEnabled'>
     if (!settings.syncEnabled) return { text: '', title: name };
     return { text: '!', color: PAUSED_COLOR, title: `${name}: ${t('badgePaused')}` };
   }
+  // Locked: waiting for the passphrase, not broken.
+  if (error.code === 'locked') return { text: '!', color: PAUSED_COLOR, title: `${name}: ${errorText(error)}` };
   return { text: '!', color: ERROR_COLOR, title: `${name}: ${errorText(error)}` };
 }
 

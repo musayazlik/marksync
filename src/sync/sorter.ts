@@ -37,13 +37,22 @@ export interface SortRun {
   model: string;
   /** Let the model read the page and search the web. */
   research?: boolean;
+  /** Set when the monthly budget is used up: the model is not asked and the bookmark stays. */
+  blocked?: { code: 'budget'; message: string };
+  /** Only ask the model and return its proposal; nothing is moved (bulk sorting preview). */
+  plan?: boolean;
+  /** More folders the model is not offered (besides `inboxId`), e.g. the inbox during bulk sorting. */
+  skip?: string[];
 }
 
 /** A log entry without its id and time. */
 export type SortOutcome = Omit<SortLogEntry, 'id' | 'at'>;
 
+/** A proposal from a planning run: a folder to create is described, not created. */
+export type PlannedOutcome = SortOutcome & { newFolder?: { parentId: string; name: string } };
+
 /** Error codes shown on the log page, next to OpenRouter's own. */
-export type SortErrorCode = 'reply' | 'unknown';
+export type SortErrorCode = 'reply' | 'budget' | 'unknown';
 
 /**
  * Asks the model where the bookmark belongs and moves it there.
@@ -53,7 +62,7 @@ export type SortErrorCode = 'reply' | 'unknown';
  * Model and network errors are returned as an 'error' outcome, never thrown,
  * so the bookmark simply stays in the inbox.
  */
-export async function sortOne(deps: SorterDeps, run: SortRun, bookmarkId: string): Promise<SortOutcome | null> {
+export async function sortOne(deps: SorterDeps, run: SortRun, bookmarkId: string): Promise<PlannedOutcome | null> {
   const tree = await deps.bookmarks.getTree();
   const hit = findTreeNode(tree, bookmarkId);
   if (!hit || hit.node.url === undefined || hit.parentId !== run.inboxId || !isSyncable(hit.node)) return null;
@@ -69,7 +78,12 @@ export async function sortOne(deps: SorterDeps, run: SortRun, bookmarkId: string
     ...(run.research ? { researched: true } : {}),
   };
 
-  const folders = listFolderOptions(tree, { exclude: deps.exclude, skip: [run.inboxId] });
+  if (run.blocked) {
+    const { researched: _, ...rest } = base;
+    return { ...rest, status: 'error', error: run.blocked.message, errorCode: run.blocked.code };
+  }
+
+  const folders = listFolderOptions(tree, { exclude: deps.exclude, skip: [run.inboxId, ...(run.skip ?? [])] });
   let reply: string;
   try {
     const answer = await deps.complete(
@@ -107,6 +121,20 @@ export async function sortOne(deps: SorterDeps, run: SortRun, bookmarkId: string
   };
   if (decision.action === 'keep') return { ...base, ...meta, status: 'kept' };
 
+  if (run.plan) {
+    if (decision.action === 'move') {
+      return { ...base, ...meta, status: 'moved', toId: decision.folder.localId, toPath: decision.folder.path };
+    }
+    return {
+      ...base,
+      ...meta,
+      status: 'created',
+      toId: decision.parent.localId,
+      toPath: `${decision.parent.path} / ${decision.name}`,
+      newFolder: { parentId: decision.parent.localId, name: decision.name },
+    };
+  }
+
   // The model took a few seconds: look again before touching anything.
   const now = await deps.bookmarks.getTree();
   const still = findTreeNode(now, bookmarkId);
@@ -130,6 +158,52 @@ export async function sortOne(deps: SorterDeps, run: SortRun, bookmarkId: string
     };
   } catch (err) {
     return { ...base, ...meta, status: 'error', error: messageOf(err), errorCode: 'unknown' };
+  }
+}
+
+/**
+ * Carries out a proposal from a planning run, after the user approved it.
+ * The bookmark must still be in `sourceId` and the target must still exist;
+ * otherwise nothing is touched. Folders created earlier in the same batch
+ * (same parent and name) are reused through `created`.
+ */
+export async function applyPlanned(
+  bookmarks: BookmarksApi,
+  p: PlannedOutcome,
+  sourceId: string,
+  created: Map<string, string>,
+): Promise<SortOutcome> {
+  const { newFolder, ...outcome } = p;
+  const tree = await bookmarks.getTree();
+  const hit = findTreeNode(tree, p.bookmarkId);
+  if (!hit) return { ...outcome, status: 'error', error: 'The bookmark was deleted.', errorCode: 'gone' };
+  if (hit.parentId !== sourceId) return { ...outcome, status: 'error', error: 'The bookmark was moved meanwhile.', errorCode: 'moved' };
+  try {
+    if (!newFolder) {
+      if (!p.toId || !findTreeNode(tree, p.toId)) {
+        return { ...outcome, status: 'error', error: 'The chosen folder was deleted.', errorCode: 'unknown' };
+      }
+      await bookmarks.move(p.bookmarkId, { parentId: p.toId });
+      return { ...outcome, status: 'moved' };
+    }
+    const parent = findTreeNode(tree, newFolder.parentId);
+    if (!parent) return { ...outcome, status: 'error', error: 'The chosen folder was deleted.', errorCode: 'unknown' };
+    const key = `${newFolder.parentId}\n${newFolder.name.toLocaleLowerCase()}`;
+    let folderId = created.get(key);
+    let status: 'moved' | 'created' = 'moved';
+    if (!folderId || !findTreeNode(tree, folderId)) {
+      // A folder of that name may exist by now (made by hand or by an earlier proposal).
+      const same = (parent.node.children ?? []).find(
+        (c) => c.url === undefined && c.title.toLocaleLowerCase() === newFolder.name.toLocaleLowerCase(),
+      );
+      folderId = same?.id ?? (await bookmarks.create({ parentId: newFolder.parentId, title: newFolder.name })).id;
+      if (!same) status = 'created';
+      created.set(key, folderId);
+    }
+    await bookmarks.move(p.bookmarkId, { parentId: folderId });
+    return { ...outcome, status, toId: folderId };
+  } catch (err) {
+    return { ...outcome, status: 'error', error: messageOf(err), errorCode: 'unknown' };
   }
 }
 

@@ -10,3 +10,6 @@ dist
 coverage
 .DS_Store
 web-ext.config.ts
+
+# Claude working files: screenshots, drafts; never pushed
+Claude outputs/

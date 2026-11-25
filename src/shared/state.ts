@@ -1,6 +1,8 @@
 import { storage } from '#imports';
 import type { SiteInfo } from '../core/ai-sort';
+import type { Spend } from '../core/budget';
 import type { LinkReason, Snapshot } from '../core/links';
+import type { KeyUsage, ModelInfo } from '../core/openrouter-data';
 import type { LocalState } from '../sync/engine';
 
 export interface Settings {
@@ -23,6 +25,8 @@ export interface Settings {
   aiAllowNewFolders: boolean;
   /** Let the model read the page and search the web before deciding (slower, small extra cost). */
   aiResearch: boolean;
+  /** Monthly cap in USD for AI sorting in this browser; 0 = no cap. */
+  aiMonthlyBudget: number;
 }
 
 /** Strong at research and judgement; any OpenRouter model ID can be entered in Settings. */
@@ -47,9 +51,10 @@ export const DEFAULT_SETTINGS: Settings = {
   aiModel: DEFAULT_AI_MODEL,
   aiAllowNewFolders: false,
   aiResearch: true,
+  aiMonthlyBudget: 0,
 };
 
-export type ErrorCode = 'auth' | 'mass-delete' | 'config' | 'network' | 'unknown';
+export type ErrorCode = 'auth' | 'mass-delete' | 'config' | 'network' | 'locked' | 'unknown';
 
 export interface Status {
   connected: boolean;
@@ -80,6 +85,7 @@ export interface DriveIds {
   backupsFolderId?: string;
   browsersFolderId?: string;
   stateFileId?: string;
+  encryptionFileId?: string;
 }
 
 export const settingsItem = storage.defineItem<Settings>('local:settings', {
@@ -105,6 +111,30 @@ export const deviceIdItem = storage.defineItem<string>('local:deviceId', {
  * Drive), and read only by the background script.
  */
 export const openRouterKeyItem = storage.defineItem<string>('local:openRouterKey');
+
+/** OpenRouter's model list, cached so Settings opens instantly (refreshed every few hours). */
+export const aiModelsItem = storage.defineItem<{ fetchedAt: number; models: ModelInfo[] }>('local:aiModels');
+/**
+ * The encryption key for the Drive files, once the passphrase was entered in
+ * this browser (base64 of the 32-byte key). Never uploaded; cleared when the
+ * account changes or encryption is turned off.
+ */
+export const encryptionKeyItem = storage.defineItem<{ keyId: string; key: string }>('local:encryptionKey');
+
+/** Last known encryption state of the account, for Settings, the popup and the badge. */
+export interface EncryptionStatus {
+  state: 'off' | 'on' | 'locked';
+  createdAt?: string;
+  createdBy?: string;
+}
+export const encryptionStatusItem = storage.defineItem<EncryptionStatus>('local:encryptionStatus', {
+  fallback: { state: 'off' },
+});
+
+/** What AI sorting in this browser spent this month (see core/budget.ts). */
+export const aiSpendItem = storage.defineItem<Spend>('local:aiSpend');
+/** Last known spending and limit of the OpenRouter key, shown in the popup. */
+export const aiUsageItem = storage.defineItem<KeyUsage>('local:aiUsage');
 
 /** One AI sorting decision, shown on the sorting log page. */
 export interface SortLogEntry {
@@ -137,6 +167,40 @@ export interface SortLogEntry {
   researched?: boolean;
 }
 
+
+/** One proposal of a bulk sorting run (see services/bulk-service.ts). */
+export type BulkProposal = Omit<SortLogEntry, 'id' | 'at'> & {
+  /** A folder the model wants to create (created only when the proposal is applied). */
+  newFolder?: { parentId: string; name: string };
+  /** Set once the proposal was carried out, or why it could not be. */
+  appliedAt?: number;
+  applyError?: string;
+};
+
+/** A bulk sorting run: the model proposes a folder for each bookmark, the user approves. */
+export interface BulkJob {
+  id: string;
+  folderId: string;
+  folderPath: string;
+  model: string;
+  research: boolean;
+  allowNewFolders: boolean;
+  state: 'planning' | 'ready' | 'applying' | 'done';
+  /** Bookmarks still to ask the model about. */
+  queue: string[];
+  total: number;
+  proposals: BulkProposal[];
+  startedAt: number;
+  /** USD OpenRouter reported for this run. */
+  cost: number;
+  /** Why planning ended early. */
+  stopped?: 'cancelled' | 'budget' | 'error';
+  stopMessage?: string;
+  applied?: { moved: number; failed: number };
+}
+
+/** The current (or last) bulk sorting run; written only by the background script. */
+export const aiBulkItem = storage.defineItem<BulkJob>('local:aiBulk');
 
 /** Newest first; written only by the background script. */
 export const sortLogItem = storage.defineItem<SortLogEntry[]>('local:sortLog', { fallback: [] });
@@ -206,6 +270,10 @@ export async function getSettings(): Promise<Settings> {
     aiModel: typeof s.aiModel === 'string' && s.aiModel.length <= 100 && MODEL_ID.test(s.aiModel.trim()) ? s.aiModel.trim() : d.aiModel,
     aiAllowNewFolders: typeof s.aiAllowNewFolders === 'boolean' ? s.aiAllowNewFolders : d.aiAllowNewFolders,
     aiResearch: typeof s.aiResearch === 'boolean' ? s.aiResearch : d.aiResearch,
+    aiMonthlyBudget:
+      typeof s.aiMonthlyBudget === 'number' && Number.isFinite(s.aiMonthlyBudget)
+        ? Math.round(Math.min(10_000, Math.max(0, s.aiMonthlyBudget)) * 100) / 100
+        : d.aiMonthlyBudget,
   };
 }
 
@@ -219,6 +287,8 @@ export async function resetAccountState(): Promise<void> {
   await syncStateItem.setValue({ mapping: {}, mirror: {}, keep: [], ...(menuFolderId ? { menuFolderId } : {}) });
   await driveIdsItem.setValue({});
   await remoteVersionItem.removeValue();
+  await encryptionKeyItem.removeValue();
+  await encryptionStatusItem.setValue({ state: 'off' });
   await snapshotMetaItem.setValue({});
 }
 

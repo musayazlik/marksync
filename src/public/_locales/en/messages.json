@@ -455,7 +455,7 @@
     "message": "Model"
   },
   "aiModelHelp": {
-    "message": "Any model ID from openrouter.ai/models. The default, {1}, is the most careful; Sonnet or Gemini Flash are faster and cheaper."
+    "message": "Pick a model from OpenRouter's list or type any model ID. The default {1} is the most thorough; Sonnet or Gemini Flash are faster and cheaper."
   },
   "aiAllowNewLabel": {
     "message": "Create a new folder when none of mine fits"
@@ -876,5 +876,392 @@
   },
   "linkChanged": {
     "message": "This bookmark was changed after the check, so it was left as is. Check again to see its new state."
+  },
+  "aiModelSearchPlaceholder": {
+    "message": "Search models: claude, gemini, gpt…"
+  },
+  "aiModelFilters": {
+    "message": "Filter models"
+  },
+  "aiModelFilterAll": {
+    "message": "All"
+  },
+  "aiModelFilterFree": {
+    "message": "Free"
+  },
+  "aiModelFilterTools": {
+    "message": "Web research"
+  },
+  "aiModelsRefresh": {
+    "message": "Refresh list"
+  },
+  "aiModelFree": {
+    "message": "Free"
+  },
+  "aiModelPrice": {
+    "message": "{1} in · {2} out / 1M tokens"
+  },
+  "aiModelContext": {
+    "message": "{1} context"
+  },
+  "aiModelToolsHint": {
+    "message": "Can read the page and search the web (Research option)"
+  },
+  "aiModelUnknown": {
+    "message": "Not in OpenRouter's list"
+  },
+  "aiModelNoTools": {
+    "message": "This model can't use tools, so it decides from the title and address only, even with Research on."
+  },
+  "aiModelUseCustom": {
+    "message": "Use “{1}” as the model ID"
+  },
+  "aiModelsNone": {
+    "message": "No model matches “{1}”."
+  },
+  "aiModelsNoneFilter": {
+    "message": "No model matches this filter."
+  },
+  "aiModelsLoading": {
+    "message": "Loading models from OpenRouter…"
+  },
+  "aiModelsOffline": {
+    "message": "Turn on AI sorting to load OpenRouter's full model list. Suggested models are shown until then."
+  },
+  "aiModelsFailed": {
+    "message": "Could not load the model list: {1}"
+  },
+  "aiModelsShown": {
+    "message": "Showing {1} of {2} models. Search to narrow the list."
+  },
+  "aiModelsCount_one": {
+    "message": "{1} model"
+  },
+  "aiModelsCount_other": {
+    "message": "{1} models"
+  },
+  "usageRefresh": {
+    "message": "Refresh"
+  },
+  "usageUpdated": {
+    "message": "Updated {1}. Click to refresh."
+  },
+  "usageModel": {
+    "message": "Model: {1}"
+  },
+  "usageFailed": {
+    "message": "Couldn't read usage: {1}"
+  },
+  "usageFreeTier": {
+    "message": "Free tier: add credits to use paid models."
+  },
+  "usageLoading": {
+    "message": "Loading…"
+  },
+  "usageKeyLimit": {
+    "message": "Key limit"
+  },
+  "usageAccount": {
+    "message": "Account balance"
+  },
+  "usagePayg": {
+    "message": "No limit"
+  },
+  "usageToday": {
+    "message": "Today"
+  },
+  "usageWeek": {
+    "message": "This week"
+  },
+  "usageMonth": {
+    "message": "This month"
+  },
+  "usageLeft": {
+    "message": "left"
+  },
+  "usageLeftOf": {
+    "message": "{1} left of {2}"
+  },
+  "usageSpentOf": {
+    "message": "{1} of {2} spent"
+  },
+  "usageSpentTotal": {
+    "message": "spent in total"
+  },
+  "usageNoLimit": {
+    "message": "This key has no spending limit."
+  },
+  "usageResetDaily": {
+    "message": "resets daily"
+  },
+  "usageResetWeekly": {
+    "message": "resets weekly"
+  },
+  "usageResetMonthly": {
+    "message": "resets monthly"
+  },
+  "usageTopUp": {
+    "message": "Add credits ↗"
+  },
+  "aiErrBudget": {
+    "message": "This month's AI budget is used up, so the bookmark stayed in the inbox."
+  },
+  "aiBudgetLabel": {
+    "message": "Monthly budget"
+  },
+  "aiBudgetHelpOff": {
+    "message": "0 = no cap. AI sorting in this browser spent {1} this month."
+  },
+  "aiBudgetHelpOn": {
+    "message": "{1} of {2} spent this month. Sorting pauses when the budget is used up."
+  },
+  "aiBudgetHelpOver": {
+    "message": "{1} of {2} spent: sorting is paused until {3}. Raise the budget to continue now."
+  },
+  "aiBudgetStopped": {
+    "message": "Stopped: the monthly budget is used up."
+  },
+  "usageBudgetLabel": {
+    "message": "Marksync this month"
+  },
+  "usageBudgetOf": {
+    "message": "{1} of {2}"
+  },
+  "usageBudgetNone": {
+    "message": "{1} · no cap"
+  },
+  "usageBudgetNear": {
+    "message": "{1}% of the monthly budget is used."
+  },
+  "usageBudgetOver": {
+    "message": "Budget used up: new bookmarks stay in the inbox until {1}."
+  },
+  "findPlaceholder": {
+    "message": "Search bookmarks"
+  },
+  "findLabel": {
+    "message": "Search bookmarks"
+  },
+  "findNone": {
+    "message": "No bookmark matches “{1}”."
+  },
+  "findCount_one": {
+    "message": "1 bookmark"
+  },
+  "findCount_other": {
+    "message": "{1} bookmarks"
+  },
+  "findMore": {
+    "message": "Showing {1} of {2}. Add a word to narrow it down."
+  },
+  "findHint": {
+    "message": "Enter opens in a new tab · Shift+Enter here · Ctrl+Enter in the background"
+  },
+  "aiBulkHeading": {
+    "message": "Sort a whole folder"
+  },
+  "aiBulkIntro": {
+    "message": "The AI proposes a folder for each bookmark already in the folder you choose (up to 100). Nothing moves until you review the list and apply it; every move can be undone on the log page."
+  },
+  "aiBulkFolderLabel": {
+    "message": "Choose a folder to sort…"
+  },
+  "aiBulkResearch": {
+    "message": "Research the sites (slower, more expensive)"
+  },
+  "aiBulkStart": {
+    "message": "Get proposals"
+  },
+  "aiBulkChooseFolder": {
+    "message": "Choose the folder to sort first."
+  },
+  "aiBulkBusy": {
+    "message": "Apply or discard the current proposals first."
+  },
+  "aiBulkEmpty": {
+    "message": "This folder has no bookmarks to sort (subfolders are not included)."
+  },
+  "aiBulkNotReady": {
+    "message": "The proposals are not ready yet."
+  },
+  "aiBulkPlanningTitle": {
+    "message": "Looking at “{1}”…"
+  },
+  "aiBulkReadyTitle": {
+    "message": "Proposals for “{1}”"
+  },
+  "aiBulkDoneTitle": {
+    "message": "“{1}” sorted"
+  },
+  "aiBulkProgress": {
+    "message": "{1} of {2} bookmarks"
+  },
+  "aiBulkSummary": {
+    "message": "{1} to move · {2} stay · {3} failed"
+  },
+  "aiBulkCostHint": {
+    "message": "What OpenRouter charged for this run"
+  },
+  "aiBulkWaiting": {
+    "message": "Asking the AI about {1} more…"
+  },
+  "aiBulkKeep": {
+    "message": "Stays here"
+  },
+  "aiBulkNewFolder": {
+    "message": "New folder"
+  },
+  "aiBulkSelectAll": {
+    "message": "Select all"
+  },
+  "aiBulkSelected": {
+    "message": "{1} of {2} selected"
+  },
+  "aiBulkApply_one": {
+    "message": "Move 1 bookmark"
+  },
+  "aiBulkApply_other": {
+    "message": "Move {1} bookmarks"
+  },
+  "aiBulkStop": {
+    "message": "Stop"
+  },
+  "aiBulkDiscard": {
+    "message": "Discard"
+  },
+  "aiBulkClose": {
+    "message": "Close"
+  },
+  "aiBulkConfirmDiscard": {
+    "message": "Discard these proposals? Nothing has been moved yet."
+  },
+  "aiBulkStoppedCancel": {
+    "message": "Stopped after {1} of {2}. You can apply the proposals so far."
+  },
+  "aiBulkStoppedError": {
+    "message": "Stopped: {1}"
+  },
+  "aiBulkDone": {
+    "message": "Moved {1}, {2} could not be moved. Undo any move on the log page."
+  },
+  "emailShow": {
+    "message": "Click to show the full address"
+  },
+  "emailHide": {
+    "message": "Click to hide the address"
+  },
+  "encHeading": {
+    "message": "Encryption"
+  },
+  "encIntro": {
+    "message": "Encrypt your bookmarks in Google Drive with a passphrase only you know. Google, and anyone who gets into your Drive, then sees only scrambled data. Each browser asks for the passphrase once."
+  },
+  "encNeedsConnect": {
+    "message": "Connect Google Drive first."
+  },
+  "encPassLabel": {
+    "message": "Passphrase"
+  },
+  "encPassAgain": {
+    "message": "Passphrase again"
+  },
+  "encStrengthHint": {
+    "message": "At least {1} characters. A few unrelated words make a passphrase that is long and easy to remember."
+  },
+  "encStrengthShort": {
+    "message": "Too short: at least {1} characters."
+  },
+  "encStrengthWeak": {
+    "message": "Weak: make it longer or mix in other kinds of characters."
+  },
+  "encStrengthFair": {
+    "message": "Fair. Longer is better."
+  },
+  "encStrengthStrong": {
+    "message": "Strong."
+  },
+  "encMismatch": {
+    "message": "The two passphrases are not the same."
+  },
+  "encUnderstand": {
+    "message": "I understand that if I forget the passphrase, the encrypted data in Drive (including backups) cannot be recovered. My bookmarks stay in my browsers."
+  },
+  "encEnable": {
+    "message": "Turn on encryption"
+  },
+  "encEnabledToast": {
+    "message": "Encryption is on. Your other browsers will ask for the passphrase."
+  },
+  "encLockedText": {
+    "message": "Encryption is on for this account. Enter the passphrase to sync this browser; until then nothing is uploaded from here."
+  },
+  "encUnlock": {
+    "message": "Unlock"
+  },
+  "encForgot": {
+    "message": "Forgot the passphrase…"
+  },
+  "encOnTitle": {
+    "message": "End-to-end encryption is on"
+  },
+  "encSince": {
+    "message": "Since {1}"
+  },
+  "encSinceBy": {
+    "message": "Since {1}, turned on in {2}"
+  },
+  "encOnWhat": {
+    "message": "Encrypted: the sync file, every backup and the bookmark lists of your browsers (AES-256-GCM, key from your passphrase with PBKDF2)."
+  },
+  "encOnNot": {
+    "message": "Not encrypted: file names and dates, and the browser names and bookmark counts shown in the lists."
+  },
+  "encOnOthers": {
+    "message": "The passphrase never leaves your browsers; the key is kept only in this browser."
+  },
+  "encLock": {
+    "message": "Forget the passphrase here"
+  },
+  "encDisable": {
+    "message": "Turn off encryption"
+  },
+  "encDisableConfirm": {
+    "message": "Turn off encryption for every browser? Your bookmarks and backups will be stored in Drive unencrypted again."
+  },
+  "encResetWord": {
+    "message": "RESET"
+  },
+  "encResetConfirm": {
+    "message": "This deletes the encrypted sync file, encrypted backups and browser lists in Drive. They cannot be recovered. Bookmarks in your browsers are not touched, and sync starts again from this browser. Type {1} to continue."
+  },
+  "encResetDone": {
+    "message": "Encryption was reset: {1} encrypted files deleted. Sync starts again from this browser."
+  },
+  "encBadgeOn": {
+    "message": "On"
+  },
+  "encBadgeOff": {
+    "message": "Off"
+  },
+  "encBadgeLocked": {
+    "message": "Locked"
+  },
+  "encAlreadyOn": {
+    "message": "Encryption is already on for this account. Enter the passphrase to unlock it."
+  },
+  "encPassphraseShort": {
+    "message": "The passphrase must have at least {1} characters."
+  },
+  "encWrongPassphrase": {
+    "message": "Wrong passphrase."
+  },
+  "errLocked": {
+    "message": "Encryption is on: enter the passphrase in Settings to sync this browser."
+  },
+  "errDecrypt": {
+    "message": "A file in Drive could not be decrypted. It may have been changed outside Marksync."
+  },
+  "errEncryptionFile": {
+    "message": "The encryption settings in Drive (encryption.json) are damaged."
   }
 }

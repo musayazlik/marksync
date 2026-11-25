@@ -1,11 +1,14 @@
 import { browser } from 'wxt/browser';
 import { t } from './i18n';
+import type { KeyUsage, ModelInfo } from '../core/openrouter-data';
 import type { BackupInfo } from '../services/backup-service';
 import type { DuplicateGroup } from '../core/dedupe';
 import type { RemoveDuplicatesResult } from '../services/dedupe-service';
 import type { BulkLinkResult, LinkAction } from '../services/links-service';
 import type { BrowserInfo } from '../services/import-service';
+import type { BulkApplyResult } from '../services/bulk-service';
 import type { SortNowResult } from '../services/sorter-service';
+import type { BulkJob, EncryptionStatus } from './state';
 import type { ImportMode, ImportResult } from '../sync/importer';
 
 /** Requests from the popup and options page to the background script. */
@@ -29,6 +32,18 @@ export type Request =
   | { type: 'settingsChanged' }
   | { type: 'aiListFolders' }
   | { type: 'aiTestKey' }
+  | { type: 'aiListModels'; refresh?: boolean }
+  | { type: 'aiUsage' }
+  | { type: 'aiBulkStart'; folderId: string; research: boolean }
+  | { type: 'aiBulkCancel' }
+  | { type: 'aiBulkApply'; bookmarkIds: string[] }
+  | { type: 'aiBulkDiscard' }
+  | { type: 'encStatus' }
+  | { type: 'encEnable'; passphrase: string }
+  | { type: 'encUnlock'; passphrase: string }
+  | { type: 'encLock' }
+  | { type: 'encDisable' }
+  | { type: 'encReset' }
   | { type: 'aiSortNow' }
   | { type: 'aiUndo'; id: string }
   | { type: 'aiClearLog' }
@@ -59,6 +74,18 @@ export interface ResponseData {
   settingsChanged: void;
   aiListFolders: { id: string; path: string }[];
   aiTestKey: string;
+  aiListModels: ModelInfo[];
+  aiUsage: KeyUsage;
+  aiBulkStart: BulkJob;
+  aiBulkCancel: void;
+  aiBulkApply: BulkApplyResult;
+  aiBulkDiscard: void;
+  encStatus: EncryptionStatus;
+  encEnable: EncryptionStatus;
+  encUnlock: EncryptionStatus;
+  encLock: EncryptionStatus;
+  encDisable: EncryptionStatus;
+  encReset: { deleted: number };
   aiSortNow: SortNowResult;
   aiUndo: void;
   aiClearLog: void;

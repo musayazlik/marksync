@@ -22,6 +22,34 @@
         <button id="open-options" class="quiet" data-i18n="openOptions" data-i18n-title="openOptionsTitle"></button>
       </header>
 
+      <!-- Search across the bookmarks in this browser; results replace the rest of the popup. -->
+      <div class="find" role="search">
+        <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true">
+          <circle cx="8.5" cy="8.5" r="5.5" />
+          <path d="M13 13l4 4" />
+        </svg>
+        <input
+          id="find"
+          type="search"
+          role="combobox"
+          aria-autocomplete="list"
+          aria-controls="results"
+          aria-expanded="false"
+          autocomplete="off"
+          spellcheck="false"
+          maxlength="200"
+          data-i18n-placeholder="findPlaceholder"
+          data-i18n-aria-label="findLabel"
+        />
+        <kbd class="find-key" aria-hidden="true">/</kbd>
+      </div>
+
+      <section id="find-results" class="find-results" hidden>
+        <p id="results-count" class="muted small" role="status"></p>
+        <ul id="results" class="results" role="listbox" data-i18n-aria-label="findLabel"></ul>
+        <p class="muted small find-hint" data-i18n="findHint"></p>
+      </section>
+
       <section id="disconnected" class="stack" hidden>
         <p data-i18n="popupIntro"></p>
         <p class="muted small" data-i18n="privacyNote"></p>
@@ -50,6 +78,54 @@
           <button id="backup" data-i18n="backupNow"></button>
         </div>
         <p id="backup-summary" class="muted small"></p>
+      </section>
+
+      <!-- OpenRouter spending: shown while AI sorting is on and a key is saved. -->
+      <section id="usage" class="usage" aria-labelledby="usage-h" hidden>
+        <header class="usage-head">
+          <h2 id="usage-h">OpenRouter</h2>
+          <span id="usage-source" class="pill"></span>
+          <button id="usage-refresh" class="icon-button" data-i18n-title="usageRefresh" data-i18n-aria-label="usageRefresh">
+            <svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true">
+              <path d="M16 10a6 6 0 1 1-1.8-4.3" />
+              <path d="M16.2 3.2v3.6h-3.6" />
+            </svg>
+          </button>
+        </header>
+
+        <div class="usage-balance">
+          <span id="usage-big" class="usage-big"></span>
+          <span id="usage-big-label" class="muted small"></span>
+        </div>
+
+        <div id="usage-gauge" class="gauge" role="meter" aria-valuemin="0" aria-valuemax="100">
+          <span class="gauge-fill"></span>
+        </div>
+        <p id="usage-line" class="muted small"></p>
+
+        <!-- What AI sorting in this browser spent this month, against the monthly cap. -->
+        <div id="usage-budget" class="budget">
+          <div class="budget-row">
+            <span class="small" data-i18n="usageBudgetLabel"></span>
+            <span id="usage-budget-text" class="budget-amount small"></span>
+          </div>
+          <div id="usage-budget-gauge" class="gauge thin" role="meter" aria-valuemin="0" aria-valuemax="100">
+            <span class="gauge-fill"></span>
+          </div>
+          <p id="usage-budget-note" class="notice small" hidden></p>
+        </div>
+
+        <dl id="usage-periods" class="usage-periods">
+          <div><dt data-i18n="usageToday"></dt><dd id="usage-today"></dd></div>
+          <div><dt data-i18n="usageWeek"></dt><dd id="usage-week"></dd></div>
+          <div><dt data-i18n="usageMonth"></dt><dd id="usage-month"></dd></div>
+        </dl>
+
+        <footer class="usage-foot">
+          <span id="usage-model" class="usage-model small"></span>
+          <a id="usage-topup" class="small" href="https://openrouter.ai/settings/credits" target="_blank" rel="noopener" data-i18n="usageTopUp"></a>
+        </footer>
+        <p id="usage-note" class="usage-note small" hidden></p>
       </section>
 
       <nav class="links">

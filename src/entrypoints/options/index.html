@@ -37,6 +37,7 @@
         <span class="rail-ribbon" aria-hidden="true"></span>
         <a href="#sec-sync" data-i18n="syncHeading"></a>
         <a href="#sec-backups" data-i18n="backupsHeading"></a>
+        <a href="#sec-encryption" data-i18n="encHeading"></a>
         <a href="#import" data-i18n="importHeading"></a>
         <a href="#ai" data-i18n="aiHeading"></a>
       </nav>
@@ -134,6 +135,86 @@
           <p class="muted small" data-i18n="restoreHelp"></p>
         </section>
 
+        <section id="sec-encryption" class="section" aria-labelledby="enc-h">
+          <div class="section-head">
+            <h2 id="enc-h" data-i18n="encHeading"></h2>
+            <span id="enc-badge" class="pill" hidden></span>
+          </div>
+          <p class="muted" data-i18n="encIntro"></p>
+          <div class="panel">
+            <div id="enc-offline" class="panel-block" hidden>
+              <p class="muted small" data-i18n="encNeedsConnect"></p>
+            </div>
+
+            <!-- Off: choose a passphrase. -->
+            <form id="enc-off" class="panel-block stack" hidden>
+              <div class="enc-fields">
+                <label class="field">
+                  <span class="small" data-i18n="encPassLabel"></span>
+                  <input id="enc-pass" type="password" autocomplete="new-password" spellcheck="false" />
+                </label>
+                <label class="field">
+                  <span class="small" data-i18n="encPassAgain"></span>
+                  <input id="enc-pass2" type="password" autocomplete="new-password" spellcheck="false" />
+                </label>
+              </div>
+              <div class="meter" data-level="0" aria-hidden="true"><span></span><span></span><span></span></div>
+              <p id="enc-meter-text" class="muted small" aria-live="polite"></p>
+              <label class="tick-label">
+                <input id="enc-understand" type="checkbox" class="tick" />
+                <span class="small" data-i18n="encUnderstand"></span>
+              </label>
+              <div class="row wrap">
+                <button id="enc-enable" type="submit" class="primary" data-i18n="encEnable" disabled></button>
+              </div>
+            </form>
+
+            <!-- Locked: on for the account, passphrase not entered here. -->
+            <form id="enc-locked" class="panel-block stack" hidden>
+              <p class="notice warn small" data-i18n="encLockedText"></p>
+              <div class="key-row">
+                <input
+                  id="enc-unlock-pass"
+                  type="password"
+                  autocomplete="current-password"
+                  spellcheck="false"
+                  data-i18n-placeholder="encPassLabel"
+                  data-i18n-aria-label="encPassLabel"
+                />
+                <button id="enc-unlock" type="submit" class="primary" data-i18n="encUnlock"></button>
+              </div>
+              <p id="enc-locked-meta" class="muted small"></p>
+              <div>
+                <button id="enc-reset" type="button" class="danger small-button" data-i18n="encForgot"></button>
+              </div>
+            </form>
+
+            <!-- On and unlocked. -->
+            <div id="enc-on" class="panel-block stack" hidden>
+              <div class="enc-on-head">
+                <svg class="enc-lock" viewBox="0 0 24 24" width="36" height="36" aria-hidden="true">
+                  <rect x="4" y="10.5" width="16" height="11" rx="3" />
+                  <path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" />
+                  <circle cx="12" cy="16" r="1.6" />
+                </svg>
+                <div class="stack tight">
+                  <strong data-i18n="encOnTitle"></strong>
+                  <span id="enc-on-meta" class="muted small"></span>
+                </div>
+              </div>
+              <ul class="hints muted small">
+                <li data-i18n="encOnWhat"></li>
+                <li data-i18n="encOnNot"></li>
+                <li data-i18n="encOnOthers"></li>
+              </ul>
+              <div class="row wrap">
+                <button id="enc-lock" type="button" data-i18n="encLock"></button>
+                <button id="enc-disable" type="button" class="danger" data-i18n="encDisable"></button>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section id="import" class="section" aria-labelledby="import-h">
           <h2 id="import-h" data-i18n="importHeading"></h2>
           <p class="muted" data-i18n="importIntro"></p>
@@ -209,13 +290,45 @@
               </div>
               <p class="muted small" data-i18n="aiKeyHelp"></p>
             </div>
-            <div class="setting">
+            <div class="setting stacked model-setting">
               <div class="setting-text">
-                <label for="aiModel" data-i18n="aiModelLabel"></label>
+                <label for="ai-model-search" data-i18n="aiModelLabel"></label>
                 <p id="ai-model-help" class="muted small"></p>
               </div>
-              <input id="aiModel" type="text" maxlength="100" spellcheck="false" list="ai-models" />
-              <datalist id="ai-models"></datalist>
+              <!-- The chosen model; the ribbon marks it in the list too. -->
+              <div id="ai-model-current" class="model-current" aria-live="polite"></div>
+              <div class="model-picker">
+                <div class="model-toolbar">
+                  <div class="model-search">
+                    <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true">
+                      <circle cx="8.5" cy="8.5" r="5.5" />
+                      <path d="M13 13l4 4" />
+                    </svg>
+                    <input
+                      id="ai-model-search"
+                      type="search"
+                      role="combobox"
+                      aria-autocomplete="list"
+                      aria-expanded="true"
+                      aria-controls="ai-model-list"
+                      autocomplete="off"
+                      spellcheck="false"
+                      maxlength="100"
+                      data-i18n-placeholder="aiModelSearchPlaceholder"
+                    />
+                  </div>
+                  <div class="model-filters" role="group" data-i18n-aria-label="aiModelFilters">
+                    <button type="button" class="chip" data-filter="all" aria-pressed="true" data-i18n="aiModelFilterAll"></button>
+                    <button type="button" class="chip" data-filter="free" aria-pressed="false" data-i18n="aiModelFilterFree"></button>
+                    <button type="button" class="chip" data-filter="tools" aria-pressed="false" data-i18n="aiModelFilterTools"></button>
+                  </div>
+                </div>
+                <ul id="ai-model-list" class="model-list" role="listbox" data-i18n-aria-label="aiModelLabel" tabindex="-1"></ul>
+                <div class="model-foot">
+                  <p id="ai-model-count" class="muted small" role="status"></p>
+                  <button id="ai-model-refresh" type="button" class="quiet small-button" data-i18n="aiModelsRefresh"></button>
+                </div>
+              </div>
             </div>
             <div class="setting">
               <div class="setting-text">
@@ -228,17 +341,71 @@
               <div class="setting-text"><label for="aiAllowNewFolders" data-i18n="aiAllowNewLabel"></label></div>
               <input id="aiAllowNewFolders" type="checkbox" />
             </div>
+            <div class="setting">
+              <div class="setting-text">
+                <label for="aiMonthlyBudget" data-i18n="aiBudgetLabel"></label>
+                <p id="ai-budget-help" class="muted small"></p>
+              </div>
+              <div class="money-input">
+                <span aria-hidden="true">USD</span>
+                <input id="aiMonthlyBudget" type="number" min="0" max="10000" step="0.5" inputmode="decimal" />
+              </div>
+            </div>
           </div>
           <p id="ai-status" class="notice small" role="status" hidden></p>
           <div class="row wrap">
             <button id="ai-sort-now" class="primary" data-i18n="aiSortNow"></button>
             <p id="ai-result" class="muted small" role="status" hidden></p>
           </div>
+
+          <!-- Bulk sorting: proposals for a whole folder, applied only after review. -->
+          <div id="bulk" class="panel bulk">
+            <div class="panel-block stack">
+              <div class="stack tight">
+                <h3 data-i18n="aiBulkHeading"></h3>
+                <p class="muted small" data-i18n="aiBulkIntro"></p>
+              </div>
+              <div class="bulk-form">
+                <select id="bulk-folder" data-i18n-aria-label="aiBulkFolderLabel"></select>
+                <label class="inline-switch">
+                  <input id="bulk-research" type="checkbox" />
+                  <span class="small" data-i18n="aiBulkResearch"></span>
+                </label>
+                <button id="bulk-start" class="primary" data-i18n="aiBulkStart"></button>
+              </div>
+            </div>
+            <div id="bulk-run" class="panel-block stack" hidden>
+              <div class="bulk-head">
+                <div class="stack tight">
+                  <strong id="bulk-title"></strong>
+                  <span id="bulk-meta" class="muted small"></span>
+                </div>
+                <span id="bulk-cost" class="pill"></span>
+              </div>
+              <div id="bulk-gauge" class="bulk-gauge" role="progressbar" aria-valuemin="0" aria-valuemax="100"><span></span></div>
+              <p id="bulk-note" class="notice small" role="status" hidden></p>
+              <div id="bulk-toolbar" class="bulk-toolbar" hidden>
+                <label class="tick-label">
+                  <input id="bulk-all" type="checkbox" class="tick" />
+                  <span class="small" data-i18n="aiBulkSelectAll"></span>
+                </label>
+                <span id="bulk-selected" class="muted small"></span>
+              </div>
+              <ul id="bulk-list" class="bulk-list"></ul>
+              <div class="row wrap bulk-actions">
+                <button id="bulk-apply" class="primary"></button>
+                <button id="bulk-stop" data-i18n="aiBulkStop"></button>
+                <button id="bulk-discard" class="quiet"></button>
+                <a id="bulk-log" class="button" href="./sorter-log.html" data-i18n="aiOpenLog" hidden></a>
+              </div>
+            </div>
+          </div>
         </section>
       </main>
     </div>
 
     <p id="action-error" class="notice error small toast" role="alert" hidden></p>
+    <p id="action-ok" class="notice ok small toast" role="status" hidden></p>
     <script type="module" src="./main.ts"></script>
   </body>
 </html>

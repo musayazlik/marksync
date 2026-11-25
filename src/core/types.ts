@@ -63,6 +63,13 @@ export interface SyncState {
    * again only when they are not newer than this.
    */
   confirmedDeletionAt?: number;
+  /**
+   * Generation of the file: a new random ID whenever the file is created from
+   * scratch (the Marksync folder was deleted in Drive, or encryption was
+   * reset). Browsers that remember another generation match their bookmarks
+   * again instead of uploading them twice. Files from before 0.3 have none.
+   */
+  epoch?: string;
 }
 
 /** A backup file in Google Drive. */

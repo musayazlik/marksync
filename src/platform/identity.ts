@@ -1,4 +1,5 @@
 import { browser } from 'wxt/browser';
+import { maskEmail } from '../core/mask';
 import { t } from '../shared/i18n';
 import { googleClientId, patchStatus, resetAccountState, statusItem, tokenItem } from '../shared/state';
 
@@ -124,7 +125,7 @@ export async function getAccessToken(): Promise<string> {
   const actual = await tokenEmail(token);
   if (email && actual && actual !== email) {
     await tokenItem.removeValue();
-    throw new AuthRequiredError(t('errOtherAccount', actual));
+    throw new AuthRequiredError(t('errOtherAccount', maskEmail(actual)));
   }
   return token;
 }

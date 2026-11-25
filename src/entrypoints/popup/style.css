@@ -80,3 +80,371 @@ button.wide {
 #action-error {
   animation: fade-up 260ms var(--ease-out);
 }
+
+/* ---------- OpenRouter usage ---------- */
+
+.usage {
+  position: relative;
+  display: grid;
+  gap: 10px;
+  padding: 14px 14px 12px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--line);
+  background:
+    radial-gradient(130% 110% at 100% 0%, color-mix(in oklab, var(--iris) 12%, transparent) 0%, transparent 58%),
+    var(--surface);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  animation: fade-up 300ms var(--ease-out);
+}
+
+/* The bookmark ribbon at the top-left corner, as everywhere in Marksync. */
+.usage::before {
+  content: '';
+  position: absolute;
+  left: 14px;
+  top: -1px;
+  width: 9px;
+  height: 18px;
+  background: var(--mint);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 76%, 0 100%);
+}
+
+.usage-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 6px;
+}
+
+.usage-head h2 {
+  font-size: 14px;
+  font-weight: 650;
+  font-stretch: 90%;
+  letter-spacing: 0.01em;
+}
+
+.usage-head .pill {
+  margin-right: auto;
+}
+
+.icon-button {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-color: transparent;
+  background: transparent;
+  color: var(--ink-2);
+}
+
+.icon-button:hover:not(:disabled) {
+  color: var(--ink);
+  background: var(--sunken);
+  border-color: transparent;
+}
+
+.icon-button:disabled {
+  opacity: 1;
+}
+
+.icon-button svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.icon-button.spinning svg {
+  animation: spin 800ms linear infinite;
+}
+
+.usage-balance {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.usage-big {
+  font-size: 30px;
+  font-weight: 700;
+  font-stretch: 80%;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.usage.loading .usage-big {
+  color: var(--ink-2);
+}
+
+/* Remaining credit as a fuel gauge: mint, amber under 25 %, red under 10 %. */
+.gauge {
+  --tone: var(--mint);
+  height: 8px;
+  border-radius: 999px;
+  background: var(--sunken);
+  overflow: hidden;
+}
+
+.gauge[data-tone='warn'] {
+  --tone: var(--amber);
+}
+
+.gauge[data-tone='low'] {
+  --tone: var(--ember);
+}
+
+.gauge[data-tone='spend'] {
+  --tone: var(--iris);
+}
+
+.gauge.thin {
+  height: 5px;
+}
+
+/* Marksync's monthly budget, under the key's numbers. */
+.budget {
+  display: grid;
+  gap: 6px;
+  padding: 10px 12px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--line);
+}
+
+.budget-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.budget-amount {
+  font-weight: 650;
+}
+
+.budget .notice {
+  margin-top: 2px;
+  padding: 6px 10px;
+}
+
+.gauge-fill {
+  display: block;
+  height: 100%;
+  width: var(--pct, 0%);
+  min-width: 4px;
+  border-radius: inherit;
+  background: linear-gradient(90deg, color-mix(in oklab, var(--tone) 72%, white), var(--tone));
+  transition:
+    width 700ms var(--ease-out),
+    background 300ms ease;
+}
+
+.usage-periods {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin: 2px 0 0;
+}
+
+.usage-periods div {
+  padding: 8px 10px;
+  border-radius: var(--r-sm);
+  background: var(--sunken);
+  min-width: 0;
+}
+
+.usage-periods dt {
+  font-size: 11px;
+  color: var(--ink-2);
+}
+
+.usage-periods dd {
+  margin: 0;
+  font-weight: 650;
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.usage-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--line);
+}
+
+.usage-model {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink-2);
+}
+
+#usage-topup {
+  flex: none;
+  font-weight: 550;
+}
+
+.usage-note {
+  margin: 0;
+}
+
+/* ---------- search ---------- */
+
+.find {
+  position: relative;
+}
+
+.find svg {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  translate: 0 -50%;
+  fill: none;
+  stroke: var(--ink-2);
+  stroke-width: 2;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+
+.find input {
+  width: 100%;
+  padding-left: 38px;
+  padding-right: 36px;
+  border-radius: 999px;
+  min-height: 40px;
+  background: var(--surface);
+}
+
+.find-key {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  translate: 0 -50%;
+  min-width: 20px;
+  padding: 1px 6px;
+  border: 1px solid var(--line);
+  border-bottom-width: 2px;
+  border-radius: 6px;
+  font: 600 11px/1.4 var(--font);
+  text-align: center;
+  color: var(--ink-2);
+  pointer-events: none;
+  transition: opacity 160ms ease;
+}
+
+.find input:focus + .find-key,
+.find input:not(:placeholder-shown) + .find-key {
+  opacity: 0;
+}
+
+/* While searching, the results take the place of everything else. */
+body.searching :is(#connected, #disconnected, #usage, .links) {
+  display: none !important;
+}
+
+.find-results {
+  display: grid;
+  gap: 8px;
+  animation: fade-up 200ms var(--ease-out);
+}
+
+.results {
+  list-style: none;
+  margin: 0 -6px;
+  padding: 0;
+  max-height: 392px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+}
+
+.result {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding: 7px 8px;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: background-color 120ms ease;
+}
+
+.result:hover,
+.result.active {
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.result.active {
+  box-shadow:
+    inset 3px 0 0 var(--iris),
+    inset 0 0 0 1px var(--line);
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  font-weight: 700;
+  font-size: 14px;
+  color: oklch(0.42 0.12 var(--hue));
+  background: oklch(0.93 0.045 var(--hue));
+}
+
+@media (prefers-color-scheme: dark) {
+  .avatar {
+    color: oklch(0.86 0.1 var(--hue));
+    background: oklch(0.32 0.06 var(--hue));
+  }
+}
+
+.result-text {
+  display: grid;
+  min-width: 0;
+}
+
+.result-title,
+.result-where {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.result-title {
+  font-weight: 600;
+}
+
+.result-where {
+  font-size: 12px;
+  color: var(--ink-2);
+}
+
+.result-path::before {
+  content: ' · ';
+}
+
+.result mark {
+  background: color-mix(in oklab, var(--mint) 35%, transparent);
+  color: inherit;
+  border-radius: 3px;
+  padding: 0 1px;
+}
+
+.results-empty {
+  padding: 18px 8px;
+  text-align: center;
+}
+
+.find-hint {
+  font-size: 11.5px;
+  text-align: center;
+  padding-top: 6px;
+  border-top: 1px solid var(--line);
+}

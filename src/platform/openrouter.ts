@@ -1,5 +1,6 @@
 import { browser } from 'wxt/browser';
 import type { ChatMessage } from '../core/ai-sort';
+import { parseKeyUsage, parseModels, type KeyUsage, type ModelInfo } from '../core/openrouter-data';
 
 /**
  * Minimal OpenRouter client (OpenAI-compatible chat completions).
@@ -44,7 +45,7 @@ function codeFor(status: number): OpenRouterErrorCode {
   return status >= 500 ? 'network' : 'unknown';
 }
 
-async function send(path: string, apiKey: string, init: RequestInit, controller: AbortController): Promise<Response> {
+async function send(path: string, apiKey: string | undefined, init: RequestInit, controller: AbortController): Promise<Response> {
   if (!(await hasOpenRouterPermission())) {
     throw new OpenRouterError('Marksync is not allowed to contact openrouter.ai.', 'permission');
   }
@@ -56,7 +57,7 @@ async function send(path: string, apiKey: string, init: RequestInit, controller:
       // No cookies: the API key is the only credential.
       credentials: 'omit',
       headers: {
-        Authorization: `Bearer ${apiKey}`,
+        ...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {}),
         'Content-Type': 'application/json',
         // App attribution on openrouter.ai (optional headers).
         'HTTP-Referer': 'https://github.com/musayazlik/marksync',
@@ -100,7 +101,7 @@ async function guarded<T>(task: (controller: AbortController) => Promise<T>): Pr
   }
 }
 
-async function request(path: string, apiKey: string): Promise<unknown> {
+async function request(path: string, apiKey?: string): Promise<unknown> {
   return guarded(async (controller) => {
     const res = await send(path, apiKey, {}, controller);
     return res.json().catch(() => undefined);
@@ -241,4 +242,27 @@ export async function checkKey(apiKey: string): Promise<string> {
   const body = (await request('/key', apiKey)) as { data?: { label?: unknown } } | undefined;
   const label = body?.data?.label;
   return typeof label === 'string' ? label : '';
+}
+
+/** Every model OpenRouter offers (public list, the key is not needed). */
+export async function fetchModels(): Promise<ModelInfo[]> {
+  const models = parseModels(await request('/models'));
+  if (!models.length) throw new OpenRouterError('OpenRouter returned no models.', 'unknown');
+  return models;
+}
+
+/**
+ * Limit and spending of the key, and the account balance when this key may
+ * read it (some keys may not: then only the key's own numbers are shown).
+ */
+export async function fetchKeyUsage(apiKey: string): Promise<KeyUsage> {
+  const [key, credits] = await Promise.all([
+    request('/key', apiKey),
+    request('/credits', apiKey).catch((err: unknown) => {
+      if (err instanceof OpenRouterError && err.code === 'auth') return undefined;
+      if (err instanceof OpenRouterError && err.code === 'permission') throw err;
+      return undefined;
+    }),
+  ]);
+  return parseKeyUsage(key, credits);
 }

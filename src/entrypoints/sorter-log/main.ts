@@ -29,6 +29,7 @@ const errorKey: Record<string, string> = {
   permission: 'aiPermissionMissing',
   network: 'aiErrNetwork',
   reply: 'aiErrReply',
+  budget: 'aiErrBudget',
 };
 
 let entries: SortLogEntry[] = [];

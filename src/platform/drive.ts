@@ -41,10 +41,17 @@ export function fileIdPath(id: string): string {
   return encodeURIComponent(id);
 }
 
+/** Turns file content into what is stored in Drive and back (encryption, see services/encryption-service.ts). */
+export interface DriveCodec {
+  encode(data: unknown): Promise<unknown>;
+  decode(stored: unknown): Promise<unknown>;
+}
+
 export class DriveClient {
   constructor(
     private readonly getToken: () => Promise<string>,
     private readonly onUnauthorized: () => Promise<void>,
+    private readonly codec?: DriveCodec,
   ) {}
 
   private async request(url: string, init: RequestInit = {}, retry = true): Promise<Response> {
@@ -104,7 +111,8 @@ export class DriveClient {
 
   async downloadJson<T>(id: string): Promise<T> {
     const res = await this.request(`${API}/files/${fileIdPath(id)}?alt=media`);
-    return (await res.json()) as T;
+    const stored: unknown = await res.json();
+    return (this.codec ? await this.codec.decode(stored) : stored) as T;
   }
 
   async createJson(
@@ -113,11 +121,12 @@ export class DriveClient {
     data: unknown,
     appProperties?: Record<string, string>,
   ): Promise<DriveFile> {
+    const content = this.codec ? await this.codec.encode(data) : data;
     const boundary = `marksync-${crypto.randomUUID()}`;
     const meta = { name, parents: [parentId], mimeType: 'application/json', ...(appProperties ? { appProperties } : {}) };
     const body =
       `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(meta)}\r\n` +
-      `--${boundary}\r\nContent-Type: application/json\r\n\r\n${JSON.stringify(data)}\r\n` +
+      `--${boundary}\r\nContent-Type: application/json\r\n\r\n${JSON.stringify(content)}\r\n` +
       `--${boundary}--`;
     const res = await this.request(`${UPLOAD}/files?uploadType=multipart&fields=${FILE_FIELDS}`, {
       method: 'POST',
@@ -128,10 +137,11 @@ export class DriveClient {
   }
 
   async updateJson(id: string, data: unknown): Promise<DriveFile> {
+    const content = this.codec ? await this.codec.encode(data) : data;
     const res = await this.request(`${UPLOAD}/files/${fileIdPath(id)}?uploadType=media&fields=${FILE_FIELDS}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
+      body: JSON.stringify(content),
     });
     return (await res.json()) as DriveFile;
   }

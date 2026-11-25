@@ -15,17 +15,22 @@ src/
     records.ts   Diff with the last sync, first-sync matching, merge, sanitize, restore
     netscape.ts  HTML export that every browser can import
     ai-sort.ts   AI sorting: folder list, prompt, checking the model's reply
+    openrouter-data.ts  OpenRouter model list and key usage: parsing, search, gauge
+    budget.ts    Monthly AI spending cap
     dedupe.ts    Duplicate finder: URL normalization and grouping
     links.ts     Link checker: which addresses to check, verdicts, Wayback answers
+    search.ts    Popup bookmark search (accent-insensitive, ranked, highlight ranges)
+    crypto.ts    Passphrase → key (PBKDF2), AES-GCM envelopes, passphrase strength
+    mask.ts      Masks the account e-mail on screen
   sync/        Talks to the bookmarks API through an interface
     local-tree.ts  Read the local tree (Chromium/Firefox roots) and apply a state to it
     engine.ts      One sync run: load → diff → merge → apply → upload
-    sorter.ts      File one inbox bookmark with the model's answer; undo
+    sorter.ts      File one inbox bookmark with the model's answer (or only propose it); undo
     dedupe.ts      Remove the chosen duplicate copies (re-checked first)
   platform/    Browser and Google specifics
     identity.ts    Google sign-in with launchWebAuthFlow
     drive.ts       Google Drive v3 REST client
-    openrouter.ts  OpenRouter chat completions client (AI sorting)
+    openrouter.ts  OpenRouter client: chat completions, model list, key usage
   services/    Wires the engine to Drive and extension storage
   entrypoints/ background (events, alarms, messages), popup, options, sorter-log, duplicates, links
 tests/         In-memory Chromium and Firefox fakes, end-to-end sync tests
@@ -35,10 +40,18 @@ tests/         In-memory Chromium and Firefox fakes, end-to-end sync tests
 
 ```
 My Drive/Marksync/
-  sync-state.json   { schema, records: { [id]: SyncRecord }, updatedAt, updatedBy }
+  sync-state.json   { schema, records: { [id]: SyncRecord }, updatedAt, updatedBy, epoch? }
   backups/          one JSON file per backup, newest N kept
   browsers/         <device id>.json: each browser's own tree, for importing
+  encryption.json   only with encryption on: salt, iterations, key ID, check value
 ```
+
+`epoch` is a random ID given to the sync file when it is created from
+scratch. A browser whose local history belongs to another epoch (the folder
+was deleted in Drive, or encryption was reset) starts over like a first sync:
+its bookmarks are matched with the new file instead of uploaded again, and
+nothing counts as deleted. Files written before 0.3 have no epoch and are
+left that way.
 
 The `drive.file` scope only lets the extension see files it created itself.
 
@@ -247,6 +260,18 @@ web (on by default) and whether new folders may be created. Turning it on asks f
    back to the inbox, removes a folder the model created if it is empty, and
    is not sorted again). The log is per browser and not synced.
 
+**Model picker and usage.** Settings lists OpenRouter's models
+(`GET /api/v1/models`, cached in `local:aiModels` for 6 hours) with search,
+Free / Web research filters, price per 1M tokens and context size; any other
+model ID can still be typed in. Models without tool support are sorted
+without research even when Research is on. The popup shows the key's
+spending (`GET /api/v1/key`, plus `/api/v1/credits` when the key may read
+the account balance) as a gauge of what is left under the key limit, or of
+the account balance when the key is unlimited, with today / week / month
+totals. The numbers are kept in `local:aiUsage` and refreshed when the popup
+opens and a few seconds after paid requests. Both requests go through the
+background script; the popup and Settings never read the key.
+
 "Sort inbox now" handles bookmarks already waiting in the inbox (50 per
 click) and stops at the first key, credit or permission error.
 
@@ -256,8 +281,55 @@ click) and stops at the first key, credit or permission error.
   the latest one. Fractional indexes would merge them.
 - Changes from other browsers arrive on the next alarm (no push).
 - Not synced: favicons, separators, Firefox tags and keywords.
-- Ideas: optional end-to-end encryption with a passphrase, more UI languages,
-  Safari build, conflict history view.
+- Ideas: more UI languages, Safari build, conflict history view, changing the
+  encryption passphrase without turning encryption off and on.
+
+## Encryption (optional, `services/encryption-service.ts`)
+
+Every Drive read and write goes through the codec that `DriveClient` gets
+from `drive-store.ts`. With the key, file contents become envelopes
+`{ marksyncEncrypted: 1, keyId, iv, data }` (AES-256-GCM, key ID as
+additional data); without encryption they stay plain JSON. Plain files are
+always readable, so old backups restore and turning encryption on or off is
+a rewrite of each file, not a schema change.
+
+- **On**: `encryption.json` is created (two browsers at once: the older file
+  wins), the key is kept in `local:encryptionKey`, and every file in the
+  Marksync folder is rewritten encrypted.
+- **Other browsers** read an envelope or find `encryption.json` and become
+  *locked* (`LockedError`, status code `locked`, amber badge): they write
+  nothing until the passphrase is entered. They never fall back to writing
+  plain data while encryption is on.
+- **Off**: every file is rewritten plain and `encryption.json` deleted. A
+  browser that still has the key notices on its next write (the remote info
+  is cached for a minute per account folder) and drops it.
+- **Forgot the passphrase**: encrypted files and `encryption.json` are
+  deleted, this browser's sync history is reset and sync starts over; other
+  browsers match their bookmarks thanks to `epoch`.
+- Not encrypted: Drive metadata (file names, dates, `appProperties` with
+  browser names and counts). Disconnecting clears the key.
+
+## AI extras
+
+- **Monthly budget** (`core/budget.ts`): AI sorting counts what OpenRouter
+  reports for its own requests in this browser per calendar month
+  (`local:aiSpend`). At the cap, bookmarks stay in the inbox with a `budget`
+  log entry and bulk sorting stops; the popup warns from 80 %.
+- **Bulk sorting** (`services/bulk-service.ts`): the model proposes a folder
+  for up to 100 bookmarks of a chosen folder (`sortOne` with `plan: true`,
+  three requests at a time, never into the inbox). The run lives in
+  `local:aiBulk` and resumes after a service-worker restart. Approved
+  proposals are applied with `applyPlanned`, which checks the bookmark is
+  still where it was and reuses folders created in the same batch; each move
+  is logged and can be undone.
+
+## Popup search
+
+The popup searches this browser's bookmarks as you type (`core/search.ts`):
+every word must appear in the title, address, folder path or the site
+description AI sorting saved; case and accents are ignored and matches are
+highlighted. Enter opens in a new tab, Shift+Enter in the current tab,
+Ctrl+Enter in the background; `/` focuses the field.
 
 ## Interface
 

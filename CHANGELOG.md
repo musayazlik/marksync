@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.1](https://github.com/musayazlik/marksync/compare/v0.4.0...v0.4.1) (2026-11-25)
+
+
+### Changes
+
+* new Marksync logo ([c6879f3](https://github.com/musayazlik/marksync/commit/c6879f3bd7743f7b257e22cc17a23c2303cbed82))
+
 ## [0.4.0](https://github.com/musayazlik/marksync/compare/v0.3.0...v0.4.0) (2026-11-24)
 
 

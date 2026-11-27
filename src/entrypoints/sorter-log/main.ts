@@ -20,6 +20,13 @@ const statusKey: Record<SortLogEntry['status'], string> = {
   created: 'aiStatusCreated',
   kept: 'aiStatusKept',
   error: 'aiStatusError',
+  tidied: 'aiStatusTidied',
+};
+const tidyKey: Record<NonNullable<SortLogEntry['tidy']>['action'], string> = {
+  retitle: 'tidyLogRetitle',
+  rename: 'tidyLogRename',
+  merge: 'tidyLogMerge',
+  remove: 'tidyLogRemove',
 };
 const errorKey: Record<string, string> = {
   auth: 'aiErrAuth',
@@ -52,8 +59,8 @@ let seen: Set<string> | undefined;
 const searchEl = $<HTMLInputElement>('#search');
 const segments = [...document.querySelectorAll<HTMLButtonElement>('#filter [data-filter]')];
 
-const isMoved = (e: SortLogEntry) => (e.status === 'moved' || e.status === 'created') && !e.undoneAt;
-const tone = (e: SortLogEntry) => (e.undoneAt ? 'undone' : e.status === 'created' ? 'moved' : e.status);
+const isMoved = (e: SortLogEntry) => (e.status === 'moved' || e.status === 'created' || e.status === 'tidied') && !e.undoneAt;
+const tone = (e: SortLogEntry) => (e.undoneAt ? 'undone' : e.status === 'created' || e.status === 'tidied' ? 'moved' : e.status);
 
 function matches(e: SortLogEntry, f: Filter, query: string): boolean {
   if (f === 'moved' && !isMoved(e)) return false;
@@ -174,6 +181,10 @@ function entry(e: SortLogEntry, isNew: boolean): HTMLLIElement {
     const text = el('span', 'reason', known ? t(known) : (e.error ?? ''));
     if (e.error) text.title = e.error;
     verdict.append(text);
+  } else if (e.tidy) {
+    // A tidy-up change: what it did, in words.
+    verdict.append(el('span', 'reason', t(tidyKey[e.tidy.action], e.tidy.before, e.tidy.after ?? '')));
+    if (e.reason) verdict.append(el('span', 'reason muted', e.reason));
   } else {
     if (e.confidence !== undefined) verdict.append(el('span', 'pill', t('aiConfidence', Math.round(e.confidence * 100))));
     if (e.reason) verdict.append(el('span', 'reason', e.reason));

@@ -19,6 +19,7 @@ import {
 } from '../shared/state';
 import { detectSpecialRoots } from '../sync/local-tree';
 import { sortOne, undoSort, UndoError, type SortOutcome } from '../sync/sorter';
+import { undoTidy } from '../sync/tidy';
 import { aiRunner, assertPermission, customEndpoint, type AiRunner } from './ai-client';
 import { allTags, setTags } from './tags-service';
 import { isApplying, localBookmarks } from './sync-service';
@@ -249,8 +250,18 @@ const undoMessages: Record<UndoError['reason'], string> = {
 export function undoSortEntry(logId: string): Promise<void> {
   return serial(async () => {
     const entry = ((await sortLogItem.getValue()) ?? []).find((e) => e.id === logId);
-    if (!entry || (entry.status !== 'moved' && entry.status !== 'created') || entry.undoneAt) {
+    if (!entry || (entry.status !== 'moved' && entry.status !== 'created' && entry.status !== 'tidied') || entry.undoneAt) {
       throw new Error(t('aiUndoUnavailable'));
+    }
+    if (entry.status === 'tidied') {
+      try {
+        await undoTidy(localBookmarks(), entry);
+      } catch (err) {
+        if (err instanceof UndoError) throw new Error(t(undoMessages[err.reason]));
+        throw err;
+      }
+      await writeLog((log) => log.map((e) => (e.id === logId ? { ...e, undoneAt: Date.now() } : e)));
+      return;
     }
     ignoreMoves.add(entry.bookmarkId);
     try {

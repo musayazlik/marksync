@@ -21,6 +21,7 @@ import { updateBadge } from '../services/badge';
 import { removeDuplicates, scanDuplicates } from '../services/dedupe-service';
 import { fixAllLinks, fixLink, markInterruptedScan, startLinkScan, stopLinkScan } from '../services/links-service';
 import { applyBulk, cancelBulk, discardBulk, resumeBulk, startBulk } from '../services/bulk-service';
+import { applyTidyProposals, cancelTidy, discardTidy, estimateTidy, resumeTidy, startTidy } from '../services/tidy-service';
 import { compareBackup, restoreFromBackup, searchBackups } from '../services/history-service';
 import { allTags, setTags, tagsByLocalId } from '../services/tags-service';
 // Also installs the encryption codec for every Drive client (see drive-store.ts).
@@ -126,6 +127,7 @@ export default defineBackground(() => {
   settingsItem.watch(() => void refreshBadge());
   // Every start of the service worker: a bulk sorting run that was cut off carries on.
   void resumeBulk().catch((err) => console.warn('[marksync] bulk sorting could not resume', err));
+  void resumeTidy().catch((err) => console.warn('[marksync] tidy-up could not resume', err));
   browser.runtime.onStartup.addListener(() => {
     void scheduleAlarms();
     void syncAndPublish();
@@ -256,6 +258,17 @@ export default defineBackground(() => {
       case 'aiBulkApply':
         if (!Array.isArray(req.bookmarkIds) || !req.bookmarkIds.every((id) => typeof id === 'string')) return { moved: 0, failed: 0 };
         return applyBulk(req.bookmarkIds.slice(0, 1000));
+      case 'aiTidyEstimate':
+        return estimateTidy(typeof req.scopeId === 'string' ? req.scopeId : '');
+      case 'aiTidyStart':
+        return startTidy(typeof req.scopeId === 'string' ? req.scopeId : '');
+      case 'aiTidyCancel':
+        return cancelTidy();
+      case 'aiTidyApply':
+        if (!Array.isArray(req.ids) || req.ids.length > 5000 || !req.ids.every((x) => typeof x === 'string')) throw new Error(t('tidyNothingChosen'));
+        return applyTidyProposals(req.ids);
+      case 'aiTidyDiscard':
+        return discardTidy();
       case 'aiBulkDiscard':
         return discardBulk();
       case 'encStatus':
@@ -310,6 +323,7 @@ export default defineBackground(() => {
     'restoreBackup', 'deleteBackup', 'historyCompare', 'historyRestore', 'historySearch', 'listBrowsers', 'removeBrowser', 'importFromBrowser', 'importHtml',
     'exportHtml', 'getRedirectUrl', 'settingsChanged', 'aiListFolders', 'aiTestKey', 'aiSortNow', 'aiUndo',
     'aiClearLog', 'aiListModels', 'aiUsage', 'aiEndpointModels', 'aiBuiltinStatus', 'tagsGet', 'tagsSet', 'aiBulkStart', 'aiBulkCancel', 'aiBulkApply', 'aiBulkDiscard',
+    'aiTidyEstimate', 'aiTidyStart', 'aiTidyCancel', 'aiTidyApply', 'aiTidyDiscard',
     'dupScan', 'dupRemove', 'linkScan', 'linkStop', 'linkFix', 'linkFixAll',
     'encStatus', 'encEnable', 'encUnlock', 'encLock', 'encDisable', 'encReset',
   ]);

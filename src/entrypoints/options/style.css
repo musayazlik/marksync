@@ -1011,3 +1011,24 @@ input[type='checkbox'].tick:indeterminate::after {
   height: 8px;
   accent-color: var(--iris);
 }
+
+/* Tidy-up proposals are grouped by kind. */
+.tidy-group {
+  padding: 10px 12px 4px;
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  color: var(--ink-2);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tidy-group .small-button {
+  margin-left: auto;
+}
+
+.bulk-title.was {
+  text-decoration: line-through;
+  text-decoration-color: color-mix(in oklab, var(--ink-2) 60%, transparent);
+}

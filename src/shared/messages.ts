@@ -9,7 +9,8 @@ import type { BulkLinkResult, LinkAction } from '../services/links-service';
 import type { BrowserInfo } from '../services/import-service';
 import type { BulkApplyResult } from '../services/bulk-service';
 import type { SortNowResult } from '../services/sorter-service';
-import type { BulkJob, EncryptionStatus } from './state';
+import type { BulkJob, EncryptionStatus, TidyJob } from './state';
+import type { TidyApplyResult, TidyEstimate } from '../services/tidy-service';
 import type { BuiltinState } from '../platform/builtin-ai';
 import type { ImportMode, ImportResult } from '../sync/importer';
 
@@ -47,6 +48,11 @@ export type Request =
   | { type: 'aiBulkCancel' }
   | { type: 'aiBulkApply'; bookmarkIds: string[] }
   | { type: 'aiBulkDiscard' }
+  | { type: 'aiTidyEstimate'; scopeId: string }
+  | { type: 'aiTidyStart'; scopeId: string }
+  | { type: 'aiTidyCancel' }
+  | { type: 'aiTidyApply'; ids: string[] }
+  | { type: 'aiTidyDiscard' }
   | { type: 'encStatus' }
   | { type: 'encEnable'; passphrase: string }
   | { type: 'encUnlock'; passphrase: string }
@@ -96,6 +102,11 @@ export interface ResponseData {
   aiBulkCancel: void;
   aiBulkApply: BulkApplyResult;
   aiBulkDiscard: void;
+  aiTidyEstimate: TidyEstimate;
+  aiTidyStart: TidyJob;
+  aiTidyCancel: void;
+  aiTidyApply: TidyApplyResult;
+  aiTidyDiscard: void;
   encStatus: EncryptionStatus;
   encEnable: EncryptionStatus;
   encUnlock: EncryptionStatus;

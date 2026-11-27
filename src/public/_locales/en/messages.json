@@ -1572,5 +1572,158 @@
   },
   "tagsAdd": {
     "message": "+ Tag"
+  },
+  "tidyHeading": {
+    "message": "Tidy up the library"
+  },
+  "tidyIntro": {
+    "message": "The AI looks at your whole folder structure (or one folder) and proposes merging folders that mean the same thing, renaming unclear folders and cleaning cryptic bookmark titles; empty folders are found too. Nothing changes until you review the list and apply it. A backup is made first, and every change can be undone on the log page."
+  },
+  "tidyScopeLabel": {
+    "message": "What to tidy up"
+  },
+  "tidyScopeAll": {
+    "message": "The whole library"
+  },
+  "tidyStart": {
+    "message": "Make a plan"
+  },
+  "tidyEstimateSize": {
+    "message": "{1} folders and {2} bookmarks."
+  },
+  "tidyEstimateFree_one": {
+    "message": "1 request, free with this provider."
+  },
+  "tidyEstimateFree_other": {
+    "message": "{1} requests, free with this provider."
+  },
+  "tidyEstimateUnknown_one": {
+    "message": "1 request; the price of this model is unknown."
+  },
+  "tidyEstimateUnknown_other": {
+    "message": "{1} requests; the price of this model is unknown."
+  },
+  "tidyEstimateCost_one": {
+    "message": "1 request, about {2} on OpenRouter."
+  },
+  "tidyEstimateCost_other": {
+    "message": "{1} requests, about {2} on OpenRouter."
+  },
+  "tidyConfirmStart": {
+    "message": "Ask the AI for a tidy-up plan? {1} Nothing changes until you apply it."
+  },
+  "tidyPlanningTitle": {
+    "message": "Planning: {1}"
+  },
+  "tidyReadyTitle": {
+    "message": "Plan for {1}"
+  },
+  "tidyDoneTitle": {
+    "message": "Tidied up: {1}"
+  },
+  "tidyProgress": {
+    "message": "Request {1} of {2}"
+  },
+  "tidyFound_one": {
+    "message": "1 proposal"
+  },
+  "tidyFound_other": {
+    "message": "{1} proposals"
+  },
+  "tidyFree": {
+    "message": "free"
+  },
+  "tidyWaiting": {
+    "message": "The AI is looking at your folders and titles…"
+  },
+  "tidyGroupMerge": {
+    "message": "Merge folders"
+  },
+  "tidyGroupRename": {
+    "message": "Rename folders"
+  },
+  "tidyGroupRemove": {
+    "message": "Remove empty folders"
+  },
+  "tidyGroupRetitle": {
+    "message": "Clean up titles"
+  },
+  "tidyGroupAll": {
+    "message": "Select all"
+  },
+  "tidyGroupNone": {
+    "message": "Select none"
+  },
+  "tidyItems_one": {
+    "message": "1 item"
+  },
+  "tidyItems_other": {
+    "message": "{1} items"
+  },
+  "tidyEmpty": {
+    "message": "empty"
+  },
+  "tidyAriaRetitle": {
+    "message": "Rename bookmark {1} to {2}"
+  },
+  "tidyAriaMerge": {
+    "message": "Merge {1} into {2}"
+  },
+  "tidyAriaRename": {
+    "message": "Rename folder {1} to {2}"
+  },
+  "tidyAriaRemove": {
+    "message": "Remove empty folder {1}"
+  },
+  "tidyApply_one": {
+    "message": "Apply 1 change"
+  },
+  "tidyApply_other": {
+    "message": "Apply {1} changes"
+  },
+  "tidyConfirmApply": {
+    "message": "Apply {1} change(s)? Your bookmarks are backed up first, and each change can be undone on the log page."
+  },
+  "tidyConfirmApplyNoBackup": {
+    "message": "Apply {1} change(s)? Not connected to Google Drive, so no backup is made first; each change can still be undone on the log page."
+  },
+  "tidyApplied": {
+    "message": "{1} changes applied, {2} could not be applied."
+  },
+  "tidyNothing": {
+    "message": "The AI found nothing to tidy up."
+  },
+  "tidyCancelled": {
+    "message": "Stopped. The proposals so far can still be applied."
+  },
+  "tidyInterrupted": {
+    "message": "The browser stopped Marksync while planning. The proposals so far can still be applied."
+  },
+  "tidyFailures_one": {
+    "message": "1 request failed; its proposals are missing."
+  },
+  "tidyFailures_other": {
+    "message": "{1} requests failed; their proposals are missing."
+  },
+  "tidyScopeGone": {
+    "message": "The folder to tidy up no longer exists."
+  },
+  "tidyNothingChosen": {
+    "message": "Tick the changes to apply first."
+  },
+  "aiStatusTidied": {
+    "message": "Tidied"
+  },
+  "tidyLogRetitle": {
+    "message": "Title was \"{1}\""
+  },
+  "tidyLogRename": {
+    "message": "Folder renamed from \"{1}\" to \"{2}\""
+  },
+  "tidyLogMerge": {
+    "message": "Folder \"{1}\" merged into another"
+  },
+  "tidyLogRemove": {
+    "message": "Empty folder \"{1}\" removed"
   }
 }

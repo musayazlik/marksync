@@ -29,6 +29,8 @@ export interface SorterDeps {
   exclude?: string[];
   /** UI language, for the model's short reason. */
   language: string;
+  /** Tags the user already uses (most used first), offered to the model. */
+  existingTags?: readonly string[];
 }
 
 export interface ModelReply {
@@ -108,6 +110,7 @@ export async function sortOne(deps: SorterDeps, run: SortRun, bookmarkId: string
         folders,
         allowNewFolders: run.allowNewFolders,
         language: deps.language,
+        ...(deps.existingTags?.length ? { existingTags: deps.existingTags } : {}),
         research: !!run.research,
       }),
       { research: !!run.research, schema: sortReplySchema(folders, run.allowNewFolders) },
@@ -133,6 +136,7 @@ export async function sortOne(deps: SorterDeps, run: SortRun, bookmarkId: string
     reason: decision.reason || undefined,
     confidence: decision.confidence,
     ...(decision.site ? { site: decision.site } : {}),
+    ...(decision.tags?.length ? { tags: decision.tags } : {}),
   };
   if (decision.action === 'keep') return { ...base, ...meta, status: 'kept' };
 

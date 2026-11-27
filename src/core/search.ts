@@ -1,6 +1,7 @@
 /**
  * Bookmark search for the popup: every word must appear in the title, the
- * address, the folder path or what AI sorting found out about the site.
+ * address, the folder path, the tags or what AI sorting found out about the
+ * site. A word starting with "#" must be (the start of) one of the tags.
  * Matching ignores case and accents ("istanbul" finds "İstanbul", "cafe"
  * finds "Café"). Pure functions, unit tested.
  */
@@ -23,6 +24,8 @@ export interface SearchItem {
   path: string;
   /** Site name, category and summary from AI sorting, if any. */
   about?: string;
+  /** Marksync tags (see core/tags.ts). */
+  tags?: string[];
 }
 
 export interface SearchHit {
@@ -75,6 +78,7 @@ export function flattenBookmarks(
   tree: SearchNode[],
   about?: (id: string, url: string) => string | undefined,
   max = 50_000,
+  tagsOf?: (id: string) => string[] | undefined,
 ): SearchItem[] {
   const out: SearchItem[] = [];
   const walk = (nodes: SearchNode[], path: string[], depth: number) => {
@@ -84,6 +88,7 @@ export function flattenBookmarks(
       if (n.url !== undefined) {
         if (!isOpenable(n.url)) continue;
         const extra = about?.(n.id, n.url);
+        const tags = tagsOf?.(n.id);
         out.push({
           id: n.id,
           title: n.title || n.url,
@@ -91,6 +96,7 @@ export function flattenBookmarks(
           host: hostOf(n.url),
           path: path.join(' / '),
           ...(extra ? { about: extra } : {}),
+          ...(tags?.length ? { tags } : {}),
         });
       } else if (n.children) {
         // The invisible root has no title; top-level folders start the path.
@@ -104,32 +110,64 @@ export function flattenBookmarks(
 
 const words = (query: string) => fold(query).split(/\s+/).filter(Boolean).slice(0, 8);
 
-/** Folded fields, cached per item (the popup searches on every key press). */
-const folded = new WeakMap<SearchItem, { title: string; url: string; host: string; path: string; about: string }>();
-function fieldsOf(item: SearchItem) {
+interface Folded {
+  title: string;
+  url: string;
+  host: string;
+  path: string;
+  about: string;
+  tags: string[];
+  tagText: string;
+}
+/** Folded fields, cached per item (the popup searches on every key press). Tags are compared by content. */
+const folded = new WeakMap<SearchItem, Folded & { tagKey: string }>();
+function fieldsOf(item: SearchItem): Folded {
+  const tagKey = (item.tags ?? []).join('|');
   let f = folded.get(item);
-  if (!f) {
-    f = { title: fold(item.title), url: fold(item.url), host: fold(item.host), path: fold(item.path), about: fold(item.about ?? '') };
+  if (!f || f.tagKey !== tagKey) {
+    const tags = (item.tags ?? []).map(fold);
+    f = {
+      title: fold(item.title),
+      url: fold(item.url),
+      host: fold(item.host),
+      path: fold(item.path),
+      about: fold(item.about ?? ''),
+      tags,
+      tagText: tags.join(' '),
+      tagKey,
+    };
     folded.set(item, f);
   }
   return f;
 }
 
+/** "#recipe pasta" → tag filters ["recipe"] and words ["pasta"]. */
+export function splitQuery(query: string): { tags: string[]; words: string[] } {
+  const all = words(query);
+  return {
+    tags: all.filter((w) => w.startsWith('#')).map((w) => w.slice(1)).filter(Boolean),
+    words: all.filter((w) => !w.startsWith('#')),
+  };
+}
+
 const startsWord = (text: string, word: string) => text.startsWith(word) || text.includes(` ${word}`) || text.includes(`-${word}`);
 
 export function searchBookmarks(items: SearchItem[], query: string, max = 50): { hits: SearchHit[]; total: number } {
-  const ws = words(query);
-  if (!ws.length) return { hits: [], total: 0 };
+  const { tags: tagFilters, words: ws } = splitQuery(query);
+  if (!ws.length && !tagFilters.length) return { hits: [], total: 0 };
   const hits: SearchHit[] = [];
   for (const item of items) {
     const f = fieldsOf(item);
-    let score = 0;
+    // "#italian-food" finds the tag "italian food" (a search word has no spaces).
+    if (!tagFilters.every((t) => f.tags.some((tag) => tag.replace(/ /g, '-').startsWith(t)))) continue;
+    let score = tagFilters.length * 6;
     let ok = true;
     for (const w of ws) {
       if (f.title.includes(w)) score += startsWord(f.title, w) ? 12 : 8;
       else if (f.host.includes(w)) score += f.host.startsWith(w) ? 7 : 5;
       else if (f.path.includes(w)) score += 4;
       else if (f.url.includes(w)) score += 3;
+      else if (f.tagText.includes(w)) score += 3;
       else if (f.about.includes(w)) score += 2;
       else {
         ok = false;
@@ -137,7 +175,7 @@ export function searchBookmarks(items: SearchItem[], query: string, max = 50): {
       }
     }
     if (!ok) continue;
-    if (f.title === ws.join(' ')) score += 20;
+    if (ws.length && f.title === ws.join(' ')) score += 20;
     // Shorter titles are usually the more specific match.
     score -= Math.min(4, f.title.length / 40);
     hits.push({ item, score });
@@ -148,7 +186,7 @@ export function searchBookmarks(items: SearchItem[], query: string, max = 50): {
 
 /** [start, end) ranges of `text` that match a word of the query, merged, for highlighting. */
 export function matchRanges(text: string, query: string): [number, number][] {
-  const ws = words(query);
+  const ws = splitQuery(query).words;
   if (!ws.length || !text) return [];
   const { folded: f, map } = foldWithMap(text);
   const ranges: [number, number][] = [];

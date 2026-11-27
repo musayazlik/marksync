@@ -20,6 +20,7 @@ src/
     budget.ts    Monthly AI spending cap
     dedupe.ts    Duplicate finder: URL normalization and grouping
     history.ts   Version history: backup-vs-now diff, partial restore plan, search in a backup
+    tags.ts      Tags: cleaning, newest-edit-wins merge, tags.json validation
     links.ts     Link checker: which addresses to check, verdicts, Wayback answers
     search.ts    Popup bookmark search (accent-insensitive, ranked, highlight ranges)
     crypto.ts    Passphrase → key (PBKDF2), AES-GCM envelopes, passphrase strength
@@ -361,6 +362,28 @@ a rewrite of each file, not a schema change.
   proposals are applied with `applyPlanned`, which checks the bookmark is
   still where it was and reuses folders created in the same batch; each move
   is logged and can be undone.
+
+## Tags
+
+Browsers have no synced tags, so Marksync keeps its own: `local:tags` in
+each browser (by shared record ID), merged with `Marksync/tags.json` in
+Drive after every sync and a few seconds after an edit
+(`services/tags-service.ts`). They are deliberately not in
+`sync-state.json`: older versions drop unknown record fields and would wipe
+them. Each bookmark's tag list is one value with a clock; the newest edit
+wins, an empty list is a removal that reaches the other browsers, and tags
+of bookmarks that no longer exist are dropped. A tag set on a bookmark that
+has no shared ID yet waits in `pending` until the next sync gives it one.
+The file version guards the write; a concurrent write from another browser
+is merged on a retry. With encryption on, `tags.json` is encrypted like the
+other files.
+
+AI sorting proposes 1-3 tags (reusing the user's existing ones) and gives
+them to the bookmark only if it has none. The popup shows tags on results,
+edits them inline and filters with `#tag` (also by prefix; `#italian-food`
+for "italian food"); the most used tags are listed under the search box.
+Firefox's own tags are not readable through the WebExtension API, so they
+cannot be imported.
 
 ## Popup search
 

@@ -437,6 +437,78 @@ body.searching :is(#connected, #disconnected, #usage, .links) {
   padding: 0 1px;
 }
 
+/* ---------- tags ---------- */
+
+.tag-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: -2px;
+}
+
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 8px;
+  border: 0;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 11.5px;
+  font-weight: 550;
+  line-height: 1.6;
+  color: var(--iris);
+  background: var(--iris-soft);
+  cursor: pointer;
+}
+
+.tag-chip:hover,
+.tag-chip:focus-visible {
+  background: color-mix(in oklab, var(--iris) 22%, var(--surface));
+}
+
+.tag-chip[aria-pressed='true'] {
+  color: var(--on-iris);
+  background: var(--iris);
+}
+
+.result-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin-top: 3px;
+}
+
+.tag-edit {
+  padding: 0 6px;
+  border: 0;
+  border-radius: 999px;
+  font-size: 11.5px;
+  line-height: 1.6;
+  color: var(--ink-2);
+  background: transparent;
+  opacity: 0;
+  cursor: pointer;
+  transition: opacity 120ms ease;
+}
+
+.result:hover .tag-edit,
+.result.active .tag-edit,
+.tag-edit:focus-visible {
+  opacity: 1;
+}
+
+.tag-edit:hover {
+  color: var(--ink);
+  background: var(--sunken);
+}
+
+.tag-input {
+  width: 100%;
+  padding: 3px 8px;
+  font-size: 12px;
+}
+
 .results-empty {
   padding: 18px 8px;
   text-align: center;

@@ -10,6 +10,7 @@ import { MassDeleteError, syncOnce, type SyncOptions, type SyncResult } from '..
 import { createBackup } from './backup-service';
 import { LockedError } from './errors';
 import { DriveRemoteStore, driveClient } from './drive-store';
+import { syncTags } from './tags-service';
 
 let tail: Promise<unknown> = Promise.resolve();
 let queuedSync: Promise<SyncResult> | null = null;
@@ -113,6 +114,8 @@ async function doSync(opts: SyncOptions): Promise<SyncResult> {
       skipped: result.skipped,
       error: undefined,
     });
+    // Tags are a separate file: merged after the bookmarks, never blocking them.
+    void syncTags().catch((err) => console.warn('[marksync] tags sync failed', err));
     return result;
   } catch (err) {
     await patchStatus({ syncing: false, error: describeError(err) });

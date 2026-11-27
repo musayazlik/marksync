@@ -1050,7 +1050,7 @@
     "message": "{2} sonuçtan {1} tanesi gösteriliyor. Daraltmak için bir kelime daha ekleyin."
   },
   "findHint": {
-    "message": "Enter yeni sekmede açar · Shift+Enter bu sekmede · Ctrl+Enter arka planda"
+    "message": "Enter yeni sekmede açar · Shift+Enter bu sekmede · Ctrl+Enter arka planda · #etiket etikete göre süzer"
   },
   "aiBulkHeading": {
     "message": "Bir klasörü toplu düzenle"
@@ -1552,5 +1552,20 @@
   },
   "historyFindOpen": {
     "message": "Bu yedekle karşılaştır"
+  },
+  "tagsBarLabel": {
+    "message": "En çok kullanılan etiketler"
+  },
+  "tagsPlaceholder": {
+    "message": "tarif, italyan, hızlı"
+  },
+  "tagsEditLabel": {
+    "message": "{1} etiketleri"
+  },
+  "tagsEdit": {
+    "message": "Etiketleri düzenle"
+  },
+  "tagsAdd": {
+    "message": "+ Etiket"
   }
 }

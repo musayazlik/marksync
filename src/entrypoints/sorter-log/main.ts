@@ -134,6 +134,8 @@ function siteDetails(e: SortLogEntry): HTMLDetailsElement | undefined {
   body.append(dl);
   const facts = el('div', 'facts');
   if (e.researched) facts.append(el('span', 'pill', t('aiResearched')));
+  // Tags the model proposed (the bookmark got them unless it had tags already).
+  for (const tag of e.tags ?? []) facts.append(el('span', 'pill', `#${tag}`));
   if (e.cost !== undefined) facts.append(el('span', 'pill', t('aiCost', formatCost(e.cost))));
   if (facts.childElementCount) body.append(facts);
   details.append(body);

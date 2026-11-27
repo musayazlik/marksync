@@ -2,19 +2,15 @@ import { browser } from 'wxt/browser';
 import { listFolderOptions } from '../core/ai-sort';
 import { addSpend, budgetState, currentSpend } from '../core/budget';
 import type { KeyUsage, ModelInfo } from '../core/openrouter-data';
-import {
-  chatCompletion,
-  checkKey,
-  fetchKeyUsage,
-  fetchModels,
-  hasOpenRouterPermission,
-  OpenRouterError,
-} from '../platform/openrouter';
+import { builtinLanguage } from '../core/ai-provider';
+import { builtinAvailability, type BuiltinState } from '../platform/builtin-ai';
+import { checkKey, fetchEndpointModels, fetchKeyUsage, fetchModels, OpenRouterError } from '../platform/openrouter';
 import { t } from '../shared/i18n';
 import {
   aiModelsItem,
   aiSpendItem,
   aiUsageItem,
+  endpointKeyItem,
   getSettings,
   openRouterKeyItem,
   SORT_LOG_MAX,
@@ -23,11 +19,13 @@ import {
 } from '../shared/state';
 import { detectSpecialRoots } from '../sync/local-tree';
 import { sortOne, undoSort, UndoError, type SortOutcome } from '../sync/sorter';
+import { aiRunner, assertPermission, customEndpoint, type AiRunner } from './ai-client';
 import { isApplying, localBookmarks } from './sync-service';
 
 /**
  * AI sorting: a bookmark added to the inbox folder *in this browser* is filed
- * into a matching folder by a model on OpenRouter, a few seconds later.
+ * into a matching folder by a model (OpenRouter, an OpenAI-compatible
+ * endpoint, or the browser's built-in model), a few seconds later.
  *
  * Only local additions are handled (never bookmarks that arrive through
  * sync), so two browsers with AI sorting turned on never sort the same
@@ -80,28 +78,25 @@ export function clearSortLog(): Promise<unknown> {
 
 interface Ready {
   inboxId: string;
-  apiKey: string;
-  model: string;
   allowNewFolders: boolean;
   research: boolean;
-  /** Monthly cap in USD, 0 = none. */
+  /** Monthly cap in USD, 0 = none (applies to OpenRouter only). */
   budget: number;
+  runner: AiRunner;
 }
 
 /** The settings needed to sort, or null when AI sorting is off or incomplete. */
 async function readiness(): Promise<Ready | null> {
-  const [s, apiKey, cache] = await Promise.all([getSettings(), openRouterKeyItem.getValue(), aiModelsItem.getValue()]);
-  if (!s.aiSortEnabled || !s.aiInboxFolderId || !apiKey) return null;
-  // A model that cannot use tools would reject the research request; it
-  // decides from the title and address instead.
-  const known = cache?.models.find((m) => m.id === s.aiModel);
+  const s = await getSettings();
+  if (!s.aiSortEnabled || !s.aiInboxFolderId) return null;
+  const runner = await aiRunner(s).catch(() => null);
+  if (!runner) return null;
   return {
     inboxId: s.aiInboxFolderId,
-    apiKey,
-    model: s.aiModel,
     allowNewFolders: s.aiAllowNewFolders,
-    research: s.aiResearch && (known?.tools ?? true),
-    budget: s.aiMonthlyBudget,
+    research: s.aiResearch && runner.canResearch,
+    budget: runner.budgeted ? s.aiMonthlyBudget : 0,
+    runner,
   };
 }
 
@@ -126,28 +121,30 @@ async function sortBookmark(id: string, ready: Ready): Promise<SortOutcome | nul
   const blocked = (await overBudget(ready)) ? { code: 'budget' as const, message: t('aiErrBudget') } : undefined;
   const bookmarks = localBookmarks();
   const special = await detectSpecialRoots(bookmarks);
+  const { runner } = ready;
   const outcome = await sortOne(
     {
       bookmarks,
       exclude: special.exclude,
-      language: browser.i18n.getUILanguage(),
-      complete: (messages, { research }) =>
-        chatCompletion({ apiKey: ready.apiKey, model: ready.model, messages, research }),
+      language: runner.language,
+      complete: (messages, opts) => runner.complete(messages, opts),
     },
     {
       inboxId: ready.inboxId,
       allowNewFolders: ready.allowNewFolders,
-      model: ready.model,
+      model: runner.model,
+      provider: runner.provider,
       research: ready.research,
+      ...(runner.maxFolders ? { maxFolders: runner.maxFolders } : {}),
       ...(blocked ? { blocked } : {}),
     },
     id,
   );
   if (outcome) {
     // Every request the model answered (or failed) counts, with the cost OpenRouter reported.
-    if (outcome.errorCode !== 'budget') await recordSpend(outcome.cost);
+    if (runner.budgeted && outcome.errorCode !== 'budget') await recordSpend(outcome.cost);
     await addLog(outcome);
-    if (outcome.cost !== undefined || outcome.status === 'error') usageSoon();
+    if (runner.budgeted && (outcome.cost !== undefined || outcome.status === 'error')) usageSoon();
   }
   return outcome;
 }
@@ -209,9 +206,12 @@ export interface SortNowResult {
 /** Sorts the bookmarks already waiting in the inbox. */
 export function sortInboxNow(): Promise<SortNowResult> {
   return serial(async () => {
+    const s = await getSettings();
+    if (!s.aiSortEnabled || !s.aiInboxFolderId) throw new Error(t('aiNotReady'));
+    // Says what is missing (key, address, model) when the provider is not set up.
+    await assertPermission(await aiRunner(s), s);
     const ready = await readiness();
     if (!ready) throw new Error(t('aiNotReady'));
-    if (!(await hasOpenRouterPermission())) throw new Error(t('aiPermissionMissing'));
     if (await overBudget(ready)) throw new Error(t('aiErrBudget'));
     const children = await localBookmarks().getChildren(ready.inboxId);
     const result: SortNowResult = { sorted: 0, kept: 0, failed: 0 };
@@ -229,7 +229,7 @@ export function sortInboxNow(): Promise<SortNowResult> {
       else {
         result.failed++;
         // A wrong key or no credits fails every bookmark the same way: stop.
-        if (['auth', 'credits', 'permission'].includes(outcome.errorCode ?? '')) break;
+        if (['auth', 'credits', 'permission', 'unavailable'].includes(outcome.errorCode ?? '')) break;
       }
     }
     return result;
@@ -282,6 +282,25 @@ export async function testOpenRouter(): Promise<string> {
     if (err instanceof OpenRouterError && err.code === 'auth') throw new Error(t('aiKeyRejected'));
     throw err;
   }
+}
+
+/** "Test" for an OpenAI-compatible endpoint: the models it offers (shows the address and key work). */
+export async function listEndpointModels(): Promise<string[]> {
+  const s = await getSettings();
+  const endpoint = customEndpoint(s);
+  if (!endpoint) throw new Error(t('aiNoEndpoint'));
+  try {
+    return await fetchEndpointModels(endpoint, (await endpointKeyItem.getValue()) || undefined);
+  } catch (err) {
+    if (err instanceof OpenRouterError && err.code === 'permission') throw new Error(t('aiPermissionMissingHost', endpoint.label));
+    if (err instanceof OpenRouterError && err.code === 'auth') throw new Error(t('aiEndpointKeyRejected'));
+    throw err;
+  }
+}
+
+/** Whether the browser's built-in model can run here, checked where it runs (the background). */
+export function builtinStatus(): Promise<BuiltinState> {
+  return builtinAvailability(builtinLanguage(browser.i18n.getUILanguage()));
 }
 
 // ---------- OpenRouter models and usage ----------

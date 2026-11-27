@@ -389,7 +389,7 @@
     "message": "Open sorting log"
   },
   "aiIntro": {
-    "message": "Choose an inbox folder. When you add a bookmark to it in this browser, an AI model on OpenRouter picks the best matching folder among yours and moves the bookmark there a few seconds later."
+    "message": "Choose an inbox folder. When you add a bookmark to it in this browser, an AI model picks the best matching folder among yours and moves the bookmark there a few seconds later. The model can run on OpenRouter, on a server you run (Ollama, LM Studio, ...) or on this device."
   },
   "aiPrivacy": {
     "message": "Only while this is on: the bookmark's title, its address without the part after \"?\" and the names of your folders are sent to OpenRouter and the model you choose. With web research on, OpenRouter also opens that address and may search the web for it. Other browsers send nothing unless you turn it on there too."
@@ -467,7 +467,7 @@
     "message": "Moved {1}, left in the inbox {2}, failed {3}. Details are in the sorting log."
   },
   "aiNotReady": {
-    "message": "Turn on AI sorting, choose an inbox folder and save an API key first."
+    "message": "Turn on AI sorting, choose an inbox folder and finish setting up the AI provider first."
   },
   "aiPermissionMissing": {
     "message": "Marksync is not allowed to contact openrouter.ai. Turn AI sorting off and on again to allow it."
@@ -1263,5 +1263,143 @@
   },
   "errEncryptionFile": {
     "message": "The encryption settings in Drive (encryption.json) are damaged."
+  },
+  "aiProviderLabel": {
+    "message": "AI provider"
+  },
+  "aiProviderOpenRouter": {
+    "message": "OpenRouter"
+  },
+  "aiProviderCustom": {
+    "message": "Your own server (OpenAI-compatible)"
+  },
+  "aiProviderCustomShort": {
+    "message": "own server"
+  },
+  "aiProviderBuiltin": {
+    "message": "Built-in AI of this browser"
+  },
+  "aiProviderHelpOpenRouter": {
+    "message": "Hundreds of models, web research, costs a little per bookmark. Needs an OpenRouter API key."
+  },
+  "aiProviderHelpCustom": {
+    "message": "Free and private: Ollama, LM Studio, vLLM, llama.cpp or any OpenAI-compatible address. No web research."
+  },
+  "aiProviderHelpBuiltin": {
+    "message": "Free, offline, nothing leaves this device. Chrome downloads a small model once. No web research, and fewer folders are offered."
+  },
+  "aiPrivacyCustom": {
+    "message": "Only while this is on: the bookmark's title, its address without the part after \"?\" and the names of your folders are sent to {1}. Nothing is sent to OpenRouter. Other browsers send nothing unless you turn it on there too."
+  },
+  "aiPrivacyBuiltin": {
+    "message": "The model runs on this device: the bookmark's title, address and your folder names never leave this computer."
+  },
+  "aiEndpointLabel": {
+    "message": "Server address"
+  },
+  "aiEndpointHelp": {
+    "message": "The base address of the OpenAI-compatible API, e.g. http://localhost:11434/v1 for Ollama or http://localhost:1234/v1 for LM Studio. Marksync asks for permission to contact this address only."
+  },
+  "aiEndpointNone": {
+    "message": "No address saved."
+  },
+  "aiEndpointSaved": {
+    "message": "Saved: {1}"
+  },
+  "aiEndpointInsecure": {
+    "message": "Saved: {1}. This address is not encrypted (http) and not on your network: use https for a server on the internet."
+  },
+  "aiEndpointSavedToast": {
+    "message": "Address saved. Marksync may now contact {1}."
+  },
+  "aiEndpointInvalid": {
+    "message": "Enter an http or https address without a user name, \"?\" or \"#\", e.g. http://localhost:11434/v1."
+  },
+  "aiEndpointTestOk_one": {
+    "message": "Connected. The server offers {1} model."
+  },
+  "aiEndpointTestOk_other": {
+    "message": "Connected. The server offers {1} models; pick one under Model."
+  },
+  "aiEndpointTestNoModels": {
+    "message": "Connected, but the server listed no models. Enter the model name yourself."
+  },
+  "aiEndpointModelLabel": {
+    "message": "Model"
+  },
+  "aiEndpointModelHelp": {
+    "message": "The model name as the server knows it, e.g. llama3.2:3b or qwen3:8b. \"Test\" above lists the models the server offers."
+  },
+  "aiEndpointModelInvalid": {
+    "message": "Enter the model name as the server lists it (letters, digits and . : / @ + - _)."
+  },
+  "aiEndpointModelSaved": {
+    "message": "Model saved: {1}"
+  },
+  "aiEndpointKeyLabel": {
+    "message": "API key (optional)"
+  },
+  "aiEndpointKeyNone": {
+    "message": "No key saved. Local servers usually need none."
+  },
+  "aiEndpointKeyHelp": {
+    "message": "Sent as a Bearer token to the address above only. Stored in this browser only, never uploaded to Google Drive."
+  },
+  "aiEndpointKeyRejected": {
+    "message": "The server rejected the key. Check the key, or remove it if the server needs none."
+  },
+  "aiBuiltinLabel": {
+    "message": "On-device model"
+  },
+  "aiBuiltinHelp": {
+    "message": "Chrome 138 or newer on Windows, macOS, Linux or a Chromebook Plus, with a GPU with more than 4 GB of memory or 16 GB of RAM and 4 CPU cores, and about 22 GB free disk space for the download. Reasons and site notes are written in English, Spanish, Japanese, German or French."
+  },
+  "aiBuiltinPrepare": {
+    "message": "Download the model"
+  },
+  "aiBuiltinUnsupported": {
+    "message": "This browser has no built-in AI model. Use Chrome 138 or newer, or choose another provider."
+  },
+  "aiBuiltinUnavailable": {
+    "message": "This device cannot run the built-in model (see the requirements below). Choose another provider."
+  },
+  "aiBuiltinDownloadable": {
+    "message": "The model is not downloaded yet. Download it once (a few GB), then it works offline."
+  },
+  "aiBuiltinDownloading": {
+    "message": "Chrome is downloading the model. This can take a while."
+  },
+  "aiBuiltinReady": {
+    "message": "The model is ready on this device."
+  },
+  "aiBuiltinNotReady": {
+    "message": "Download the built-in model first (below)."
+  },
+  "aiNoEndpoint": {
+    "message": "Save the address of your server first."
+  },
+  "aiNoEndpointModel": {
+    "message": "Choose the model on your server first."
+  },
+  "aiPermissionMissingHost": {
+    "message": "Marksync is not allowed to contact {1}. Save the address again to allow it."
+  },
+  "aiPermissionDeniedHost": {
+    "message": "AI sorting needs permission to contact {1}."
+  },
+  "aiErrUnavailable": {
+    "message": "The model cannot run right now (not downloaded, or not supported on this device)."
+  },
+  "aiErrAuthEndpoint": {
+    "message": "The server rejected the API key."
+  },
+  "aiErrModelEndpoint": {
+    "message": "The model failed or rejected the request. Check the model name in Settings."
+  },
+  "aiErrPermissionEndpoint": {
+    "message": "Marksync is not allowed to contact this server. Save its address again in Settings."
+  },
+  "aiErrNetworkEndpoint": {
+    "message": "The model did not answer: the server is not running, not reachable or too slow."
   }
 }

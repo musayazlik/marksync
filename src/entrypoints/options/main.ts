@@ -7,6 +7,7 @@ import {
   aiBulkItem,
   aiSpendItem,
   aiUsageItem,
+  endpointKeyItem,
   DEFAULT_AI_MODEL,
   getSettings,
   MODEL_ID,
@@ -20,6 +21,8 @@ import {
   type Status,
 } from '../../shared/state';
 import { OPENROUTER_ORIGIN } from '../../platform/openrouter';
+import { prepareBuiltin, type BuiltinState } from '../../platform/builtin-ai';
+import { builtinLanguage, ENDPOINT_MODEL, isLocalEndpoint, parseEndpoint, type AiProvider } from '../../core/ai-provider';
 import { maskEmail } from '../../core/mask';
 import { MIN_PASSPHRASE, passphraseStrength } from '../../core/crypto';
 import { budgetState, currentSpend, nextMonthStart } from '../../core/budget';
@@ -208,12 +211,29 @@ async function saveSetting<K extends keyof Settings>(key: K, value: Settings[K])
 }
 
 /**
- * Asks for openrouter.ai, and in Firefox 140+ for consent to send bookmark
- * data. Must be called directly in the click handler: browsers only show a
- * permission prompt in response to a user action.
+ * The settings as last read, so click handlers can ask for a permission
+ * without awaiting first (a prompt needs the user action, see below).
  */
-function requestAiPermission(): Promise<boolean> {
-  const origins = [OPENROUTER_ORIGIN];
+let aiSettings: Settings | undefined;
+/** Whether the browser's own model can run, as the background last reported it. */
+let builtinState: BuiltinState | undefined;
+
+/** The host AI sorting talks to with these settings; undefined for the on-device model. */
+function aiOrigin(s: Pick<Settings, 'aiProvider' | 'aiEndpoint'>): string | undefined {
+  if (s.aiProvider === 'openrouter') return OPENROUTER_ORIGIN;
+  if (s.aiProvider === 'custom') return parseEndpoint(s.aiEndpoint)?.origin;
+  return undefined;
+}
+
+/**
+ * Asks for the AI host, and in Firefox 140+ for consent to send bookmark
+ * data. Must be called directly in the click handler: browsers only show a
+ * permission prompt in response to a user action. Nothing to ask for the
+ * on-device model (`origin` undefined).
+ */
+function requestAiPermission(origin: string | undefined): Promise<boolean> {
+  if (!origin) return Promise.resolve(true);
+  const origins = [origin];
   if (import.meta.env.FIREFOX) {
     const withConsent = { origins, data_collection: ['bookmarksInfo'] } as Parameters<typeof browser.permissions.request>[0];
     // Firefox before 140 does not know data_collection.
@@ -222,28 +242,237 @@ function requestAiPermission(): Promise<boolean> {
   return browser.permissions.request({ origins });
 }
 
+const keyHint = (key: string) => `${key.slice(0, 6)}…${key.slice(-4)}`;
+
+/** What is still missing for the chosen provider, or '' when it is set up. */
+async function providerProblem(s: Settings): Promise<string> {
+  if (s.aiProvider === 'builtin') {
+    if (builtinState === 'available') return '';
+    return builtinState === 'downloadable' || builtinState === 'downloading' ? t('aiBuiltinNotReady') : t('aiBuiltinUnavailable');
+  }
+  if (s.aiProvider === 'custom') {
+    const endpoint = parseEndpoint(s.aiEndpoint);
+    if (!endpoint) return t('aiNoEndpoint');
+    if (!(await browser.permissions.contains({ origins: [endpoint.origin] }))) return t('aiPermissionMissingHost', endpoint.label);
+    if (!s.aiEndpointModel) return t('aiNoEndpointModel');
+    return '';
+  }
+  if (!(await browser.permissions.contains({ origins: [OPENROUTER_ORIGIN] }))) return t('aiPermissionMissing');
+  if (!(await openRouterKeyItem.getValue())) return t('aiNoKey');
+  return '';
+}
+
+/** Shows the settings of the chosen provider only, and its privacy note. */
+function renderProvider(s: Settings) {
+  for (const node of document.querySelectorAll<HTMLElement>('[data-provider]')) {
+    node.hidden = node.dataset.provider !== s.aiProvider;
+  }
+  $<HTMLSelectElement>('#aiProvider').value = s.aiProvider;
+  const endpoint = parseEndpoint(s.aiEndpoint);
+  $('#ai-privacy').textContent =
+    s.aiProvider === 'builtin'
+      ? t('aiPrivacyBuiltin')
+      : s.aiProvider === 'custom'
+        ? t('aiPrivacyCustom', endpoint?.label ?? t('aiEndpointNone'))
+        : t('aiPrivacy');
+  $('#ai-provider-help').textContent = t(
+    s.aiProvider === 'builtin' ? 'aiProviderHelpBuiltin' : s.aiProvider === 'custom' ? 'aiProviderHelpCustom' : 'aiProviderHelpOpenRouter',
+  );
+}
+
 async function renderAiStatus() {
   const s = await getSettings();
+  aiSettings = s;
+  renderProvider(s);
   const key = await openRouterKeyItem.getValue();
   const status = $('#ai-status');
   const inbox = aiFolders.find((f) => f.id === s.aiInboxFolderId);
+  const problem = await providerProblem(s);
   let text = '';
   if (s.aiSortEnabled) {
-    if (!(await browser.permissions.contains({ origins: [OPENROUTER_ORIGIN] }))) text = t('aiPermissionMissing');
+    if (problem && problem !== t('aiNoKey') && problem !== t('aiNoEndpointModel')) text = problem;
     else if (!s.aiInboxFolderId) text = t('aiChooseInbox');
     else if (!inbox) text = t('aiInboxMissing');
-    else if (!key) text = t('aiNoKey');
+    else if (problem) text = problem;
     else text = t('aiReady', inbox.path);
   }
   status.textContent = text;
   status.hidden = !text;
-  status.classList.toggle('warn', !!text && !(inbox && key));
-  $<HTMLButtonElement>('#ai-sort-now').disabled = !(s.aiSortEnabled && inbox && key);
+  status.classList.toggle('warn', !!text && !(inbox && !problem));
+  $<HTMLButtonElement>('#ai-sort-now').disabled = !(s.aiSortEnabled && inbox && !problem);
 
-  $('#ai-key-state').textContent = key ? t('aiKeySaved', `${key.slice(0, 6)}…${key.slice(-4)}`) : t('aiKeyNone');
+  $('#ai-key-state').textContent = key ? t('aiKeySaved', keyHint(key)) : t('aiKeyNone');
   $('#ai-key-remove').hidden = !key;
   $<HTMLButtonElement>('#ai-key-test').disabled = !key;
+
+  const endpoint = parseEndpoint(s.aiEndpoint);
+  const endpointState = $('#ai-endpoint-state');
+  endpointState.textContent = endpoint
+    ? isLocalEndpoint(endpoint) || endpoint.base.startsWith('https:')
+      ? t('aiEndpointSaved', endpoint.base)
+      : t('aiEndpointInsecure', endpoint.base)
+    : t('aiEndpointNone');
+  endpointState.classList.toggle('warn-text', !!endpoint && !isLocalEndpoint(endpoint) && !endpoint.base.startsWith('https:'));
+  if (document.activeElement !== $('#ai-endpoint')) $<HTMLInputElement>('#ai-endpoint').value = s.aiEndpoint;
+  if (document.activeElement !== $('#ai-endpoint-model')) $<HTMLInputElement>('#ai-endpoint-model').value = s.aiEndpointModel;
+  $<HTMLButtonElement>('#ai-endpoint-test').disabled = !endpoint;
+  const endpointKey = await endpointKeyItem.getValue();
+  $('#ai-endpoint-key-state').textContent = endpointKey ? t('aiKeySaved', keyHint(endpointKey)) : t('aiEndpointKeyNone');
+  $('#ai-endpoint-key-remove').hidden = !endpointKey;
 }
+
+// ---------- AI provider: OpenAI-compatible endpoint and built-in model ----------
+
+const aiProvider = $<HTMLSelectElement>('#aiProvider');
+const endpointInput = $<HTMLInputElement>('#ai-endpoint');
+const endpointModelInput = $<HTMLInputElement>('#ai-endpoint-model');
+const endpointKeyInput = $<HTMLInputElement>('#ai-endpoint-key');
+
+aiProvider.addEventListener('change', () => {
+  actionError.hidden = true;
+  const provider = aiProvider.value as AiProvider;
+  const origin = aiSettings ? aiOrigin({ ...aiSettings, aiProvider: provider }) : undefined;
+  // Ask for the new host now, while the choice counts as a user action.
+  const asked = aiSettings?.aiSortEnabled ? requestAiPermission(origin) : Promise.resolve(true);
+  void asked
+    .then(async (granted) => {
+      await saveSetting('aiProvider', provider);
+      if (!granted) throw new Error(t('aiPermissionDenied'));
+    })
+    .catch(showError)
+    .finally(() => {
+      void renderAiStatus();
+      if (provider === 'builtin') void renderBuiltin();
+      if (provider === 'openrouter') void loadModels();
+    });
+});
+
+$('#ai-endpoint-save').addEventListener('click', () => {
+  actionError.hidden = true;
+  const endpoint = parseEndpoint(endpointInput.value);
+  if (!endpoint) {
+    showError(new Error(t('aiEndpointInvalid')));
+    return;
+  }
+  // No await before this call: the permission prompt needs the click.
+  void withBusy(
+    $<HTMLButtonElement>('#ai-endpoint-save'),
+    async () => {
+      const granted = await requestAiPermission(endpoint.origin);
+      await saveSetting('aiEndpoint', endpoint.base);
+      endpointInput.value = endpoint.base;
+      await renderAiStatus();
+      if (!granted) throw new Error(t('aiPermissionDeniedHost', endpoint.label));
+      showToast($('#action-ok'), t('aiEndpointSavedToast', endpoint.label));
+    },
+    actionError,
+  );
+});
+endpointInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') $<HTMLButtonElement>('#ai-endpoint-save').click();
+});
+
+$('#ai-endpoint-test').addEventListener('click', () =>
+  withBusy(
+    $<HTMLButtonElement>('#ai-endpoint-test'),
+    async () => {
+      const ids = await send({ type: 'aiEndpointModels' });
+      $('#ai-endpoint-models').replaceChildren(
+        ...ids.map((id) => Object.assign(document.createElement('option'), { value: id })),
+      );
+      const result = $('#ai-result');
+      result.textContent = ids.length ? tn('aiEndpointTestOk', ids.length) : t('aiEndpointTestNoModels');
+      result.hidden = false;
+      // A single model on the server: nothing to choose.
+      if (ids.length === 1 && !(await getSettings()).aiEndpointModel) {
+        endpointModelInput.value = ids[0]!;
+        await saveSetting('aiEndpointModel', ids[0]!);
+      }
+    },
+    actionError,
+  ),
+);
+
+$('#ai-endpoint-model-save').addEventListener('click', () =>
+  withBusy(
+    $<HTMLButtonElement>('#ai-endpoint-model-save'),
+    async () => {
+      const model = endpointModelInput.value.trim();
+      if (!ENDPOINT_MODEL.test(model)) throw new Error(t('aiEndpointModelInvalid'));
+      await saveSetting('aiEndpointModel', model);
+      await renderAiStatus();
+      showToast($('#action-ok'), t('aiEndpointModelSaved', model));
+    },
+    actionError,
+  ),
+);
+endpointModelInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') $<HTMLButtonElement>('#ai-endpoint-model-save').click();
+});
+
+$('#ai-endpoint-key-save').addEventListener('click', () =>
+  withBusy(
+    $<HTMLButtonElement>('#ai-endpoint-key-save'),
+    async () => {
+      const key = endpointKeyInput.value.trim();
+      if (!/^[\x21-\x7e]{1,500}$/.test(key)) throw new Error(t('aiKeyInvalid'));
+      await endpointKeyItem.setValue(key);
+      endpointKeyInput.value = '';
+      await renderAiStatus();
+    },
+    actionError,
+  ),
+);
+endpointKeyInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') $<HTMLButtonElement>('#ai-endpoint-key-save').click();
+});
+$('#ai-endpoint-key-remove').addEventListener('click', () =>
+  withBusy(
+    $<HTMLButtonElement>('#ai-endpoint-key-remove'),
+    async () => {
+      if (!confirm(t('aiConfirmRemoveKey'))) return;
+      await endpointKeyItem.removeValue();
+      await renderAiStatus();
+    },
+    actionError,
+  ),
+);
+
+const builtinText: Record<BuiltinState, string> = {
+  unsupported: 'aiBuiltinUnsupported',
+  unavailable: 'aiBuiltinUnavailable',
+  downloadable: 'aiBuiltinDownloadable',
+  downloading: 'aiBuiltinDownloading',
+  available: 'aiBuiltinReady',
+};
+
+/** Asks the background (where the model runs) whether it can run, and shows it. */
+async function renderBuiltin() {
+  builtinState = await send({ type: 'aiBuiltinStatus' }).catch(() => 'unsupported' as const);
+  const state = $('#ai-builtin-state');
+  state.textContent = t(builtinText[builtinState]);
+  state.className = `small ${builtinState === 'available' ? '' : builtinState === 'downloadable' || builtinState === 'downloading' ? 'muted' : 'warn-text'}`;
+  // The page can start the download only where the page itself has the API.
+  $('#ai-builtin-prepare').hidden = !(builtinState === 'downloadable' || builtinState === 'downloading') || !('LanguageModel' in self);
+  await renderAiStatus();
+}
+
+$('#ai-builtin-prepare').addEventListener('click', () => {
+  const button = $<HTMLButtonElement>('#ai-builtin-prepare');
+  const progress = $<HTMLProgressElement>('#ai-builtin-progress');
+  progress.hidden = false;
+  progress.removeAttribute('value');
+  // Started straight from the click: the download needs the user action.
+  const download = prepareBuiltin(builtinLanguage(browser.i18n.getUILanguage()), (loaded) => {
+    // After the download the model is unpacked: show an open-ended bar.
+    if (loaded >= 1) progress.removeAttribute('value');
+    else progress.value = loaded;
+  });
+  void withBusy(button, () => download, actionError).finally(() => {
+    progress.hidden = true;
+    void renderBuiltin();
+  });
+});
 
 async function loadAiFolders() {
   const s = await getSettings();
@@ -288,7 +517,18 @@ async function initAi() {
   researchOn = s.aiResearch;
   renderModels();
   $<HTMLInputElement>('#bulk-research').checked = false;
-  await Promise.all([loadAiFolders(), loadModels(), renderBudget(), aiBulkItem.getValue().then((j) => renderBulk(j ?? undefined))]);
+  aiSettings = s;
+  // Firefox has no on-device model to offer.
+  if (import.meta.env.FIREFOX && s.aiProvider !== 'builtin') aiProvider.querySelector('option[value="builtin"]')?.remove();
+  renderProvider(s);
+  await Promise.all([
+    loadAiFolders(),
+    loadModels(),
+    renderBudget(),
+    aiBulkItem.getValue().then((j) => renderBulk(j ?? undefined)),
+    // Checked even when another provider is chosen, so switching shows the state at once.
+    renderBuiltin(),
+  ]);
 }
 
 aiEnabled.addEventListener('change', () => {
@@ -298,7 +538,7 @@ aiEnabled.addEventListener('change', () => {
     return;
   }
   // No await before this call: the permission prompt needs the user action.
-  void requestAiPermission()
+  void requestAiPermission(aiSettings ? aiOrigin(aiSettings) : OPENROUTER_ORIGIN)
     .then(async (granted) => {
       if (!granted) {
         aiEnabled.checked = false;

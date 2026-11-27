@@ -5,8 +5,10 @@ import {
   InvalidReplyError,
   listFolderOptions,
   parseSortReply,
+  sortReplySchema,
   type ChatMessage,
 } from '../core/ai-sort';
+import type { AiProvider } from '../core/ai-provider';
 import type { SortLogEntry } from '../shared/state';
 import type { BookmarksApi } from './bookmarks-api';
 import { isSyncable } from './local-tree';
@@ -17,8 +19,12 @@ import { isSyncable } from './local-tree';
  */
 export interface SorterDeps {
   bookmarks: BookmarksApi;
-  /** Sends the prompt to the model and returns its reply (text, or text with sources and cost). */
-  complete(messages: ChatMessage[], opts: { research: boolean }): Promise<string | ModelReply>;
+  /**
+   * Sends the prompt to the model and returns its reply (text, or text with
+   * sources and cost). `schema` describes the expected JSON, for providers
+   * that can constrain their output.
+   */
+  complete(messages: ChatMessage[], opts: { research: boolean; schema: Record<string, unknown> }): Promise<string | ModelReply>;
   /** Folders never offered (Opera's Trash and Speed Dial). */
   exclude?: string[];
   /** UI language, for the model's short reason. */
@@ -35,6 +41,10 @@ export interface SortRun {
   inboxId: string;
   allowNewFolders: boolean;
   model: string;
+  /** Recorded in the log entry. */
+  provider?: AiProvider;
+  /** At most this many folders are offered (small on-device models). */
+  maxFolders?: number;
   /** Let the model read the page and search the web. */
   research?: boolean;
   /** Set when the monthly budget is used up: the model is not asked and the bookmark stays. */
@@ -75,6 +85,7 @@ export async function sortOne(deps: SorterDeps, run: SortRun, bookmarkId: string
     fromId: run.inboxId,
     fromPath: folderPath(tree, run.inboxId),
     model: run.model,
+    ...(run.provider ? { provider: run.provider } : {}),
     ...(run.research ? { researched: true } : {}),
   };
 
@@ -83,7 +94,11 @@ export async function sortOne(deps: SorterDeps, run: SortRun, bookmarkId: string
     return { ...rest, status: 'error', error: run.blocked.message, errorCode: run.blocked.code };
   }
 
-  const folders = listFolderOptions(tree, { exclude: deps.exclude, skip: [run.inboxId, ...(run.skip ?? [])] });
+  const folders = listFolderOptions(tree, {
+    exclude: deps.exclude,
+    skip: [run.inboxId, ...(run.skip ?? [])],
+    ...(run.maxFolders ? { max: run.maxFolders } : {}),
+  });
   let reply: string;
   try {
     const answer = await deps.complete(
@@ -95,7 +110,7 @@ export async function sortOne(deps: SorterDeps, run: SortRun, bookmarkId: string
         language: deps.language,
         research: !!run.research,
       }),
-      { research: !!run.research },
+      { research: !!run.research, schema: sortReplySchema(folders, run.allowNewFolders) },
     );
     if (typeof answer === 'string') reply = answer;
     else {

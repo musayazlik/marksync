@@ -30,7 +30,19 @@ const errorKey: Record<string, string> = {
   network: 'aiErrNetwork',
   reply: 'aiErrReply',
   budget: 'aiErrBudget',
+  unavailable: 'aiErrUnavailable',
 };
+/** Entries from a local endpoint or the built-in model: the OpenRouter wording does not fit. */
+const otherErrorKey: Record<string, string> = {
+  auth: 'aiErrAuthEndpoint',
+  'rate-limit': 'aiErrRateLimit',
+  model: 'aiErrModelEndpoint',
+  permission: 'aiErrPermissionEndpoint',
+  network: 'aiErrNetworkEndpoint',
+  reply: 'aiErrReply',
+  unavailable: 'aiErrUnavailable',
+};
+const providerKey = { openrouter: 'aiProviderOpenRouter', custom: 'aiProviderCustom', builtin: 'aiProviderBuiltin' } as const;
 
 let entries: SortLogEntry[] = [];
 let filter: Filter = 'all';
@@ -155,7 +167,8 @@ function entry(e: SortLogEntry, isNew: boolean): HTMLLIElement {
   const verdict = el('div', 'verdict');
   verdict.append(el('span', `pill status ${tone(e)}`, e.undoneAt ? t('aiStatusUndone') : t(statusKey[e.status])));
   if (e.status === 'error') {
-    const known = e.errorCode ? errorKey[e.errorCode] : undefined;
+    const keys = e.provider && e.provider !== 'openrouter' ? otherErrorKey : errorKey;
+    const known = e.errorCode ? keys[e.errorCode] : undefined;
     const text = el('span', 'reason', known ? t(known) : (e.error ?? ''));
     if (e.error) text.title = e.error;
     verdict.append(text);
@@ -169,7 +182,11 @@ function entry(e: SortLogEntry, isNew: boolean): HTMLLIElement {
   if (about) body.append(about);
 
   const foot = el('div', 'entry-foot');
-  foot.append(el('span', 'muted small', e.model));
+  // Which provider and model decided (entries from before 0.5 have no provider: OpenRouter).
+  const decidedBy = el('span', 'muted small', e.model);
+  if (e.provider && e.provider !== 'openrouter') decidedBy.title = t(providerKey[e.provider]);
+  if (e.provider === 'custom') decidedBy.textContent = `${e.model} · ${t('aiProviderCustomShort')}`;
+  foot.append(decidedBy);
   if (isMoved(e)) {
     const undo = el('button', 'quiet', t('aiUndo'));
     undo.title = t('aiUndoHint');

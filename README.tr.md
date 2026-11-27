@@ -26,6 +26,7 @@ oradadır. Üçüncü taraf bir sunucu yoktur; her şey Google Drive'ınızdaki
 - Yinelenen yer imi bulucu: birden fazla kez kaydedilmiş sayfalar (fark yalnızca http/https, sondaki eğik çizgi ya da `utm_` parametreleri olsa bile); her birinden bir kopya tutulur, önce yedek alınır
 - Bağlantı denetimi: sayfası kaybolmuş ya da taşınmış yer imlerini bulur; taşınanı yeni adresiyle güncelleyin, kaybolanı [Wayback Machine](https://web.archive.org)'deki kayıtlı kopyasına yönlendirin
 - Kendi [OpenRouter](https://openrouter.ai) anahtarınızla isteğe bağlı yapay zekâ düzenlemesi: bir gelen kutusu klasörü seçin, model (varsayılan Claude Opus) oraya eklediğiniz her yer imini araştırır, en uygun klasöre taşır ve sitenin ne olduğunu, ne için kullanıldığını açıklar; her karar Geri al seçeneğiyle bir kayıt sayfasında listelenir
+- OpenRouter olmadan ücretsiz ve gizli yapay zekâ düzenlemesi: kendi OpenAI uyumlu sunucunuzu (Ollama, LM Studio, vLLM, llama.cpp) ya da tarayıcının cihaz üzerindeki yerleşik modelini (Chrome 138+, Gemini Nano) kullanın
 - Yapay zekâ ekleri: OpenRouter'ın tüm model listesinden arayarak seçim (ücretsiz / web araştırması filtreleri, fiyatlar), mevcut bir klasörü önizleme ve onayla toplu düzenleme, aylık harcama sınırı ve popup'ta OpenRouter bakiyesi ile harcamalar
 - Popup'tan tüm yer imlerinde anlık arama (başlık, adres, klasör ve yapay zekânın site hakkında öğrendikleri; aksan duyarsız)
 - İsteğe bağlı uçtan uca şifreleme: Drive'daki eşitleme dosyası, yedekler ve tarayıcı listeleri yalnızca sizin bildiğiniz bir parolayla şifrelenir (AES-256-GCM, PBKDF2)
@@ -50,9 +51,10 @@ oradadır. Üçüncü taraf bir sunucu yoktur; her şey Google Drive'ınızdaki
 - *Disconnect* yalnızca tıkladığınız tarayıcının bağlantısını keser; diğer tarayıcılarınız bağlı kalır.
   Marksync'in erişimini her yerden kaldırmak için https://myaccount.google.com/permissions adresini kullanın.
 - Yapay zekâ düzenlemesi varsayılan olarak kapalıdır. Yalnızca bir tarayıcıda açtığınızda (bu sırada
-  `openrouter.ai` için izin istenir), o tarayıcı gelen kutusuna eklediğiniz her yer iminin başlığını ve
-  adresini (sorgu kısmı olmadan) ve klasör adlarınızı OpenRouter'a ve seçtiğiniz modele gönderir.
-  OpenRouter anahtarınız o tarayıcının yerel deposunda kalır, Drive'a hiçbir zaman yüklenmez.
+  `openrouter.ai` ya da kendi sunucunuzun adresi için izin istenir), o tarayıcı gelen kutusuna
+  eklediğiniz her yer iminin başlığını ve adresini (sorgu kısmı olmadan) ve klasör adlarınızı o
+  sağlayıcıya ve seçtiğiniz modele gönderir. Tarayıcının yerleşik modeliyle hiçbir şey cihazdan
+  çıkmaz. API anahtarları o tarayıcının yerel deposunda kalır, Drive'a hiçbir zaman yüklenmez.
 - Bağlantı denetimi yalnızca siz başlattığınızda çalışır (bu sırada tüm siteleri açma izni istenir).
   Her yer iminin adresini çerezleriniz olmadan ister, kendi bilgisayarınızdaki veya yerel ağınızdaki
   adresleri hiç açmaz ve kaybolan her sayfanın adresini `archive.org`'da arar.

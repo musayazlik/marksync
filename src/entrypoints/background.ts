@@ -22,6 +22,7 @@ import { removeDuplicates, scanDuplicates } from '../services/dedupe-service';
 import { fixAllLinks, fixLink, markInterruptedScan, startLinkScan, stopLinkScan } from '../services/links-service';
 import { applyBulk, cancelBulk, discardBulk, resumeBulk, startBulk } from '../services/bulk-service';
 import { compareBackup, restoreFromBackup, searchBackups } from '../services/history-service';
+import { allTags, setTags, tagsByLocalId } from '../services/tags-service';
 // Also installs the encryption codec for every Drive client (see drive-store.ts).
 import {
   disableEncryption,
@@ -238,6 +239,11 @@ export default defineBackground(() => {
         return listEndpointModels();
       case 'aiBuiltinStatus':
         return builtinStatus();
+      case 'tagsGet':
+        return { byId: await tagsByLocalId(), all: await allTags() };
+      case 'tagsSet':
+        if (typeof req.id !== 'string' || !req.id || !Array.isArray(req.tags)) throw new Error('Invalid tags.');
+        return setTags(req.id, req.tags.filter((x): x is string => typeof x === 'string'));
       case 'aiListModels':
         return listModels(req.refresh === true);
       case 'aiUsage':
@@ -303,7 +309,7 @@ export default defineBackground(() => {
     'connect', 'disconnect', 'syncNow', 'checkNow', 'resyncFromDrive', 'keepLocal', 'backupNow', 'listBackups',
     'restoreBackup', 'deleteBackup', 'historyCompare', 'historyRestore', 'historySearch', 'listBrowsers', 'removeBrowser', 'importFromBrowser', 'importHtml',
     'exportHtml', 'getRedirectUrl', 'settingsChanged', 'aiListFolders', 'aiTestKey', 'aiSortNow', 'aiUndo',
-    'aiClearLog', 'aiListModels', 'aiUsage', 'aiEndpointModels', 'aiBuiltinStatus', 'aiBulkStart', 'aiBulkCancel', 'aiBulkApply', 'aiBulkDiscard',
+    'aiClearLog', 'aiListModels', 'aiUsage', 'aiEndpointModels', 'aiBuiltinStatus', 'tagsGet', 'tagsSet', 'aiBulkStart', 'aiBulkCancel', 'aiBulkApply', 'aiBulkDiscard',
     'dupScan', 'dupRemove', 'linkScan', 'linkStop', 'linkFix', 'linkFixAll',
     'encStatus', 'encEnable', 'encUnlock', 'encLock', 'encDisable', 'encReset',
   ]);

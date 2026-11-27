@@ -20,6 +20,7 @@ oradadır. Üçüncü taraf bir sunucu yoktur; her şey Google Drive'ınızdaki
 - Aynı yer imleri zaten olan bir tarayıcı bağlandığında kopya oluşmaz
 - Bir eşitleme yer imlerinin çoğunu silecekse durur ve onay ister
 - Google Drive'a otomatik ve elle yedekleme, tek tıkla geri yükleme
+- Tarayıcılar arasında eşitlenen etiketler: yapay zekâ önerir, popup'ta düzenlersiniz, popup aramasında `#etiket` ile süzersiniz
 - Sürüm geçmişi: herhangi bir yedeği şimdiki yer imlerinizle karşılaştırın (kaldırılan, taşınan, adı değişen, eklenen; klasöre göre), tek bir yer imini ya da klasörü geri getirin, bir yer imini hâlâ içeren yedeği bulun
 - Başka tarayıcıdan içe aktarma (Marksync kurulu tarayıcıdan ya da herhangi bir tarayıcının HTML dosyasından), kopyasız birleştirme veya yeni klasöre koyma
 - Standart HTML yer imi dosyasına dışa aktarma

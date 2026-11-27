@@ -20,6 +20,7 @@ import {
 import { detectSpecialRoots } from '../sync/local-tree';
 import { sortOne, undoSort, UndoError, type SortOutcome } from '../sync/sorter';
 import { aiRunner, assertPermission, customEndpoint, type AiRunner } from './ai-client';
+import { allTags, setTags } from './tags-service';
 import { isApplying, localBookmarks } from './sync-service';
 
 /**
@@ -127,6 +128,7 @@ async function sortBookmark(id: string, ready: Ready): Promise<SortOutcome | nul
       bookmarks,
       exclude: special.exclude,
       language: runner.language,
+      existingTags: (await allTags()).map((x) => x.tag),
       complete: (messages, opts) => runner.complete(messages, opts),
     },
     {
@@ -144,6 +146,8 @@ async function sortBookmark(id: string, ready: Ready): Promise<SortOutcome | nul
     // Every request the model answered (or failed) counts, with the cost OpenRouter reported.
     if (runner.budgeted && outcome.errorCode !== 'budget') await recordSpend(outcome.cost);
     await addLog(outcome);
+    // The model's tags, unless the user tagged the bookmark already.
+    if (outcome.tags?.length && outcome.status !== 'error') await setTags(id, outcome.tags, { onlyIfEmpty: true });
     if (runner.budgeted && (outcome.cost !== undefined || outcome.status === 'error')) usageSoon();
   }
   return outcome;

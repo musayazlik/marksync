@@ -4,6 +4,7 @@ import { aiBulkItem, getSettings, type BulkJob, type BulkProposal } from '../sha
 import { t } from '../shared/i18n';
 import { detectSpecialRoots } from '../sync/local-tree';
 import { aiRunner, assertPermission } from './ai-client';
+import { allTags, setTags } from './tags-service';
 import { applyPlanned, sortOne } from '../sync/sorter';
 import { addLog, overBudget, recordSpend, usageSoon } from './sorter-service';
 import { localBookmarks } from './sync-service';
@@ -90,6 +91,7 @@ function plan(jobId: string): Promise<void> {
       const bookmarks = localBookmarks();
       const special = await detectSpecialRoots(bookmarks);
       const taken = new Set<string>();
+      const existingTags = (await allTags()).map((x) => x.tag);
 
       const next = async (): Promise<string | undefined> => {
         const job = await aiBulkItem.getValue();
@@ -113,6 +115,7 @@ function plan(jobId: string): Promise<void> {
               bookmarks,
               exclude: special.exclude,
               language: runner.language,
+              existingTags,
               complete: (messages, opts) => runner.complete(messages, opts),
             },
             {
@@ -203,6 +206,7 @@ export async function applyBulk(bookmarkIds: string[]): Promise<BulkApplyResult>
       if (ok) {
         result.moved++;
         await addLog(outcome);
+        if (outcome.tags?.length) await setTags(p.bookmarkId, outcome.tags, { onlyIfEmpty: true });
       } else result.failed++;
       await updateJob((j) => {
         const target = j.proposals.find((x) => x.bookmarkId === p.bookmarkId);

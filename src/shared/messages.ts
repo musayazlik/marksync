@@ -40,6 +40,8 @@ export type Request =
   | { type: 'aiListModels'; refresh?: boolean }
   | { type: 'aiUsage' }
   | { type: 'aiEndpointModels' }
+  | { type: 'tagsGet' }
+  | { type: 'tagsSet'; id: string; tags: string[] }
   | { type: 'aiBuiltinStatus' }
   | { type: 'aiBulkStart'; folderId: string; research: boolean }
   | { type: 'aiBulkCancel' }
@@ -87,6 +89,8 @@ export interface ResponseData {
   aiListModels: ModelInfo[];
   aiUsage: KeyUsage;
   aiEndpointModels: string[];
+  tagsGet: { byId: Record<string, string[]>; all: { tag: string; count: number }[] };
+  tagsSet: string[];
   aiBuiltinStatus: BuiltinState;
   aiBulkStart: BulkJob;
   aiBulkCancel: void;

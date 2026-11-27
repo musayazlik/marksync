@@ -3,7 +3,7 @@ import { send } from '../../shared/messages';
 import { errorText, localizePage, t, tn } from '../../shared/i18n';
 import { aiModelsItem, aiSpendItem, aiUsageItem, sortLogItem, getSettings, settingsItem, statusItem, type Settings, type Status } from '../../shared/state';
 import { maskEmail } from '../../core/mask';
-import { flattenBookmarks, matchRanges, searchBookmarks, type SearchItem } from '../../core/search';
+import { flattenBookmarks, fold, matchRanges, searchBookmarks, splitQuery, type SearchItem } from '../../core/search';
 import { budgetState, currentSpend, nextMonthStart } from '../../core/budget';
 import { formatUsd, usageGauge, type KeyUsage } from '../../core/openrouter-data';
 import { OPENROUTER_ORIGIN } from '../../platform/openrouter';
@@ -275,18 +275,108 @@ let items: Promise<SearchItem[]> | undefined;
 let rows: HTMLLIElement[] = [];
 let current = -1;
 
+/** Tags of this browser's bookmarks (local ID → tags) and the most used ones. */
+let tagData: { byId: Record<string, string[]>; all: { tag: string; count: number }[] } = { byId: {}, all: [] };
+
 /** The bookmarks of this browser, read once when the search is first used. */
 function loadItems(): Promise<SearchItem[]> {
-  items ??= Promise.all([browser.bookmarks.getTree(), sortLogItem.getValue()]).then(([tree, log]) => {
+  items ??= Promise.all([
+    browser.bookmarks.getTree(),
+    sortLogItem.getValue(),
+    send({ type: 'tagsGet' }).catch(() => tagData),
+  ]).then(([tree, log, tags]) => {
+    tagData = tags;
+    renderTagBar();
     // What AI sorting found out about a site is searchable too.
     const about = new Map<string, string>();
     for (const e of log ?? []) {
       if (!e.site || about.has(e.bookmarkId)) continue;
       about.set(e.bookmarkId, [e.site.name, e.site.category, e.site.summary, e.site.purpose].filter(Boolean).join(' '));
     }
-    return flattenBookmarks(tree, (id) => about.get(id));
+    return flattenBookmarks(tree, (id) => about.get(id), undefined, (id) => tags.byId[id]);
   });
   return items;
+}
+
+/** Tags already in the search box ("#recipe"). */
+const queryTags = () => splitQuery(find.value).tags;
+
+/** Puts "#tag" into the search (or takes it out again). */
+function toggleTag(tag: string) {
+  const token = `#${tag.replace(/\s+/g, '-')}`;
+  const parts = find.value.trim().split(/\s+/).filter(Boolean);
+  const has = parts.some((p) => fold(p) === fold(token));
+  find.value = (has ? parts.filter((p) => fold(p) !== fold(token)) : [...parts, token]).join(' ') + (has ? '' : ' ');
+  find.focus();
+  void runSearch();
+}
+
+function tagChip(tag: string): HTMLButtonElement {
+  const chip = document.createElement('button');
+  chip.type = 'button';
+  chip.className = 'tag-chip';
+  chip.textContent = `#${tag}`;
+  chip.dataset.tag = tag;
+  chip.setAttribute('aria-pressed', String(queryTags().some((q) => fold(tag.replace(/\s+/g, '-')).startsWith(q))));
+  return chip;
+}
+
+/** The most used tags under the search box. */
+function renderTagBar() {
+  const bar = $('#tag-bar');
+  bar.replaceChildren(...tagData.all.slice(0, 8).map((x) => tagChip(x.tag)));
+  bar.hidden = !tagData.all.length;
+}
+
+$('#tag-bar').addEventListener('click', (e) => {
+  const chip = (e.target as HTMLElement).closest<HTMLButtonElement>('.tag-chip');
+  if (chip?.dataset.tag) toggleTag(chip.dataset.tag);
+});
+find.addEventListener('focus', () => void loadItems());
+
+/** Inline editing of a result's tags: comma separated, Enter saves, Escape cancels. */
+function editTags(li: HTMLLIElement, item: SearchItem) {
+  const box = li.querySelector<HTMLElement>('.result-tags')!;
+  const input = document.createElement('input');
+  input.className = 'tag-input';
+  input.value = (item.tags ?? []).join(', ');
+  input.placeholder = t('tagsPlaceholder');
+  input.setAttribute('aria-label', t('tagsEditLabel', item.title));
+  input.maxLength = 300;
+  box.replaceChildren(input);
+  input.focus();
+  let done = false;
+  const finish = async (save: boolean) => {
+    if (done) return;
+    done = true;
+    if (save) {
+      try {
+        const tags = await send({ type: 'tagsSet', id: item.id, tags: input.value.split(',') });
+        item.tags = tags;
+        tagData.byId[item.id] = tags;
+        const counts = new Map<string, number>();
+        for (const list of Object.values(tagData.byId)) for (const tag of list) counts.set(tag, (counts.get(tag) ?? 0) + 1);
+        tagData.all = [...counts].map(([tag, count]) => ({ tag, count })).sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag));
+        renderTagBar();
+      } catch (err) {
+        console.warn('[marksync] saving tags failed', err);
+      }
+    }
+    void runSearch();
+    find.focus();
+  };
+  input.addEventListener('keydown', (e) => {
+    e.stopPropagation();
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      void finish(true);
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      void finish(false);
+    }
+  });
+  input.addEventListener('blur', () => void finish(true));
+  input.addEventListener('click', (e) => e.stopPropagation());
 }
 
 /** Text with the matching parts wrapped in <mark>. */
@@ -382,6 +472,21 @@ async function runSearch() {
       where.append(path);
     }
     text.append(title, where);
+    const tags = document.createElement('span');
+    tags.className = 'result-tags';
+    for (const tag of item.tags ?? []) tags.append(tagChip(tag));
+    const edit = document.createElement('button');
+    edit.type = 'button';
+    edit.className = 'tag-edit';
+    edit.textContent = item.tags?.length ? t('tagsEdit') : t('tagsAdd');
+    edit.setAttribute('aria-label', t('tagsEditLabel', item.title));
+    edit.tabIndex = -1;
+    edit.addEventListener('click', (e) => {
+      e.stopPropagation();
+      editTags(li, item);
+    });
+    tags.append(edit);
+    text.append(tags);
     li.append(avatar(item.host), text);
     return li;
   });
@@ -398,8 +503,10 @@ async function runSearch() {
   select(0);
 }
 
-find.addEventListener('input', () => void runSearch());
-find.addEventListener('focus', () => void loadItems());
+find.addEventListener('input', () => {
+  void runSearch();
+  renderTagBar();
+});
 find.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
     e.preventDefault();
@@ -417,6 +524,12 @@ find.addEventListener('keydown', (e) => {
   }
 });
 results.addEventListener('click', (e) => {
+  const chip = (e.target as HTMLElement).closest<HTMLButtonElement>('.tag-chip');
+  if (chip?.dataset.tag) {
+    toggleTag(chip.dataset.tag);
+    return;
+  }
+  if ((e.target as HTMLElement).closest('.tag-input')) return;
   const row = (e.target as HTMLElement).closest<HTMLLIElement>('.result');
   if (!row?.dataset.url) return;
   void openResult(row.dataset.url, e.ctrlKey || e.metaKey ? 'background' : e.shiftKey ? 'here' : 'tab');

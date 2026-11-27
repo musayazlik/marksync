@@ -2,6 +2,7 @@ import { storage } from '#imports';
 import type { SiteInfo } from '../core/ai-sort';
 import { AI_PROVIDERS, ENDPOINT_MODEL, parseEndpoint, type AiProvider } from '../core/ai-provider';
 import type { Spend } from '../core/budget';
+import type { TagEntry, TagMap } from '../core/tags';
 import type { LinkReason, Snapshot } from '../core/links';
 import type { KeyUsage, ModelInfo } from '../core/openrouter-data';
 import type { LocalState } from '../sync/engine';
@@ -96,6 +97,7 @@ export interface DriveIds {
   browsersFolderId?: string;
   stateFileId?: string;
   encryptionFileId?: string;
+  tagsFileId?: string;
 }
 
 export const settingsItem = storage.defineItem<Settings>('local:settings', {
@@ -143,6 +145,19 @@ export const encryptionStatusItem = storage.defineItem<EncryptionStatus>('local:
   fallback: { state: 'off' },
 });
 
+/**
+ * Tags of this browser's bookmarks by shared record ID, as last merged with
+ * tags.json in Drive (see services/tags-service.ts). `pending`: tags set on
+ * bookmarks that have no shared ID yet (not synced), by local ID.
+ */
+export interface TagsStore {
+  items: TagMap;
+  pending: Record<string, TagEntry>;
+  /** Drive version of tags.json after the last merge. */
+  version?: string;
+}
+export const tagsItem = storage.defineItem<TagsStore>('local:tags', { fallback: { items: {}, pending: {} } });
+
 /** What AI sorting in this browser spent this month (see core/budget.ts). */
 export const aiSpendItem = storage.defineItem<Spend>('local:aiSpend');
 /** Last known spending and limit of the OpenRouter key, shown in the popup. */
@@ -173,6 +188,8 @@ export interface SortLogEntry {
   undoneAt?: number;
   /** What the model found out about the site. */
   site?: SiteInfo;
+  /** Topic tags the model proposed (given to the bookmark if it had none). */
+  tags?: string[];
   /** Web pages the model used (http/https only). */
   sources?: { url: string; title?: string }[];
   /** OpenRouter's reported cost of the request, in USD (other providers report none). */
@@ -310,6 +327,8 @@ export async function resetAccountState(): Promise<void> {
   await encryptionKeyItem.removeValue();
   await encryptionStatusItem.setValue({ state: 'off' });
   await snapshotMetaItem.setValue({});
+  // Tags belong to the account's bookmarks.
+  await tagsItem.setValue({ items: {}, pending: {} });
 }
 
 let statusWrites: Promise<unknown> = Promise.resolve();

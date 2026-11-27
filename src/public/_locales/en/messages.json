@@ -1055,7 +1055,7 @@
     "message": "Showing {1} of {2}. Add a word to narrow it down."
   },
   "findHint": {
-    "message": "Enter opens in a new tab · Shift+Enter here · Ctrl+Enter in the background"
+    "message": "Enter opens in a new tab · Shift+Enter here · Ctrl+Enter in the background · #tag filters by tag"
   },
   "aiBulkHeading": {
     "message": "Sort a whole folder"
@@ -1557,5 +1557,20 @@
   },
   "historyFindOpen": {
     "message": "Compare this backup"
+  },
+  "tagsBarLabel": {
+    "message": "Most used tags"
+  },
+  "tagsPlaceholder": {
+    "message": "recipe, italian, quick"
+  },
+  "tagsEditLabel": {
+    "message": "Tags of {1}"
+  },
+  "tagsEdit": {
+    "message": "Edit tags"
+  },
+  "tagsAdd": {
+    "message": "+ Tag"
   }
 }

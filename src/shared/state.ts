@@ -4,6 +4,7 @@ import { AI_PROVIDERS, ENDPOINT_MODEL, parseEndpoint, type AiProvider } from '..
 import type { Spend } from '../core/budget';
 import type { TagEntry, TagMap } from '../core/tags';
 import type { TidyProposal } from '../core/tidy';
+import type { DigestFrequency, DigestPick } from '../core/digest';
 import type { LinkReason, Snapshot } from '../core/links';
 import type { KeyUsage, ModelInfo } from '../core/openrouter-data';
 import type { LocalState } from '../sync/engine';
@@ -36,6 +37,8 @@ export interface Settings {
   aiResearch: boolean;
   /** Monthly cap in USD for AI sorting in this browser; 0 = no cap. */
   aiMonthlyBudget: number;
+  /** "Rediscover" in the popup: forgotten bookmarks, once a day or a week; off by default. */
+  digestFrequency: DigestFrequency;
 }
 
 /** Strong at research and judgement; any OpenRouter model ID can be entered in Settings. */
@@ -64,6 +67,7 @@ export const DEFAULT_SETTINGS: Settings = {
   aiAllowNewFolders: false,
   aiResearch: true,
   aiMonthlyBudget: 0,
+  digestFrequency: 'off',
 };
 
 export type ErrorCode = 'auth' | 'mass-delete' | 'config' | 'network' | 'locked' | 'unknown';
@@ -277,6 +281,21 @@ export const aiTidyItem = storage.defineItem<TidyJob>('local:aiTidy');
 /** The current (or last) bulk sorting run; written only by the background script. */
 export const aiBulkItem = storage.defineItem<BulkJob>('local:aiBulk');
 
+/** The current "Rediscover" digest of this browser (services/digest-service.ts). */
+export interface DigestState {
+  createdAt?: number;
+  picks: DigestPick[];
+  /** What the user did with each pick of the current digest. */
+  done: Record<string, 'opened' | 'kept' | 'archived' | 'deleted'>;
+  /** Bookmarks the user chose to keep, and when (they skip a few months of digests). */
+  kept: Record<string, number>;
+  /** Bookmarks opened from Marksync, and when (Firefox has no "last used" date). */
+  opened: Record<string, number>;
+}
+export const digestItem = storage.defineItem<DigestState>('local:digest', {
+  fallback: { picks: [], done: {}, kept: {}, opened: {} },
+});
+
 /** Newest first; written only by the background script. */
 export const sortLogItem = storage.defineItem<SortLogEntry[]>('local:sortLog', { fallback: [] });
 export const SORT_LOG_MAX = 500;
@@ -353,6 +372,7 @@ export async function getSettings(): Promise<Settings> {
       typeof s.aiMonthlyBudget === 'number' && Number.isFinite(s.aiMonthlyBudget)
         ? Math.round(Math.min(10_000, Math.max(0, s.aiMonthlyBudget)) * 100) / 100
         : d.aiMonthlyBudget,
+    digestFrequency: s.digestFrequency === 'daily' || s.digestFrequency === 'weekly' ? s.digestFrequency : 'off',
   };
 }
 

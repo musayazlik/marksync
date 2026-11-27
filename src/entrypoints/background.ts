@@ -24,6 +24,7 @@ import { applyBulk, cancelBulk, discardBulk, resumeBulk, startBulk } from '../se
 import { applyTidyProposals, cancelTidy, discardTidy, estimateTidy, resumeTidy, startTidy } from '../services/tidy-service';
 import { compareBackup, restoreFromBackup, searchBackups } from '../services/history-service';
 import { allTags, setTags, tagsByLocalId } from '../services/tags-service';
+import { actOnDigest, getDigest } from '../services/digest-service';
 // Also installs the encryption codec for every Drive client (see drive-store.ts).
 import {
   disableEncryption,
@@ -241,6 +242,11 @@ export default defineBackground(() => {
         return listEndpointModels();
       case 'aiBuiltinStatus':
         return builtinStatus();
+      case 'digestGet':
+        return getDigest();
+      case 'digestAct':
+        if (typeof req.id !== 'string' || !['open', 'keep', 'archive', 'delete'].includes(req.action)) throw new Error('Invalid request.');
+        return actOnDigest(req.id, req.action);
       case 'tagsGet':
         return { byId: await tagsByLocalId(), all: await allTags() };
       case 'tagsSet':
@@ -322,7 +328,7 @@ export default defineBackground(() => {
     'connect', 'disconnect', 'syncNow', 'checkNow', 'resyncFromDrive', 'keepLocal', 'backupNow', 'listBackups',
     'restoreBackup', 'deleteBackup', 'historyCompare', 'historyRestore', 'historySearch', 'listBrowsers', 'removeBrowser', 'importFromBrowser', 'importHtml',
     'exportHtml', 'getRedirectUrl', 'settingsChanged', 'aiListFolders', 'aiTestKey', 'aiSortNow', 'aiUndo',
-    'aiClearLog', 'aiListModels', 'aiUsage', 'aiEndpointModels', 'aiBuiltinStatus', 'tagsGet', 'tagsSet', 'aiBulkStart', 'aiBulkCancel', 'aiBulkApply', 'aiBulkDiscard',
+    'aiClearLog', 'aiListModels', 'aiUsage', 'aiEndpointModels', 'aiBuiltinStatus', 'tagsGet', 'tagsSet', 'digestGet', 'digestAct', 'aiBulkStart', 'aiBulkCancel', 'aiBulkApply', 'aiBulkDiscard',
     'aiTidyEstimate', 'aiTidyStart', 'aiTidyCancel', 'aiTidyApply', 'aiTidyDiscard',
     'dupScan', 'dupRemove', 'linkScan', 'linkStop', 'linkFix', 'linkFixAll',
     'encStatus', 'encEnable', 'encUnlock', 'encLock', 'encDisable', 'encReset',

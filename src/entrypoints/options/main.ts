@@ -126,6 +126,7 @@ const fields = {
   aiAllowNewFolders: 'checkbox',
   aiResearch: 'checkbox',
   aiMonthlyBudget: 'number',
+  digestFrequency: 'text',
 } as const satisfies Partial<Record<keyof Settings, string>>;
 
 async function loadSettings() {

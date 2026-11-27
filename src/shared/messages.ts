@@ -11,6 +11,7 @@ import type { BulkApplyResult } from '../services/bulk-service';
 import type { SortNowResult } from '../services/sorter-service';
 import type { BulkJob, EncryptionStatus, TidyJob } from './state';
 import type { TidyApplyResult, TidyEstimate } from '../services/tidy-service';
+import type { DigestAction, DigestEntry } from '../services/digest-service';
 import type { BuiltinState } from '../platform/builtin-ai';
 import type { ImportMode, ImportResult } from '../sync/importer';
 
@@ -42,6 +43,8 @@ export type Request =
   | { type: 'aiUsage' }
   | { type: 'aiEndpointModels' }
   | { type: 'tagsGet' }
+  | { type: 'digestGet' }
+  | { type: 'digestAct'; id: string; action: DigestAction }
   | { type: 'tagsSet'; id: string; tags: string[] }
   | { type: 'aiBuiltinStatus' }
   | { type: 'aiBulkStart'; folderId: string; research: boolean }
@@ -97,6 +100,8 @@ export interface ResponseData {
   aiEndpointModels: string[];
   tagsGet: { byId: Record<string, string[]>; all: { tag: string; count: number }[] };
   tagsSet: string[];
+  digestGet: DigestEntry[] | null;
+  digestAct: void;
   aiBuiltinStatus: BuiltinState;
   aiBulkStart: BulkJob;
   aiBulkCancel: void;

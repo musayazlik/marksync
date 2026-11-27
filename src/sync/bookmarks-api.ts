@@ -12,6 +12,8 @@ export interface BookmarkNode {
   type?: string;
   /** When the bookmark was created, in milliseconds since the epoch. */
   dateAdded?: number;
+  /** Chrome 114+: when the bookmark was last opened. */
+  dateLastUsed?: number;
   /** Chrome 134+: 'bookmarks-bar' | 'other' | 'mobile' | 'managed'. */
   folderType?: string;
   /**

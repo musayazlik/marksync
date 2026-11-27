@@ -112,6 +112,19 @@ You need a Google Cloud project with the Drive API and an OAuth client of type
   A forgotten passphrase cannot be recovered: *Forgot the passphrase* deletes the encrypted files
   and starts sync over from your bookmarks, which are never touched.
 
+## Free, and staying free
+
+Marksync has no server and no account of its own, and it stays that way:
+
+- Everything is free. AI features run with your own key (OpenRouter), on your own server
+  (Ollama, LM Studio, ...) or on the browser's built-in model, so Marksync never pays for your
+  requests and never sees them.
+- There are no paid tiers or "Pro" features, and no hosted AI proxy: it would need a server and
+  break the promise that your data only goes between your browsers, your Drive and the AI provider
+  you chose.
+- If Marksync is useful to you, a star, a bug report, a translation or a pull request helps the
+  most.
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md). Licence: [MIT](LICENSE).

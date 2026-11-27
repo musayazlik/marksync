@@ -83,6 +83,19 @@ pnpm zip:all              # mağaza paketleri
 
 Ayrıntılar için [README.md](README.md) ve [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
+## Ücretsiz ve ücretsiz kalacak
+
+Marksync'in kendine ait bir sunucusu ya da hesabı yok ve böyle kalacak:
+
+- Her şey ücretsiz. Yapay zekâ özellikleri kendi anahtarınızla (OpenRouter), kendi sunucunuzda
+  (Ollama, LM Studio, ...) ya da tarayıcının yerleşik modeliyle çalışır; Marksync isteklerinizin
+  ücretini ödemez ve onları hiç görmez.
+- Ücretli paket, "Pro" özellik ya da barındırılan bir yapay zekâ aracısı yok: bunlar bir sunucu
+  gerektirir ve verilerinizin yalnızca tarayıcılarınız, Drive'ınız ve seçtiğiniz yapay zekâ
+  sağlayıcısı arasında dolaştığı sözünü bozar.
+- Marksync işinize yarıyorsa en çok bir yıldız, bir hata bildirimi, bir çeviri ya da bir pull
+  request yardımcı olur.
+
 ## Sürümler
 
 Sürümler otomatik çıkar ([CONTRIBUTING.md](CONTRIBUTING.md#releases)). Her sürümün

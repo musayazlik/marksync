@@ -11,6 +11,7 @@ import type { BulkApplyResult } from '../services/bulk-service';
 import type { SortNowResult } from '../services/sorter-service';
 import type { BulkJob, EncryptionStatus, TidyJob } from './state';
 import type { TidyApplyResult, TidyEstimate } from '../services/tidy-service';
+import type { NamingEstimate, NamingOptions } from '../services/naming-service';
 import type { DigestAction, DigestEntry } from '../services/digest-service';
 import type { SemanticStatus } from '../services/semantic-service';
 import type { BuiltinState } from '../platform/builtin-ai';
@@ -58,6 +59,12 @@ export type Request =
   | { type: 'aiBulkCancel' }
   | { type: 'aiBulkApply'; bookmarkIds: string[] }
   | { type: 'aiBulkDiscard' }
+  | { type: 'aiNamingEstimate'; options: NamingOptions }
+  | { type: 'aiNamingStart'; options: NamingOptions }
+  | { type: 'aiNamingCancel' }
+  | { type: 'aiNamingEdit'; id: string; title: string }
+  | { type: 'aiNamingApply'; ids: string[] }
+  | { type: 'aiNamingDiscard' }
   | { type: 'aiTidyEstimate'; scopeId: string }
   | { type: 'aiTidyStart'; scopeId: string }
   | { type: 'aiTidyCancel' }
@@ -120,6 +127,12 @@ export interface ResponseData {
   aiBulkCancel: void;
   aiBulkApply: BulkApplyResult;
   aiBulkDiscard: void;
+  aiNamingEstimate: NamingEstimate;
+  aiNamingStart: TidyJob;
+  aiNamingCancel: void;
+  aiNamingEdit: string;
+  aiNamingApply: TidyApplyResult;
+  aiNamingDiscard: void;
   aiTidyEstimate: TidyEstimate;
   aiTidyStart: TidyJob;
   aiTidyCancel: void;

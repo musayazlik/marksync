@@ -268,8 +268,14 @@ export interface BulkJob {
 /** A "Tidy up the library" run (services/tidy-service.ts). */
 export interface TidyJob {
   id: string;
-  /** Folder to tidy; '' = the whole library. */
+  /** 'naming': "Name bookmarks with AI" (only retitle proposals, titles editable). */
+  mode?: 'tidy' | 'naming';
+  /** Folder to tidy; '' = the whole library. For naming: the first chosen folder. */
   scopeId: string;
+  /** Naming: every chosen folder. */
+  scopeIds?: string[];
+  /** Naming: the model read each page. */
+  research?: boolean;
   scopePath: string;
   model: string;
   provider: AiProvider;
@@ -288,6 +294,8 @@ export interface TidyJob {
   applied?: { done: number; failed: number; backedUp: boolean };
 }
 export const aiTidyItem = storage.defineItem<TidyJob>('local:aiTidy');
+/** The current or last "Name bookmarks with AI" run. */
+export const aiNamingItem = storage.defineItem<TidyJob>('local:aiNaming');
 
 /** The current (or last) bulk sorting run; written only by the background script. */
 export const aiBulkItem = storage.defineItem<BulkJob>('local:aiBulk');

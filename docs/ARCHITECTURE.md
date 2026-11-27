@@ -23,6 +23,7 @@ src/
     history.ts   Version history: backup-vs-now diff, partial restore plan, search in a backup
     tags.ts      Tags: cleaning, newest-edit-wins merge, tags.json validation
     tidy.ts      "Tidy up the library": folder summary, prompts, checking the plan, cost estimate
+    naming.ts    "Name bookmarks with AI": descriptive-title prompts and reply checks
     digest.ts    "Rediscover": picking forgotten bookmarks (seeded, no network)
     semantic.ts  Search by meaning: indexed text, int8 vectors, nearest neighbours
     links.ts     Link checker: which addresses to check, verdicts, Wayback answers
@@ -447,6 +448,20 @@ days (same tag, same AI site category or same site), the rest at random
 can be opened, kept (it skips digests for 180 days), archived (moved to an
 "Archive" folder under Other bookmarks) or deleted. The digest lives in
 `local:digest` in each browser and is not synced.
+
+## Name bookmarks with AI (`services/naming-service.ts`)
+
+Settings → AI sorting → *Name bookmarks with AI*: tick one or more folders
+(optionally with their subfolders, at most 300 bookmarks per run). With web
+research on OpenRouter (and a tool-capable model) the model reads each page
+and answers for one bookmark per request (several at once); otherwise it
+names batches of 25 from titles and addresses. Titles are written in the UI
+language or in each page's own, at most 120 characters. The proposals
+(`local:aiNaming`, the same job format as tidy-up, retitle proposals only)
+show the old title and an editable new one; an edit is saved with the run
+as soon as the box is left, so Settings can be closed meanwhile. *Rename*
+takes a backup, re-checks that each title is unchanged since the proposal,
+and logs each rename as a "Tidied" entry with Undo.
 
 ## Tags
 

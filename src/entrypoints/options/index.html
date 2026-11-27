@@ -471,6 +471,52 @@
             </div>
           </div>
 
+          <!-- Name bookmarks with AI: descriptive, editable titles for the bookmarks in chosen folders. -->
+          <div id="naming" class="panel bulk">
+            <div class="panel-block stack">
+              <div class="stack tight">
+                <h3 data-i18n="namingHeading"></h3>
+                <p class="muted small" data-i18n="namingIntro"></p>
+              </div>
+              <input id="naming-filter" type="search" autocomplete="off" spellcheck="false" data-i18n-placeholder="namingFilterPlaceholder" data-i18n-aria-label="namingFilterPlaceholder" />
+              <ul id="naming-folders" class="naming-folders" data-i18n-aria-label="namingFoldersLabel"></ul>
+              <div class="row wrap naming-options">
+                <label class="tick-label"><input id="naming-sub" type="checkbox" class="tick" checked /><span class="small" data-i18n="namingSubfolders"></span></label>
+                <label class="tick-label" data-provider="openrouter"><input id="naming-research" type="checkbox" class="tick" checked /><span class="small" data-i18n="namingResearch"></span></label>
+                <label class="tick-label"><input id="naming-ui-lang" type="checkbox" class="tick" checked /><span class="small" data-i18n="namingUiLanguage"></span></label>
+              </div>
+              <p id="naming-estimate" class="muted small" role="status"></p>
+              <div class="row wrap">
+                <button id="naming-start" class="primary" data-i18n="namingStart"></button>
+              </div>
+            </div>
+            <div id="naming-run" class="panel-block stack" hidden>
+              <div class="bulk-head">
+                <div class="stack tight">
+                  <strong id="naming-title"></strong>
+                  <span id="naming-meta" class="muted small"></span>
+                </div>
+                <span id="naming-cost" class="pill"></span>
+              </div>
+              <div id="naming-gauge" class="bulk-gauge" role="progressbar" aria-valuemin="0" aria-valuemax="100"><span></span></div>
+              <p id="naming-note" class="notice small" role="status" hidden></p>
+              <div id="naming-toolbar" class="bulk-toolbar" hidden>
+                <label class="tick-label">
+                  <input id="naming-all" type="checkbox" class="tick" />
+                  <span class="small" data-i18n="aiBulkSelectAll"></span>
+                </label>
+                <span class="muted small" data-i18n="namingEditHint"></span>
+              </div>
+              <ul id="naming-list" class="bulk-list"></ul>
+              <div class="row wrap bulk-actions">
+                <button id="naming-apply" class="primary"></button>
+                <button id="naming-stop" data-i18n="aiBulkStop"></button>
+                <button id="naming-discard" class="quiet"></button>
+                <a id="naming-log" class="button" href="./sorter-log.html" data-i18n="aiOpenLog" hidden></a>
+              </div>
+            </div>
+          </div>
+
           <!-- Search by meaning: embeddings of every bookmark, opt-in. -->
           <div id="semantic" class="panel">
             <div class="panel-block stack">

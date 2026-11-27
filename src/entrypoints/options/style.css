@@ -1033,3 +1033,43 @@ input[type='checkbox'].tick:indeterminate::after {
   text-decoration: line-through;
   text-decoration-color: color-mix(in oklab, var(--ink-2) 60%, transparent);
 }
+
+/* Name bookmarks with AI: folder picker and editable titles. */
+.naming-folders {
+  list-style: none;
+  margin: 0;
+  padding: 4px;
+  max-height: 220px;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface);
+}
+
+.naming-folders li {
+  padding: 4px 6px;
+  border-radius: var(--r-sm);
+}
+
+.naming-folders li:hover {
+  background: var(--sunken);
+}
+
+.naming-folders .tick-label {
+  width: 100%;
+}
+
+.naming-options {
+  gap: 8px 18px;
+}
+
+.naming-input {
+  width: 100%;
+  min-width: 0;
+  padding: 5px 8px;
+  font-size: 13px;
+}
+
+.bulk-row .bulk-target:has(.naming-input) {
+  flex: 1 1 260px;
+}

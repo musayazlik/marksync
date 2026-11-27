@@ -91,16 +91,29 @@ export async function deleteBackup(id: string): Promise<void> {
  * is backed up first, so a restore can itself be undone.
  */
 export async function restoreBackup(id: string): Promise<void> {
+  const { records } = await loadBackup(id);
+  await createBackup('before-restore', { protect: id });
+  await restoreRecords(records);
+}
+
+/**
+ * Downloads a backup (decrypted when encryption is on) and returns its
+ * well-formed records only: backups live in Drive too, so they are checked
+ * like the sync file.
+ */
+export async function loadBackup(id: string): Promise<{ records: RecordMap; createdAt: number; source: string }> {
   const drive = driveClient();
   await assertInFolder(drive, id, 'backups');
   const backup = await drive.downloadJson<BackupFile>(id);
   if (typeof backup !== 'object' || backup === null || backup.kind !== 'marksync-backup' || backup.schema !== 1) {
     throw new Error(t('errNotBackup'));
   }
-  // Backups live in Drive too: only well-formed records are restored.
   const { records } = sanitizeRemoteRecords(backup.records, Date.now());
-  await createBackup('before-restore', { protect: id });
-  await restoreRecords(records);
+  return {
+    records,
+    createdAt: typeof backup.createdAt === 'number' ? backup.createdAt : 0,
+    source: typeof backup.source === 'string' ? backup.source.slice(0, 100) : '',
+  };
 }
 
 /** Runs the scheduled backup if it is due. */

@@ -2,6 +2,7 @@ import { browser } from 'wxt/browser';
 import { t } from './i18n';
 import type { KeyUsage, ModelInfo } from '../core/openrouter-data';
 import type { BackupInfo } from '../services/backup-service';
+import type { BackupDiff, BackupHit, PartialRestoreResult } from '../services/history-service';
 import type { DuplicateGroup } from '../core/dedupe';
 import type { RemoveDuplicatesResult } from '../services/dedupe-service';
 import type { BulkLinkResult, LinkAction } from '../services/links-service';
@@ -24,6 +25,9 @@ export type Request =
   | { type: 'listBackups' }
   | { type: 'restoreBackup'; id: string }
   | { type: 'deleteBackup'; id: string }
+  | { type: 'historyCompare'; id: string }
+  | { type: 'historyRestore'; id: string; ids: string[] }
+  | { type: 'historySearch'; query: string }
   | { type: 'listBrowsers' }
   | { type: 'removeBrowser'; fileId: string }
   | { type: 'importFromBrowser'; fileId: string; mode: ImportMode }
@@ -68,6 +72,9 @@ export interface ResponseData {
   listBackups: BackupInfo[];
   restoreBackup: void;
   deleteBackup: void;
+  historyCompare: BackupDiff;
+  historyRestore: PartialRestoreResult;
+  historySearch: BackupHit[];
   listBrowsers: BrowserInfo[];
   removeBrowser: void;
   importFromBrowser: ImportResult;

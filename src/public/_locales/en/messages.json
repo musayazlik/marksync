@@ -213,7 +213,7 @@
     "message": "No backups yet."
   },
   "restoreHelp": {
-    "message": "Restoring replaces the bookmarks in every connected browser. The current bookmarks are backed up first, so you can undo a restore."
+    "message": "Restoring replaces the bookmarks in every connected browser. The current bookmarks are backed up first, so you can undo a restore. To bring back only some bookmarks or folders, open History."
   },
   "backupReasonScheduled": {
     "message": "automatic"
@@ -1401,5 +1401,161 @@
   },
   "aiErrNetworkEndpoint": {
     "message": "The model did not answer: the server is not running, not reachable or too slow."
+  },
+  "historyOpen": {
+    "message": "History"
+  },
+  "historyOpenHint": {
+    "message": "Compare this backup with your bookmarks now and bring back single items"
+  },
+  "historyTitle": {
+    "message": "Version history"
+  },
+  "historyIntro": {
+    "message": "Pick a backup to see what changed since: removed, moved, renamed and added bookmarks, grouped by the folder they were in. Tick what you want back; nothing else changes."
+  },
+  "historyBackupLabel": {
+    "message": "Compare your bookmarks now with the backup from"
+  },
+  "historyFilters": {
+    "message": "Show changes"
+  },
+  "historyFilterAll": {
+    "message": "All"
+  },
+  "historyFilterPlaceholder": {
+    "message": "Filter by title, address or folder"
+  },
+  "historyLoading": {
+    "message": "Comparing with the backup…"
+  },
+  "historyKindRemoved": {
+    "message": "Removed"
+  },
+  "historyKindMoved": {
+    "message": "Moved"
+  },
+  "historyKindRenamed": {
+    "message": "Renamed"
+  },
+  "historyKindAdded": {
+    "message": "Added"
+  },
+  "historyItems_one": {
+    "message": "{1} item"
+  },
+  "historyItems_other": {
+    "message": "{1} items"
+  },
+  "historyChanges_one": {
+    "message": "{1} change"
+  },
+  "historyChanges_other": {
+    "message": "{1} changes"
+  },
+  "historyRestoreSelected_one": {
+    "message": "Bring back 1 item"
+  },
+  "historyRestoreSelected_other": {
+    "message": "Bring back {1} items"
+  },
+  "historyChoose": {
+    "message": "Bring back {1}"
+  },
+  "historyUntitled": {
+    "message": "(untitled)"
+  },
+  "historyInside_one": {
+    "message": "with 1 item inside"
+  },
+  "historyInside_other": {
+    "message": "with {1} items inside"
+  },
+  "historyInsideAdded_one": {
+    "message": "1 item inside"
+  },
+  "historyInsideAdded_other": {
+    "message": "{1} items inside"
+  },
+  "historyNowIn": {
+    "message": "now in {1}"
+  },
+  "historyWasTitle": {
+    "message": "was \"{1}\""
+  },
+  "historyWasUrl": {
+    "message": "was {1}"
+  },
+  "historyAddedHint": {
+    "message": "Added after this backup: there is nothing to bring back."
+  },
+  "historySelectFolder": {
+    "message": "Select all"
+  },
+  "historyNoMatch": {
+    "message": "No change matches the filter."
+  },
+  "historyNoChanges": {
+    "message": "Nothing changed since this backup."
+  },
+  "historyNoBackups": {
+    "message": "There are no backups yet. Make one in Settings, or wait for the scheduled backup."
+  },
+  "historyConfirm": {
+    "message": "Bring back {1} item(s) as they were in the backup from {2}? Your current bookmarks are backed up first; nothing else changes."
+  },
+  "historyDone_one": {
+    "message": "1 item is back and syncs to your other browsers."
+  },
+  "historyDone_other": {
+    "message": "{1} items are back and sync to your other browsers."
+  },
+  "historyDoneFallback": {
+    "message": "Items whose folder no longer exists are in \"{1}\" under Other bookmarks."
+  },
+  "historyFailed_one": {
+    "message": "1 item could not be restored."
+  },
+  "historyFailed_other": {
+    "message": "{1} items could not be restored."
+  },
+  "historyDoneUndo": {
+    "message": "A backup of the bookmarks before this was made."
+  },
+  "historyNoRoot": {
+    "message": "No folder to restore into was found."
+  },
+  "historyRestoredFolder": {
+    "message": "Restored ({1})"
+  },
+  "historyFindHeading": {
+    "message": "Find in backups"
+  },
+  "historyFindIntro": {
+    "message": "Which backup still had a bookmark? Search all backups by title or address."
+  },
+  "historyFindPlaceholder": {
+    "message": "e.g. example.com/recipes"
+  },
+  "historyFindButton": {
+    "message": "Search"
+  },
+  "historyFindShort": {
+    "message": "Type at least two characters."
+  },
+  "historyFinding": {
+    "message": "Searching the backups…"
+  },
+  "historyFound_one": {
+    "message": "Found in 1 backup."
+  },
+  "historyFound_other": {
+    "message": "Found in {1} backups."
+  },
+  "historyFoundNone": {
+    "message": "No backup has a bookmark like that."
+  },
+  "historyFindOpen": {
+    "message": "Compare this backup"
   }
 }

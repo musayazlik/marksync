@@ -190,7 +190,13 @@ async function loadBackups() {
       if (!confirm(t('confirmDeleteBackup'))) return;
       void withBusy(del, () => send({ type: 'deleteBackup', id: b.id }).then(loadBackups), actionError);
     });
-    actions.append(restore, ' ', del);
+    // Compare with now and bring back single items (history.html).
+    const historyLink = document.createElement('a');
+    historyLink.className = 'button';
+    historyLink.href = `./history.html?id=${encodeURIComponent(b.id)}`;
+    historyLink.textContent = t('historyOpen');
+    historyLink.title = t('historyOpenHint');
+    actions.append(historyLink, ' ', restore, ' ', del);
     tr.append(actions);
     tbody.append(tr);
   }

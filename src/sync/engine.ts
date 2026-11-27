@@ -12,7 +12,7 @@ import {
   sanitize,
 } from '../core/records';
 import { optionalClock, sanitizeRemoteRecords } from '../core/validate';
-import { ROOT_KEYS, type IdMapping, type RecordMap, type SyncState } from '../core/types';
+import { ROOT_KEYS, SYNC_SCHEMA, type IdMapping, type RecordMap, type SyncState } from '../core/types';
 import type { BookmarksApi } from './bookmarks-api';
 import { applyRecords, readLocal } from './local-tree';
 
@@ -227,7 +227,7 @@ async function attemptSync(deps: SyncDeps, opts: SyncOptions): Promise<SyncResul
   if (uploaded) {
     remoteVersion = await deps.remote.save(
       {
-        schema: 1,
+        schema: SYNC_SCHEMA,
         records: merged,
         updatedAt: now,
         updatedBy: deps.deviceLabel,

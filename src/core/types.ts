@@ -36,8 +36,14 @@ export interface SyncRecord {
   kind: NodeKind;
   /** A RootKey or the id of another folder record. */
   parentId: string;
-  /** Position among the synced children of the parent, starting at 0. */
+  /** Position among the synced children of the parent, starting at 0 (derived from `pos`). */
   index: number;
+  /**
+   * Fractional position key (schema 2, see core/position.ts): siblings are
+   * ordered by it. Missing in schema 1 files and old backups; sanitize()
+   * assigns keys from `index` then.
+   */
+  pos?: string;
   title: string;
   url?: string;
   /** Clock of the last title or URL change. */
@@ -50,9 +56,16 @@ export interface SyncRecord {
 
 export type RecordMap = Record<string, SyncRecord>;
 
+/**
+ * Version of the sync file format. 2 added the fractional position keys
+ * (`SyncRecord.pos`); versions before 0.7 refuse a file with schema 2 and
+ * ask to update, and 0.7+ reads schema 1 files and writes them back as 2.
+ */
+export const SYNC_SCHEMA = 2;
+
 /** The JSON file stored in Google Drive and shared by all browsers. */
 export interface SyncState {
-  schema: 1;
+  schema: 1 | 2;
   records: RecordMap;
   updatedAt: number;
   /** Label of the browser that wrote the file, e.g. "Brave on Windows". */

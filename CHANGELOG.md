@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.5.0](https://github.com/musayazlik/marksync/compare/v0.4.1...v0.5.0) (2026-11-27)
+
+
+### Features
+
+* **ai:** a monthly spending cap, and the OpenRouter balance and spending in the popup ([e8fb9ff](https://github.com/musayazlik/marksync/commit/e8fb9ff11cef23a2037c5d01d5493ef0014f6c37))
+* **ai:** pick the model from OpenRouter's full list, with search, free and web-research filters and prices ([e8fb9ff](https://github.com/musayazlik/marksync/commit/e8fb9ff11cef23a2037c5d01d5493ef0014f6c37))
+* **ai:** sort a whole existing folder with a review-and-approve preview ([e8fb9ff](https://github.com/musayazlik/marksync/commit/e8fb9ff11cef23a2037c5d01d5493ef0014f6c37))
+* **ai:** sort with your own OpenAI-compatible server or the browser's built-in model ([b547239](https://github.com/musayazlik/marksync/commit/b547239384779a773c473e77591c12abb14b4cad)), closes [#10](https://github.com/musayazlik/marksync/issues/10)
+* **backups:** version history with a diff view and per-item restore ([c61ff41](https://github.com/musayazlik/marksync/commit/c61ff4112c6182d35ea202b1986d7242488ff250)), closes [#8](https://github.com/musayazlik/marksync/issues/8)
+* **popup:** instant search across all bookmarks, including what AI sorting learned about each site ([e8fb9ff](https://github.com/musayazlik/marksync/commit/e8fb9ff11cef23a2037c5d01d5493ef0014f6c37))
+* **sync:** optional end-to-end encryption of everything Marksync keeps in Drive ([e8fb9ff](https://github.com/musayazlik/marksync/commit/e8fb9ff11cef23a2037c5d01d5493ef0014f6c37))
+* **ui:** the account address is masked on screen until clicked ([e8fb9ff](https://github.com/musayazlik/marksync/commit/e8fb9ff11cef23a2037c5d01d5493ef0014f6c37))
+
 ## [0.4.1](https://github.com/musayazlik/marksync/compare/v0.4.0...v0.4.1) (2026-11-25)
 
 

@@ -459,6 +459,39 @@
               </div>
             </div>
           </div>
+
+          <!-- Tidy up the library: folder merges, renames, empty folders, titles; applied only after review. -->
+          <div id="tidy" class="panel bulk">
+            <div class="panel-block stack">
+              <div class="stack tight">
+                <h3 data-i18n="tidyHeading"></h3>
+                <p class="muted small" data-i18n="tidyIntro"></p>
+              </div>
+              <div class="bulk-form">
+                <select id="tidy-scope" data-i18n-aria-label="tidyScopeLabel"></select>
+                <button id="tidy-start" class="primary" data-i18n="tidyStart"></button>
+              </div>
+              <p id="tidy-estimate" class="muted small" role="status"></p>
+            </div>
+            <div id="tidy-run" class="panel-block stack" hidden>
+              <div class="bulk-head">
+                <div class="stack tight">
+                  <strong id="tidy-title"></strong>
+                  <span id="tidy-meta" class="muted small"></span>
+                </div>
+                <span id="tidy-cost" class="pill"></span>
+              </div>
+              <div id="tidy-gauge" class="bulk-gauge" role="progressbar" aria-valuemin="0" aria-valuemax="100"><span></span></div>
+              <p id="tidy-note" class="notice small" role="status" hidden></p>
+              <ul id="tidy-list" class="bulk-list"></ul>
+              <div class="row wrap bulk-actions">
+                <button id="tidy-apply" class="primary"></button>
+                <button id="tidy-stop" data-i18n="aiBulkStop"></button>
+                <button id="tidy-discard" class="quiet"></button>
+                <a id="tidy-log" class="button" href="./sorter-log.html" data-i18n="aiOpenLog" hidden></a>
+              </div>
+            </div>
+          </div>
         </section>
       </main>
     </div>

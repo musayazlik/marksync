@@ -32,6 +32,7 @@ other file there.
 - Link checker: finds bookmarks whose pages are gone or have moved; update a moved bookmark to its new address, or point a dead one to its saved copy in the [Wayback Machine](https://web.archive.org)
 - Optional AI sorting with your own [OpenRouter](https://openrouter.ai) key: pick an inbox folder, and the model (Claude Opus by default) researches each bookmark you add to it, moves it to the folder that fits best and explains what the site is and what it is used for; every decision is listed on a log page with Undo
 - Free, private AI sorting without OpenRouter: point it at your own OpenAI-compatible server (Ollama, LM Studio, vLLM, llama.cpp) or use the browser's built-in on-device model (Chrome 138+, Gemini Nano)
+- Tidy up the whole library with AI: merge folders that mean the same thing, rename unclear ones, clean cryptic titles and drop empty folders, with a cost estimate first, a reviewable plan, a backup and Undo for every change
 - AI extras: pick the model from OpenRouter's full list (search, free / web-research filters, prices), sort a whole existing folder with a review-and-approve preview, a monthly spending cap, and your OpenRouter balance and spending in the popup
 - Instant search across all bookmarks from the popup (title, address, folder and what AI sorting learned about the site; ignores accents)
 - Optional end-to-end encryption: the sync file, backups and browser lists in Drive are encrypted with a passphrase only you know (AES-256-GCM, PBKDF2)

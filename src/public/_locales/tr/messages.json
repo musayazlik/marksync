@@ -1567,5 +1567,158 @@
   },
   "tagsAdd": {
     "message": "+ Etiket"
+  },
+  "tidyHeading": {
+    "message": "Kütüphaneyi toparla"
+  },
+  "tidyIntro": {
+    "message": "Yapay zekâ tüm klasör yapınıza (ya da bir klasöre) bakar; aynı anlama gelen klasörleri birleştirmeyi, belirsiz klasörleri yeniden adlandırmayı ve anlaşılmayan yer imi başlıklarını temizlemeyi önerir; boş klasörler de bulunur. Listeyi inceleyip uygulayana kadar hiçbir şey değişmez. Önce yedek alınır ve her değişiklik kayıt sayfasından geri alınabilir."
+  },
+  "tidyScopeLabel": {
+    "message": "Neyi toparlayalım"
+  },
+  "tidyScopeAll": {
+    "message": "Tüm kütüphane"
+  },
+  "tidyStart": {
+    "message": "Plan çıkar"
+  },
+  "tidyEstimateSize": {
+    "message": "{1} klasör ve {2} yer imi."
+  },
+  "tidyEstimateFree_one": {
+    "message": "1 istek, bu sağlayıcıyla ücretsiz."
+  },
+  "tidyEstimateFree_other": {
+    "message": "{1} istek, bu sağlayıcıyla ücretsiz."
+  },
+  "tidyEstimateUnknown_one": {
+    "message": "1 istek; bu modelin fiyatı bilinmiyor."
+  },
+  "tidyEstimateUnknown_other": {
+    "message": "{1} istek; bu modelin fiyatı bilinmiyor."
+  },
+  "tidyEstimateCost_one": {
+    "message": "1 istek, OpenRouter'da yaklaşık {2}."
+  },
+  "tidyEstimateCost_other": {
+    "message": "{1} istek, OpenRouter'da yaklaşık {2}."
+  },
+  "tidyConfirmStart": {
+    "message": "Yapay zekâdan bir toparlama planı istensin mi? {1} Uygulayana kadar hiçbir şey değişmez."
+  },
+  "tidyPlanningTitle": {
+    "message": "Planlanıyor: {1}"
+  },
+  "tidyReadyTitle": {
+    "message": "{1} için plan"
+  },
+  "tidyDoneTitle": {
+    "message": "Toparlandı: {1}"
+  },
+  "tidyProgress": {
+    "message": "İstek {1} / {2}"
+  },
+  "tidyFound_one": {
+    "message": "1 öneri"
+  },
+  "tidyFound_other": {
+    "message": "{1} öneri"
+  },
+  "tidyFree": {
+    "message": "ücretsiz"
+  },
+  "tidyWaiting": {
+    "message": "Yapay zekâ klasörlerinize ve başlıklarınıza bakıyor…"
+  },
+  "tidyGroupMerge": {
+    "message": "Klasörleri birleştir"
+  },
+  "tidyGroupRename": {
+    "message": "Klasörleri yeniden adlandır"
+  },
+  "tidyGroupRemove": {
+    "message": "Boş klasörleri kaldır"
+  },
+  "tidyGroupRetitle": {
+    "message": "Başlıkları temizle"
+  },
+  "tidyGroupAll": {
+    "message": "Tümünü seç"
+  },
+  "tidyGroupNone": {
+    "message": "Hiçbirini seçme"
+  },
+  "tidyItems_one": {
+    "message": "1 öğe"
+  },
+  "tidyItems_other": {
+    "message": "{1} öğe"
+  },
+  "tidyEmpty": {
+    "message": "boş"
+  },
+  "tidyAriaRetitle": {
+    "message": "{1} yer iminin adını {2} yap"
+  },
+  "tidyAriaMerge": {
+    "message": "{1} klasörünü {2} ile birleştir"
+  },
+  "tidyAriaRename": {
+    "message": "{1} klasörünün adını {2} yap"
+  },
+  "tidyAriaRemove": {
+    "message": "Boş {1} klasörünü kaldır"
+  },
+  "tidyApply_one": {
+    "message": "1 değişikliği uygula"
+  },
+  "tidyApply_other": {
+    "message": "{1} değişikliği uygula"
+  },
+  "tidyConfirmApply": {
+    "message": "{1} değişiklik uygulansın mı? Önce yer imlerinizin yedeği alınır ve her değişiklik kayıt sayfasından geri alınabilir."
+  },
+  "tidyConfirmApplyNoBackup": {
+    "message": "{1} değişiklik uygulansın mı? Google Drive'a bağlı değilsiniz, bu yüzden önce yedek alınmaz; yine de her değişiklik kayıt sayfasından geri alınabilir."
+  },
+  "tidyApplied": {
+    "message": "{1} değişiklik uygulandı, {2} uygulanamadı."
+  },
+  "tidyNothing": {
+    "message": "Yapay zekâ toparlanacak bir şey bulmadı."
+  },
+  "tidyCancelled": {
+    "message": "Durduruldu. Şimdiye kadarki öneriler yine de uygulanabilir."
+  },
+  "tidyInterrupted": {
+    "message": "Tarayıcı planlama sırasında Marksync'i durdurdu. Şimdiye kadarki öneriler yine de uygulanabilir."
+  },
+  "tidyFailures_one": {
+    "message": "1 istek başarısız oldu; önerileri eksik."
+  },
+  "tidyFailures_other": {
+    "message": "{1} istek başarısız oldu; önerileri eksik."
+  },
+  "tidyScopeGone": {
+    "message": "Toparlanacak klasör artık yok."
+  },
+  "tidyNothingChosen": {
+    "message": "Önce uygulanacak değişiklikleri işaretleyin."
+  },
+  "aiStatusTidied": {
+    "message": "Toparlandı"
+  },
+  "tidyLogRetitle": {
+    "message": "Başlık önceden \"{1}\""
+  },
+  "tidyLogRename": {
+    "message": "Klasörün adı \"{1}\" iken \"{2}\" yapıldı"
+  },
+  "tidyLogMerge": {
+    "message": "\"{1}\" klasörü başka bir klasörle birleştirildi"
+  },
+  "tidyLogRemove": {
+    "message": "Boş \"{1}\" klasörü kaldırıldı"
   }
 }

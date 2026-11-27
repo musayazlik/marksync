@@ -21,6 +21,7 @@ src/
     dedupe.ts    Duplicate finder: URL normalization and grouping
     history.ts   Version history: backup-vs-now diff, partial restore plan, search in a backup
     tags.ts      Tags: cleaning, newest-edit-wins merge, tags.json validation
+    tidy.ts      "Tidy up the library": folder summary, prompts, checking the plan, cost estimate
     links.ts     Link checker: which addresses to check, verdicts, Wayback answers
     search.ts    Popup bookmark search (accent-insensitive, ranked, highlight ranges)
     crypto.ts    Passphrase → key (PBKDF2), AES-GCM envelopes, passphrase strength
@@ -29,6 +30,7 @@ src/
     local-tree.ts  Read the local tree (Chromium/Firefox roots) and apply a state to it
     engine.ts      One sync run: load → diff → merge → apply → upload
     sorter.ts      File one inbox bookmark with the model's answer (or only propose it); undo
+    tidy.ts        Apply one approved tidy-up change (re-checked first); undo
     dedupe.ts      Remove the chosen duplicate copies (re-checked first)
   platform/    Browser and Google specifics
     identity.ts    Google sign-in with launchWebAuthFlow
@@ -362,6 +364,32 @@ a rewrite of each file, not a schema change.
   proposals are applied with `applyPlanned`, which checks the bookmark is
   still where it was and reuses folders created in the same batch; each move
   is logged and can be undone.
+
+## Tidy up the library (`services/tidy-service.ts`)
+
+Settings → AI sorting → *Tidy up the library*, for everything or one
+folder. Before the run, an estimate shows the number of requests and, on
+OpenRouter, the expected cost (prompt size / 4 as tokens, times the model's
+price per 1M tokens). The plan has four kinds of proposals:
+
+- **merge** and **rename** folders: one request with the folder list
+  (`f12: path (n bookmarks) e.g. "title", ...`, at most 300 folders). Only
+  offered refs count; top-level folders, the inbox and the scope are never
+  merged or renamed; a folder is never merged into its own subtree; a rename
+  that clashes with a sibling is dropped.
+- **retitle** bookmarks: up to 200 titles in requests of 40; the model lists
+  only titles that are clearly worse (bare addresses, tracking strings,
+  slogans).
+- **remove** empty folders: found without the model (the topmost folder of
+  an empty chain; a separator counts as content).
+
+Proposals are kept in `local:aiTidy`, grouped by kind and all ticked. *Apply*
+takes a `before-cleanup` backup when connected, then applies titles, renames,
+merges and removals in that order with sync on hold, re-checking each item
+first (a title or name changed since the plan is left alone). Every applied
+change is a `tidied` entry in the sorting log with what Undo needs: the old
+title or name, or the folder's parent, position and moved items, so a merged
+or removed folder comes back where it was.
 
 ## Tags
 

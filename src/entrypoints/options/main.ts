@@ -5,6 +5,8 @@ import {
   encryptionStatusItem,
   type EncryptionStatus,
   aiBulkItem,
+  aiTidyItem,
+  type TidyJob,
   aiSpendItem,
   aiUsageItem,
   endpointKeyItem,
@@ -30,6 +32,7 @@ import { formatTokens, formatUsd, searchModels, type ModelFilter, type ModelInfo
 import { $, emblemState, revealOnClick, RELEASES_URL, setEmblem, showToast, statusTone, timeAgo, withBusy } from '../../shared/ui';
 import { detectBrowser } from '../../platform/browser-info';
 import type { BackupInfo } from '../../services/backup-service';
+import type { TidyEstimate } from '../../services/tidy-service';
 import type { ImportMode, ImportResult } from '../../sync/importer';
 
 localizePage();
@@ -512,6 +515,7 @@ async function loadAiFolders() {
     ...aiFolders.map((f) => Object.assign(document.createElement('option'), { value: f.id, textContent: f.path })),
   );
   bulkFolder.value = aiFolders.some((f) => f.id === keep) ? keep : '';
+  fillTidyScopes();
   await renderAiStatus();
 }
 
@@ -532,9 +536,11 @@ async function initAi() {
     loadModels(),
     renderBudget(),
     aiBulkItem.getValue().then((j) => renderBulk(j ?? undefined)),
+    aiTidyItem.getValue().then((j) => renderTidy(j ?? undefined)),
     // Checked even when another provider is chosen, so switching shows the state at once.
     renderBuiltin(),
   ]);
+  void renderTidyEstimate();
 }
 
 aiEnabled.addEventListener('change', () => {
@@ -631,9 +637,13 @@ async function renderBudget() {
 }
 aiSpendItem.watch(() => void renderBudget());
 
+let estimateTimer: ReturnType<typeof setTimeout> | undefined;
 settingsItem.watch((s) => {
   void renderAiStatus();
   void renderBudget();
+  // Provider or model changed: the estimate changes with it.
+  clearTimeout(estimateTimer);
+  estimateTimer = setTimeout(() => void renderTidyEstimate(), 400);
   if (s && (s.aiModel !== currentModel || s.aiResearch !== researchOn)) {
     currentModel = s.aiModel;
     researchOn = s.aiResearch;
@@ -1252,6 +1262,255 @@ $('#bulk-discard').addEventListener('click', () =>
       const pending = job?.proposals.filter(movable).length ?? 0;
       if (job?.state !== 'done' && pending && !confirm(t('aiBulkConfirmDiscard'))) return;
       await send({ type: 'aiBulkDiscard' });
+    },
+    actionError,
+  ),
+);
+
+// ---------- tidy up the library ----------
+
+const tidyScope = $<HTMLSelectElement>('#tidy-scope');
+let tidyJobId = '';
+const tidyChosen = new Set<string>();
+const tidySeen = new Set<string>();
+type TidyItem = TidyJob['proposals'][number];
+const tidyOpen = (p: TidyItem) => !p.appliedAt;
+const TIDY_GROUPS: TidyItem['kind'][] = ['merge', 'rename', 'remove', 'retitle'];
+const tidyGroupKey: Record<TidyItem['kind'], string> = {
+  merge: 'tidyGroupMerge',
+  rename: 'tidyGroupRename',
+  remove: 'tidyGroupRemove',
+  retitle: 'tidyGroupRetitle',
+};
+
+/** The scope picker: the whole library or one folder. */
+function fillTidyScopes() {
+  const keep = tidyScope.value;
+  tidyScope.replaceChildren(
+    Object.assign(document.createElement('option'), { value: '', textContent: t('tidyScopeAll') }),
+    ...aiFolders.map((f) => Object.assign(document.createElement('option'), { value: f.id, textContent: f.path })),
+  );
+  tidyScope.value = aiFolders.some((f) => f.id === keep) ? keep : '';
+}
+
+function estimateText(e: TidyEstimate): string {
+  const size = t('tidyEstimateSize', e.folders, e.bookmarks);
+  if (e.provider !== 'openrouter') return `${size} ${tn('tidyEstimateFree', e.requests)}`;
+  if (e.usd === undefined) return `${size} ${tn('tidyEstimateUnknown', e.requests)}`;
+  return `${size} ${tn('tidyEstimateCost', e.requests, formatUsd(e.usd))}`;
+}
+
+let estimateRun = 0;
+async function renderTidyEstimate(): Promise<TidyEstimate | undefined> {
+  const run = ++estimateRun;
+  const box = $('#tidy-estimate');
+  try {
+    const e = await send({ type: 'aiTidyEstimate', scopeId: tidyScope.value });
+    if (run === estimateRun) {
+      box.textContent = estimateText(e);
+      box.classList.remove('warn-text');
+    }
+    return e;
+  } catch (err) {
+    if (run === estimateRun) {
+      box.textContent = err instanceof Error ? err.message : String(err);
+      box.classList.add('warn-text');
+    }
+    return undefined;
+  }
+}
+
+function tidyRow(p: TidyItem, job: TidyJob): HTMLLIElement {
+  const li = el('li', 'bulk-row');
+  li.dataset.kind = p.appliedAt ? 'applied' : p.applyError ? 'failed' : 'move';
+  const tick = document.createElement('input');
+  tick.type = 'checkbox';
+  tick.className = 'tick';
+  tick.dataset.id = p.id;
+  tick.checked = tidyChosen.has(p.id);
+  tick.disabled = !tidyOpen(p) || job.state !== 'ready';
+  if (!tidyOpen(p)) tick.style.visibility = 'hidden';
+
+  const main = el('div', 'bulk-main');
+  const target = el('div', 'bulk-target');
+  const arrow = (text: string, full = text) => {
+    const path = el('span', 'bulk-path', text);
+    path.title = full;
+    target.append(el('span', 'bulk-arrow', '→'), path);
+  };
+  if (p.kind === 'retitle') {
+    main.append(el('span', 'bulk-title was', p.title || p.url || ''), el('span', 'bulk-sub', shortPath(p.folderPath)));
+    arrow(p.newTitle);
+    tick.setAttribute('aria-label', t('tidyAriaRetitle', p.title, p.newTitle));
+  } else {
+    main.append(el('span', 'bulk-title', shortPath(p.folderPath)));
+    main.lastElementChild!.setAttribute('title', p.folderPath);
+    const sub = [p.applyError, 'reason' in p ? p.reason : undefined].filter(Boolean).join(' · ');
+    if (sub) main.append(el('span', 'bulk-sub', sub));
+    if (p.kind === 'merge') {
+      arrow(shortPath(p.intoPath), p.intoPath);
+      target.append(el('span', 'pill', tn('tidyItems', p.count)));
+      tick.setAttribute('aria-label', t('tidyAriaMerge', p.folderPath, p.intoPath));
+    } else if (p.kind === 'rename') {
+      arrow(p.name);
+      tick.setAttribute('aria-label', t('tidyAriaRename', p.folderPath, p.name));
+    } else {
+      target.append(el('span', 'pill', t('tidyEmpty')));
+      tick.setAttribute('aria-label', t('tidyAriaRemove', p.folderPath));
+    }
+  }
+  if (p.appliedAt) target.append(el('span', 'pill done', '✓'));
+  else if (p.applyError) target.append(el('span', 'pill warn', t('aiStatusError')));
+  li.append(tick, main, target);
+  return li;
+}
+
+function renderTidy(job: TidyJob | undefined) {
+  const run = $('#tidy-run');
+  const start = $<HTMLButtonElement>('#tidy-start');
+  run.hidden = !job;
+  start.disabled = !!job && job.state !== 'done';
+  start.title = start.disabled ? t('aiBulkBusy') : '';
+  if (!job) {
+    tidyJobId = '';
+    return;
+  }
+  if (job.id !== tidyJobId) {
+    tidyJobId = job.id;
+    tidyChosen.clear();
+    tidySeen.clear();
+  }
+  // Everything starts ticked: the list is the review.
+  for (const p of job.proposals) {
+    if (tidySeen.has(p.id)) continue;
+    tidySeen.add(p.id);
+    if (tidyOpen(p)) tidyChosen.add(p.id);
+  }
+  for (const id of [...tidyChosen]) {
+    const p = job.proposals.find((x) => x.id === id);
+    if (!p || !tidyOpen(p)) tidyChosen.delete(id);
+  }
+  const planning = job.state === 'planning';
+  const scope = job.scopePath || t('tidyScopeAll');
+  $('#tidy-title').textContent = t(planning ? 'tidyPlanningTitle' : job.state === 'done' ? 'tidyDoneTitle' : 'tidyReadyTitle', scope);
+  $('#tidy-meta').textContent = planning ? t('tidyProgress', job.step, job.steps) : tn('tidyFound', job.proposals.length);
+  $('#tidy-cost').textContent = job.provider === 'openrouter' ? formatUsd(job.cost) : t('tidyFree');
+  const gauge = $('#tidy-gauge');
+  gauge.hidden = !planning;
+  const pct = job.steps ? Math.round((job.step / job.steps) * 100) : 0;
+  gauge.setAttribute('aria-valuenow', String(pct));
+  gauge.querySelector<HTMLElement>('span')!.style.width = `${pct}%`;
+
+  const note = $('#tidy-note');
+  const noteText =
+    job.state === 'done' && job.applied
+      ? [t('tidyApplied', job.applied.done, job.applied.failed), job.applied.backedUp ? t('dupDoneBackup') : ''].filter(Boolean).join(' ')
+      : job.stopped === 'budget'
+        ? t('aiErrBudget')
+        : job.stopped === 'error'
+          ? t('aiBulkStoppedError', job.stopMessage ?? '')
+          : job.stopped === 'interrupted'
+            ? t('tidyInterrupted')
+            : job.stopped === 'cancelled'
+              ? t('tidyCancelled')
+              : job.state === 'ready' && !job.proposals.length
+                ? t('tidyNothing')
+                : job.failures
+                  ? tn('tidyFailures', job.failures)
+                  : '';
+  note.hidden = !noteText;
+  note.textContent = noteText;
+  note.className = `notice small ${job.state === 'done' ? 'ok' : job.stopped === 'cancelled' || !job.stopped ? '' : 'warn'}`;
+
+  const rows: HTMLLIElement[] = [];
+  for (const kind of TIDY_GROUPS) {
+    const list = job.proposals.filter((p) => p.kind === kind);
+    if (!list.length) continue;
+    const head = el('li', 'tidy-group');
+    head.append(el('span', '', `${t(tidyGroupKey[kind])} · ${list.length.toLocaleString()}`));
+    const open = list.filter(tidyOpen);
+    if (open.length > 1 && job.state === 'ready') {
+      const all = open.every((p) => tidyChosen.has(p.id));
+      const toggle = el('button', 'quiet small-button', t(all ? 'tidyGroupNone' : 'tidyGroupAll'));
+      toggle.type = 'button';
+      toggle.dataset.group = kind;
+      head.append(toggle);
+    }
+    rows.push(head, ...list.map((p) => tidyRow(p, job)));
+  }
+  if (planning) {
+    const waiting = el('li', 'bulk-row waiting');
+    waiting.append(el('span', 'bulk-spinner'), el('span', 'muted small', t('tidyWaiting')));
+    rows.push(waiting);
+  }
+  $('#tidy-list').replaceChildren(...rows);
+
+  const apply = $<HTMLButtonElement>('#tidy-apply');
+  apply.hidden = job.state === 'done';
+  apply.textContent = tn('tidyApply', tidyChosen.size);
+  apply.disabled = job.state !== 'ready' || tidyChosen.size === 0;
+  $('#tidy-stop').hidden = !planning;
+  const discard = $<HTMLButtonElement>('#tidy-discard');
+  discard.hidden = planning || job.state === 'applying';
+  discard.textContent = t(job.state === 'done' ? 'aiBulkClose' : 'aiBulkDiscard');
+  $('#tidy-log').hidden = job.state !== 'done';
+}
+
+aiTidyItem.watch((job) => renderTidy(job ?? undefined));
+tidyScope.addEventListener('change', () => void renderTidyEstimate());
+$('#tidy-list').addEventListener('change', (e) => {
+  const tick = e.target as HTMLInputElement;
+  if (!tick.classList.contains('tick') || !tick.dataset.id) return;
+  if (tick.checked) tidyChosen.add(tick.dataset.id);
+  else tidyChosen.delete(tick.dataset.id);
+  void aiTidyItem.getValue().then((j) => renderTidy(j ?? undefined));
+});
+$('#tidy-list').addEventListener('click', async (e) => {
+  const kind = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-group]')?.dataset.group;
+  if (!kind) return;
+  const job = await aiTidyItem.getValue();
+  if (!job) return;
+  const open = job.proposals.filter((p) => p.kind === kind && tidyOpen(p));
+  const all = open.every((p) => tidyChosen.has(p.id));
+  for (const p of open) {
+    if (all) tidyChosen.delete(p.id);
+    else tidyChosen.add(p.id);
+  }
+  renderTidy(job);
+});
+$('#tidy-start').addEventListener('click', () =>
+  withBusy(
+    $<HTMLButtonElement>('#tidy-start'),
+    async () => {
+      const estimate = await renderTidyEstimate();
+      if (!estimate) throw new Error($('#tidy-estimate').textContent ?? t('aiNotReady'));
+      if (!confirm(t('tidyConfirmStart', estimateText(estimate)))) return;
+      await send({ type: 'aiTidyStart', scopeId: tidyScope.value });
+      $('#tidy-run').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    },
+    actionError,
+  ),
+);
+$('#tidy-stop').addEventListener('click', () => withBusy($<HTMLButtonElement>('#tidy-stop'), () => send({ type: 'aiTidyCancel' }), actionError));
+$('#tidy-apply').addEventListener('click', () =>
+  withBusy(
+    $<HTMLButtonElement>('#tidy-apply'),
+    async () => {
+      if (!tidyChosen.size) return;
+      const connected = (await statusItem.getValue()).connected;
+      if (!confirm(t(connected ? 'tidyConfirmApply' : 'tidyConfirmApplyNoBackup', tidyChosen.size))) return;
+      await send({ type: 'aiTidyApply', ids: [...tidyChosen] });
+    },
+    actionError,
+  ),
+);
+$('#tidy-discard').addEventListener('click', () =>
+  withBusy(
+    $<HTMLButtonElement>('#tidy-discard'),
+    async () => {
+      const job = await aiTidyItem.getValue();
+      if (job?.state !== 'done' && job?.proposals.some(tidyOpen) && !confirm(t('aiBulkConfirmDiscard'))) return;
+      await send({ type: 'aiTidyDiscard' });
     },
     actionError,
   ),

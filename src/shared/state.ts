@@ -3,6 +3,7 @@ import type { SiteInfo } from '../core/ai-sort';
 import { AI_PROVIDERS, ENDPOINT_MODEL, parseEndpoint, type AiProvider } from '../core/ai-provider';
 import type { Spend } from '../core/budget';
 import type { TagEntry, TagMap } from '../core/tags';
+import type { TidyProposal } from '../core/tidy';
 import type { LinkReason, Snapshot } from '../core/links';
 import type { KeyUsage, ModelInfo } from '../core/openrouter-data';
 import type { LocalState } from '../sync/engine';
@@ -171,7 +172,8 @@ export interface SortLogEntry {
   bookmarkId: string;
   title: string;
   url?: string;
-  status: 'moved' | 'created' | 'kept' | 'error';
+  /** 'tidied': a change from "Tidy up the library" (see `tidy`). */
+  status: 'moved' | 'created' | 'kept' | 'error' | 'tidied';
   fromId?: string;
   fromPath?: string;
   toId?: string;
@@ -196,6 +198,22 @@ export interface SortLogEntry {
   cost?: number;
   /** True when the model was allowed to read the page and search the web. */
   researched?: boolean;
+  /** For 'tidied' entries: what changed, and what Undo needs. */
+  tidy?: TidyChange;
+}
+
+/** One applied tidy-up change (sync/tidy.ts). `bookmarkId` of the log entry is the bookmark or folder. */
+export interface TidyChange {
+  action: 'retitle' | 'rename' | 'merge' | 'remove';
+  /** Title or folder name before. */
+  before: string;
+  after?: string;
+  /** Merge and remove: where the folder was, to bring it back. */
+  parentId?: string;
+  index?: number;
+  /** Merge: the items moved into `targetId`. */
+  moved?: string[];
+  targetId?: string;
 }
 
 
@@ -231,6 +249,30 @@ export interface BulkJob {
   stopMessage?: string;
   applied?: { moved: number; failed: number };
 }
+
+/** A "Tidy up the library" run (services/tidy-service.ts). */
+export interface TidyJob {
+  id: string;
+  /** Folder to tidy; '' = the whole library. */
+  scopeId: string;
+  scopePath: string;
+  model: string;
+  provider: AiProvider;
+  state: 'planning' | 'ready' | 'applying' | 'done';
+  /** Model requests done and planned, for the progress bar. */
+  step: number;
+  steps: number;
+  proposals: (TidyProposal & { appliedAt?: number; applyError?: string })[];
+  startedAt: number;
+  /** USD OpenRouter reported for this run. */
+  cost: number;
+  /** Requests that failed (the run goes on without their proposals). */
+  failures?: number;
+  stopped?: 'cancelled' | 'budget' | 'error' | 'interrupted';
+  stopMessage?: string;
+  applied?: { done: number; failed: number; backedUp: boolean };
+}
+export const aiTidyItem = storage.defineItem<TidyJob>('local:aiTidy');
 
 /** The current (or last) bulk sorting run; written only by the background script. */
 export const aiBulkItem = storage.defineItem<BulkJob>('local:aiBulk');

@@ -263,7 +263,7 @@ export function sortReplySchema(folders: FolderOption[], allowNewFolders: boolea
  * otherwise the first "{" from which the text parses (a model that browsed
  * may write a sentence before its answer).
  */
-function extractJson(text: string): Record<string, unknown> {
+export function extractJson(text: string): Record<string, unknown> {
   const fenced = /```(?:json)?\s*([\s\S]*?)```/i.exec(text)?.[1];
   const body = fenced && fenced.includes('{') ? fenced : text;
   const end = body.lastIndexOf('}');

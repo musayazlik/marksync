@@ -205,7 +205,8 @@ main {
 #ai-key,
 #ai-endpoint,
 #ai-endpoint-model,
-#ai-endpoint-key {
+#ai-endpoint-key,
+#sem-model {
   flex: 1 1 220px;
   min-width: 0;
 }

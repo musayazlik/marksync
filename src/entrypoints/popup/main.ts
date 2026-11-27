@@ -529,7 +529,79 @@ async function runSearch() {
   const all = await loadItems();
   if (run !== searchRun) return;
   const { hits, total } = searchBookmarks(all, query, RESULTS_MAX);
-  rows = hits.map(({ item }, i) => {
+  rows = hits.map(({ item }, i) => resultRow(item, i, query));
+  if (rows.length) results.replaceChildren(...rows);
+  else {
+    const empty = document.createElement('li');
+    empty.className = 'results-empty muted small';
+    empty.textContent = t('findNone', query);
+    results.replaceChildren(empty);
+  }
+  $('#results-count').textContent =
+    total > hits.length ? t('findMore', hits.length, total) : total ? tn('findCount', total) : '';
+  $('#meaning').hidden = !meaningAvailable || splitQuery(query).words.length === 0;
+  current = -1;
+  select(0);
+}
+
+/** "Search by meaning" is offered once the index exists (Settings → AI). */
+let meaningAvailable = false;
+void send({ type: 'semReady' })
+  .then((ready) => (meaningAvailable = ready))
+  .catch(() => undefined);
+
+/** Results for what the query means (one embedding request), closest first. */
+async function runMeaningSearch() {
+  const query = find.value.trim();
+  if (!query) return;
+  const run = ++searchRun;
+  const button = $<HTMLButtonElement>('#meaning');
+  button.disabled = true;
+  $('#results-count').textContent = t('semSearching');
+  try {
+    const [all, hits] = await Promise.all([loadItems(), send({ type: 'semSearch', query })]);
+    if (run !== searchRun) return;
+    const byId = new Map(all.map((item) => [item.id, item]));
+    rows = hits.flatMap((h) => {
+      const item = byId.get(h.id);
+      if (!item) return [];
+      const row = resultRow(item, 0, '');
+      // Why it matched: what AI sorting said about the site, else the tags.
+      const why = item.about ?? item.tags?.map((x) => `#${x}`).join(' ');
+      if (why) {
+        const line = document.createElement('span');
+        line.className = 'result-why';
+        line.textContent = why;
+        row.querySelector('.result-text')!.insertBefore(line, row.querySelector('.result-tags'));
+      }
+      const score = document.createElement('span');
+      score.className = 'result-score';
+      score.textContent = `${Math.round(h.score * 100)}%`;
+      score.title = t('semScore');
+      row.append(score);
+      return [row];
+    });
+    rows.forEach((r, i) => (r.id = `result-${i}`));
+    if (rows.length) results.replaceChildren(...rows);
+    else {
+      const empty = document.createElement('li');
+      empty.className = 'results-empty muted small';
+      empty.textContent = t('semNone', query);
+      results.replaceChildren(empty);
+    }
+    $('#results-count').textContent = tn('semCount', rows.length);
+    current = -1;
+    select(0);
+  } catch (err) {
+    $('#results-count').textContent = err instanceof Error ? err.message : String(err);
+  } finally {
+    button.disabled = false;
+  }
+}
+$('#meaning').addEventListener('click', () => void runMeaningSearch());
+
+/** One result row: title, site, folder and tags, with the matching parts marked. */
+function resultRow(item: SearchItem, i: number, query: string): HTMLLIElement {
     const li = document.createElement('li');
     li.id = `result-${i}`;
     li.className = 'result';
@@ -569,18 +641,6 @@ async function runSearch() {
     text.append(tags);
     li.append(avatar(item.host), text);
     return li;
-  });
-  if (rows.length) results.replaceChildren(...rows);
-  else {
-    const empty = document.createElement('li');
-    empty.className = 'results-empty muted small';
-    empty.textContent = t('findNone', query);
-    results.replaceChildren(empty);
-  }
-  $('#results-count').textContent =
-    total > hits.length ? t('findMore', hits.length, total) : total ? tn('findCount', total) : '';
-  current = -1;
-  select(0);
 }
 
 find.addEventListener('input', () => {
@@ -591,6 +651,10 @@ find.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
     e.preventDefault();
     select(current + (e.key === 'ArrowDown' ? 1 : -1));
+  } else if (e.key === 'Enter' && e.altKey) {
+    // Alt+Enter: search by meaning.
+    e.preventDefault();
+    if (!$('#meaning').hidden) void runMeaningSearch();
   } else if (e.key === 'Enter') {
     const url = rows[current]?.dataset.url;
     if (!url) return;

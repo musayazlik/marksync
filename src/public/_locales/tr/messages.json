@@ -1792,5 +1792,107 @@
   },
   "digestGone": {
     "message": "Bu yer imi artık yok."
+  },
+  "semHeading": {
+    "message": "Anlamla arama"
+  },
+  "semIntro": {
+    "message": "Kelimeler farklı olsa bile yer imlerini konusuna göre bulun (\"hamur nasıl kabarır\" sorgusu \"Ekmek yapımının temelleri\"ni bulur). Her yer imi bir kez vektöre dönüştürülür; indeks Google Drive üzerinden diğer tarayıcılarınızla paylaşılır ve yalnızca yeni ya da değişen yer imleri yeniden gönderilir."
+  },
+  "semEnabledLabel": {
+    "message": "Popup'ta anlamla arama"
+  },
+  "semPrivacy": {
+    "message": "İndeksi oluşturduğunuzda, eşitlenmiş her yer iminin başlığı, \"?\" işaretinden sonraki kısmı olmadan adresi, yapay zekânın site hakkında bulduğu bilgiler ve etiketleri yukarıda seçilen sağlayıcıya (OpenRouter ya da kendi sunucunuz) gönderilir. Her anlamla aramada sorgu gönderilir."
+  },
+  "semModelLabel": {
+    "message": "Embedding modeli"
+  },
+  "semModelHelpOpenRouter": {
+    "message": "Boş: {1}. OpenRouter'daki herhangi bir embedding modeli kullanılabilir; değiştirmek yeni bir indeks oluşturur."
+  },
+  "semModelHelpCustom": {
+    "message": "Sunucunuzdaki embedding modeli; ör. Ollama'da nomic-embed-text ya da mxbai-embed-large. Değiştirmek yeni bir indeks oluşturur."
+  },
+  "semIndexed": {
+    "message": "{2} yer iminden {1} tanesi {3} ile indekslendi."
+  },
+  "semPendingTokens_one": {
+    "message": "İndekslenecek 1 yer imi (yaklaşık {2} token)."
+  },
+  "semPendingTokens_other": {
+    "message": "İndekslenecek {1} yer imi (yaklaşık {2} token)."
+  },
+  "semPendingFree_one": {
+    "message": "İndekslenecek 1 yer imi, sunucunuzla ücretsiz."
+  },
+  "semPendingFree_other": {
+    "message": "İndekslenecek {1} yer imi, sunucunuzla ücretsiz."
+  },
+  "semPendingCost_one": {
+    "message": "İndekslenecek 1 yer imi, OpenRouter'da yaklaşık {2}."
+  },
+  "semPendingCost_other": {
+    "message": "İndekslenecek {1} yer imi, OpenRouter'da yaklaşık {2}."
+  },
+  "semProgress": {
+    "message": "İndeksleniyor: {1} / {2}…"
+  },
+  "semBuild": {
+    "message": "İndeksi oluştur"
+  },
+  "semUpdate_one": {
+    "message": "1 yeni yer imini indeksle"
+  },
+  "semUpdate_other": {
+    "message": "{1} yeni yer imini indeksle"
+  },
+  "semDelete": {
+    "message": "İndeksi sil"
+  },
+  "semConfirmBuild": {
+    "message": "İndeks oluşturulsun mu? {1}"
+  },
+  "semConfirmDelete": {
+    "message": "İndeks burada ve Google Drive'da silinsin mi? Anlamla arama için yeniden oluşturulması gerekir."
+  },
+  "semNoBuiltin": {
+    "message": "Tarayıcının yerleşik modeli embedding üretemez. Yukarıdan OpenRouter'ı ya da kendi sunucunuzu seçin."
+  },
+  "semNoModel": {
+    "message": "Önce sunucunuzun embedding modelini girin."
+  },
+  "semOff": {
+    "message": "Önce anlamla aramayı açın."
+  },
+  "semDimsChanged": {
+    "message": "Model farklı boyutta bir vektörle yanıt verdi. İndeksi silip yeniden oluşturun."
+  },
+  "semInterrupted": {
+    "message": "Tarayıcı indeksleme sırasında Marksync'i durdurdu. Devam etmek için indeksi güncelleyin."
+  },
+  "semNoIndex": {
+    "message": "Henüz indeks yok. Ayarlar → Yapay zekâ ile düzenleme → Anlamla arama bölümünden oluşturun."
+  },
+  "semSearchButton": {
+    "message": "✨ Anlamla"
+  },
+  "semSearchHint": {
+    "message": "Başka kelimelerle de olsa bu konudaki yer imlerini bulun (Alt+Enter)"
+  },
+  "semSearching": {
+    "message": "Anlamla aranıyor…"
+  },
+  "semScore": {
+    "message": "Anlamca ne kadar yakın"
+  },
+  "semNone": {
+    "message": "\"{1}\" ile anlamca yakın bir şey yok."
+  },
+  "semCount_one": {
+    "message": "Anlamca yakın 1 yer imi"
+  },
+  "semCount_other": {
+    "message": "Anlamca yakın {1} yer imi"
   }
 }

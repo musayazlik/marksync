@@ -24,6 +24,7 @@ src/
     tags.ts      Tags: cleaning, newest-edit-wins merge, tags.json validation
     tidy.ts      "Tidy up the library": folder summary, prompts, checking the plan, cost estimate
     digest.ts    "Rediscover": picking forgotten bookmarks (seeded, no network)
+    semantic.ts  Search by meaning: indexed text, int8 vectors, nearest neighbours
     links.ts     Link checker: which addresses to check, verdicts, Wayback answers
     search.ts    Popup bookmark search (accent-insensitive, ranked, highlight ranges)
     crypto.ts    Passphrase → key (PBKDF2), AES-GCM envelopes, passphrase strength
@@ -412,6 +413,26 @@ first (a title or name changed since the plan is left alone). Every applied
 change is a `tidied` entry in the sorting log with what Undo needs: the old
 title or name, or the folder's parent, position and moved items, so a merged
 or removed folder comes back where it was.
+
+## Search by meaning (`services/semantic-service.ts`)
+
+Opt-in (Settings → AI sorting → *Search by meaning*). *Build the index*
+shows first how many bookmarks it will send and, on OpenRouter, the expected
+cost (`GET /api/v1/embeddings/models` prices). Each synced bookmark is
+indexed by its title, its address without query or fragment, what AI sorting
+found out about the site and its tags; the text goes to `POST /embeddings` of
+the chosen provider (OpenRouter, default model `openai/text-embedding-3-small`,
+or the user's own server, e.g. `nomic-embed-text` on Ollama; the on-device
+model has no embeddings) in batches of 64. Vectors are normalised and stored
+as int8 with a scale (one byte per dimension), keyed by shared record ID
+with a hash of their text, in `local:semanticIndex` and in Drive as
+`semantic-index.json` (encrypted like the other files), so the other
+browsers search without embedding again. An update embeds only bookmarks
+whose text changed; a different model starts a new index.
+
+In the popup, *By meaning* (or Alt+Enter) embeds the query (one request) and
+lists the closest bookmarks (cosine similarity above 0.2) with the AI site
+description or tags as the reason they matched.
 
 ## Rediscover (`services/digest-service.ts`)
 

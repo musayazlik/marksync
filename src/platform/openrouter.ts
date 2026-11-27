@@ -1,6 +1,7 @@
 import { browser } from 'wxt/browser';
 import type { ChatMessage } from '../core/ai-sort';
 import { OPENROUTER_ENDPOINT, parseModelIds, type Endpoint } from '../core/ai-provider';
+import { parseEmbeddings } from '../core/semantic';
 import { parseKeyUsage, parseModels, type KeyUsage, type ModelInfo } from '../core/openrouter-data';
 
 /**
@@ -327,4 +328,42 @@ export async function fetchKeyUsage(apiKey: string): Promise<KeyUsage> {
     }),
   ]);
   return parseKeyUsage(key, credits);
+}
+
+/**
+ * Embeddings of `input` (OpenAI-compatible `POST /embeddings`, on OpenRouter
+ * or the user's endpoint), in input order, with the cost OpenRouter reports.
+ */
+export async function embed(opts: {
+  apiKey?: string;
+  model: string;
+  input: string[];
+  endpoint?: Endpoint;
+}): Promise<{ vectors: number[][]; cost?: number }> {
+  const endpoint = opts.endpoint ?? OPENROUTER_ENDPOINT;
+  return guarded(endpoint.label, async (controller) => {
+    const res = await send(
+      endpoint,
+      '/embeddings',
+      opts.apiKey,
+      { method: 'POST', body: JSON.stringify({ model: opts.model, input: opts.input }) },
+      controller,
+    );
+    const body: unknown = await res.json().catch(() => undefined);
+    try {
+      return parseEmbeddings(body, opts.input.length);
+    } catch (err) {
+      throw new OpenRouterError(err instanceof Error ? err.message : String(err), 'model');
+    }
+  });
+}
+
+/** OpenRouter's embedding models with their price per 1M input tokens, when it says. */
+export async function fetchEmbeddingModels(): Promise<{ id: string; prompt?: number }[]> {
+  const body = (await request('/embeddings/models')) as { data?: { id?: unknown; pricing?: { prompt?: unknown } }[] } | undefined;
+  return (body?.data ?? []).flatMap((m) => {
+    if (typeof m.id !== 'string') return [];
+    const price = Number(m.pricing?.prompt);
+    return [{ id: m.id, ...(Number.isFinite(price) && price >= 0 ? { prompt: price * 1e6 } : {}) }];
+  });
 }

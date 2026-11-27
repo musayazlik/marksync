@@ -12,6 +12,7 @@ import type { SortNowResult } from '../services/sorter-service';
 import type { BulkJob, EncryptionStatus, TidyJob } from './state';
 import type { TidyApplyResult, TidyEstimate } from '../services/tidy-service';
 import type { DigestAction, DigestEntry } from '../services/digest-service';
+import type { SemanticStatus } from '../services/semantic-service';
 import type { BuiltinState } from '../platform/builtin-ai';
 import type { ImportMode, ImportResult } from '../sync/importer';
 
@@ -44,6 +45,12 @@ export type Request =
   | { type: 'aiEndpointModels' }
   | { type: 'tagsGet' }
   | { type: 'digestGet' }
+  | { type: 'semStatus' }
+  | { type: 'semBuild' }
+  | { type: 'semStop' }
+  | { type: 'semDelete' }
+  | { type: 'semSearch'; query: string }
+  | { type: 'semReady' }
   | { type: 'digestAct'; id: string; action: DigestAction }
   | { type: 'tagsSet'; id: string; tags: string[] }
   | { type: 'aiBuiltinStatus' }
@@ -101,6 +108,12 @@ export interface ResponseData {
   tagsGet: { byId: Record<string, string[]>; all: { tag: string; count: number }[] };
   tagsSet: string[];
   digestGet: DigestEntry[] | null;
+  semStatus: SemanticStatus;
+  semBuild: void;
+  semStop: void;
+  semDelete: void;
+  semSearch: { id: string; score: number }[];
+  semReady: boolean;
   digestAct: void;
   aiBuiltinStatus: BuiltinState;
   aiBulkStart: BulkJob;

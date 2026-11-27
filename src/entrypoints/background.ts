@@ -25,6 +25,7 @@ import { applyTidyProposals, cancelTidy, discardTidy, estimateTidy, resumeTidy, 
 import { compareBackup, restoreFromBackup, searchBackups } from '../services/history-service';
 import { allTags, setTags, tagsByLocalId } from '../services/tags-service';
 import { actOnDigest, getDigest } from '../services/digest-service';
+import { buildIndex, deleteIndex, resumeIndex, searchByMeaning, semanticReady, semanticStatus, stopIndex } from '../services/semantic-service';
 // Also installs the encryption codec for every Drive client (see drive-store.ts).
 import {
   disableEncryption,
@@ -129,6 +130,7 @@ export default defineBackground(() => {
   // Every start of the service worker: a bulk sorting run that was cut off carries on.
   void resumeBulk().catch((err) => console.warn('[marksync] bulk sorting could not resume', err));
   void resumeTidy().catch((err) => console.warn('[marksync] tidy-up could not resume', err));
+  void resumeIndex().catch((err) => console.warn('[marksync] indexing could not resume', err));
   browser.runtime.onStartup.addListener(() => {
     void scheduleAlarms();
     void syncAndPublish();
@@ -242,6 +244,18 @@ export default defineBackground(() => {
         return listEndpointModels();
       case 'aiBuiltinStatus':
         return builtinStatus();
+      case 'semStatus':
+        return semanticStatus();
+      case 'semBuild':
+        return buildIndex();
+      case 'semStop':
+        return stopIndex();
+      case 'semDelete':
+        return deleteIndex();
+      case 'semSearch':
+        return searchByMeaning(typeof req.query === 'string' ? req.query : '');
+      case 'semReady':
+        return semanticReady();
       case 'digestGet':
         return getDigest();
       case 'digestAct':
@@ -328,7 +342,7 @@ export default defineBackground(() => {
     'connect', 'disconnect', 'syncNow', 'checkNow', 'resyncFromDrive', 'keepLocal', 'backupNow', 'listBackups',
     'restoreBackup', 'deleteBackup', 'historyCompare', 'historyRestore', 'historySearch', 'listBrowsers', 'removeBrowser', 'importFromBrowser', 'importHtml',
     'exportHtml', 'getRedirectUrl', 'settingsChanged', 'aiListFolders', 'aiTestKey', 'aiSortNow', 'aiUndo',
-    'aiClearLog', 'aiListModels', 'aiUsage', 'aiEndpointModels', 'aiBuiltinStatus', 'tagsGet', 'tagsSet', 'digestGet', 'digestAct', 'aiBulkStart', 'aiBulkCancel', 'aiBulkApply', 'aiBulkDiscard',
+    'aiClearLog', 'aiListModels', 'aiUsage', 'aiEndpointModels', 'aiBuiltinStatus', 'tagsGet', 'tagsSet', 'digestGet', 'digestAct', 'semStatus', 'semBuild', 'semStop', 'semDelete', 'semSearch', 'semReady', 'aiBulkStart', 'aiBulkCancel', 'aiBulkApply', 'aiBulkDiscard',
     'aiTidyEstimate', 'aiTidyStart', 'aiTidyCancel', 'aiTidyApply', 'aiTidyDiscard',
     'dupScan', 'dupRemove', 'linkScan', 'linkStop', 'linkFix', 'linkFixAll',
     'encStatus', 'encEnable', 'encUnlock', 'encLock', 'encDisable', 'encReset',

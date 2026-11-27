@@ -22,6 +22,7 @@ import { removeDuplicates, scanDuplicates } from '../services/dedupe-service';
 import { fixAllLinks, fixLink, markInterruptedScan, startLinkScan, stopLinkScan } from '../services/links-service';
 import { applyBulk, cancelBulk, discardBulk, resumeBulk, startBulk } from '../services/bulk-service';
 import { applyTidyProposals, cancelTidy, discardTidy, estimateTidy, resumeTidy, startTidy } from '../services/tidy-service';
+import { applyNaming, cancelNaming, discardNaming, editNaming, estimateNaming, resumeNaming, startNaming, type NamingOptions } from '../services/naming-service';
 import { compareBackup, restoreFromBackup, searchBackups } from '../services/history-service';
 import { allTags, setTags, tagsByLocalId } from '../services/tags-service';
 import { actOnDigest, getDigest } from '../services/digest-service';
@@ -62,6 +63,12 @@ const EVENT_DEBOUNCE_MS = 1000;
 /** After switching to this browser: check now, and again in case the other browser is still uploading. */
 const FOCUS_CHECKS_MS = [0, 5_000, 15_000];
 
+/** Naming options from a page, checked (folder IDs are strings, at most 200). */
+function namingOptions(o: unknown): NamingOptions {
+  const x = (o ?? {}) as Partial<Record<keyof NamingOptions, unknown>>;
+  const ids = Array.isArray(x.folderIds) ? x.folderIds.filter((id): id is string => typeof id === 'string' && id.length <= 100).slice(0, 200) : [];
+  return { folderIds: ids, subfolders: x.subfolders === true, research: x.research === true, uiLanguage: x.uiLanguage !== false };
+}
 export default defineBackground(() => {
   let debounce: ReturnType<typeof setTimeout> | undefined;
   let browserImporting = false;
@@ -130,6 +137,7 @@ export default defineBackground(() => {
   // Every start of the service worker: a bulk sorting run that was cut off carries on.
   void resumeBulk().catch((err) => console.warn('[marksync] bulk sorting could not resume', err));
   void resumeTidy().catch((err) => console.warn('[marksync] tidy-up could not resume', err));
+  void resumeNaming().catch((err) => console.warn('[marksync] naming could not resume', err));
   void resumeIndex().catch((err) => console.warn('[marksync] indexing could not resume', err));
   browser.runtime.onStartup.addListener(() => {
     void scheduleAlarms();
@@ -278,6 +286,20 @@ export default defineBackground(() => {
       case 'aiBulkApply':
         if (!Array.isArray(req.bookmarkIds) || !req.bookmarkIds.every((id) => typeof id === 'string')) return { moved: 0, failed: 0 };
         return applyBulk(req.bookmarkIds.slice(0, 1000));
+      case 'aiNamingEstimate':
+        return estimateNaming(namingOptions(req.options));
+      case 'aiNamingStart':
+        return startNaming(namingOptions(req.options));
+      case 'aiNamingCancel':
+        return cancelNaming();
+      case 'aiNamingEdit':
+        if (typeof req.id !== 'string' || typeof req.title !== 'string') throw new Error(t('namingInvalid'));
+        return editNaming(req.id, req.title);
+      case 'aiNamingApply':
+        if (!Array.isArray(req.ids) || req.ids.length > 5000 || !req.ids.every((x) => typeof x === 'string')) throw new Error(t('tidyNothingChosen'));
+        return applyNaming(req.ids);
+      case 'aiNamingDiscard':
+        return discardNaming();
       case 'aiTidyEstimate':
         return estimateTidy(typeof req.scopeId === 'string' ? req.scopeId : '');
       case 'aiTidyStart':
@@ -344,6 +366,7 @@ export default defineBackground(() => {
     'exportHtml', 'getRedirectUrl', 'settingsChanged', 'aiListFolders', 'aiTestKey', 'aiSortNow', 'aiUndo',
     'aiClearLog', 'aiListModels', 'aiUsage', 'aiEndpointModels', 'aiBuiltinStatus', 'tagsGet', 'tagsSet', 'digestGet', 'digestAct', 'semStatus', 'semBuild', 'semStop', 'semDelete', 'semSearch', 'semReady', 'aiBulkStart', 'aiBulkCancel', 'aiBulkApply', 'aiBulkDiscard',
     'aiTidyEstimate', 'aiTidyStart', 'aiTidyCancel', 'aiTidyApply', 'aiTidyDiscard',
+    'aiNamingEstimate', 'aiNamingStart', 'aiNamingCancel', 'aiNamingEdit', 'aiNamingApply', 'aiNamingDiscard',
     'dupScan', 'dupRemove', 'linkScan', 'linkStop', 'linkFix', 'linkFixAll',
     'encStatus', 'encEnable', 'encUnlock', 'encLock', 'encDisable', 'encReset',
   ]);

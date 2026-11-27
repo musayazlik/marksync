@@ -39,20 +39,26 @@ const FATAL = new Set(['auth', 'credits', 'permission', 'unavailable']);
 /** Applied in this order: titles and names first, folders disappear last. */
 const ORDER: Record<TidyProposal['kind'], number> = { retitle: 0, rename: 1, merge: 2, remove: 3 };
 
-let writes: Promise<unknown> = Promise.resolve();
-function updateJob(change: (job: TidyJob) => TidyJob | void): Promise<TidyJob | null> {
-  const run = writes
-    .catch(() => undefined)
-    .then(async () => {
-      const job = await aiTidyItem.getValue();
-      if (!job) return null;
-      const next = change(job) ?? job;
-      await aiTidyItem.setValue(next);
-      return next;
-    });
-  writes = run;
-  return run;
+type JobItem = typeof aiTidyItem;
+const queues = new WeakMap<JobItem, Promise<unknown>>();
+
+/** Read-modify-write of a job, one at a time (tidy-up and naming each have their own). */
+export function jobUpdater(item: JobItem) {
+  return (change: (job: TidyJob) => TidyJob | void): Promise<TidyJob | null> => {
+    const run = (queues.get(item) ?? Promise.resolve())
+      .catch(() => undefined)
+      .then(async () => {
+        const job = await item.getValue();
+        if (!job) return null;
+        const next = change(job) ?? job;
+        await item.setValue(next);
+        return next;
+      });
+    queues.set(item, run);
+    return run;
+  };
 }
+const updateJob = jobUpdater(aiTidyItem);
 
 interface Scope {
   tree: SortTreeNode[];
@@ -281,7 +287,7 @@ export async function discardTidy(): Promise<void> {
   const job = await aiTidyItem.getValue();
   if (job?.state === 'applying') throw new Error(t('aiBulkBusy'));
   if (job?.state === 'planning') await cancelTidy();
-  await writes.catch(() => undefined);
+  await queues.get(aiTidyItem)?.catch(() => undefined);
   await aiTidyItem.removeValue();
 }
 
@@ -292,8 +298,14 @@ export interface TidyApplyResult {
 }
 
 /** Carries out the ticked proposals after a backup, and logs each change so it can be undone. */
-export async function applyTidyProposals(ids: string[]): Promise<TidyApplyResult> {
-  const job = await aiTidyItem.getValue();
+export function applyTidyProposals(ids: string[]): Promise<TidyApplyResult> {
+  return applyProposals(aiTidyItem, ids);
+}
+
+/** Applies ticked proposals of a job; edited titles of retitle proposals are already in the job. */
+export async function applyProposals(item: JobItem, ids: string[]): Promise<TidyApplyResult> {
+  const updateJob = jobUpdater(item);
+  const job = await item.getValue();
   if (!job || job.state !== 'ready') throw new Error(t('aiBulkNotReady'));
   const wanted = new Set(ids);
   const chosen = job.proposals.filter((p) => wanted.has(p.id) && !p.appliedAt).sort((a, b) => ORDER[a.kind] - ORDER[b.kind]);

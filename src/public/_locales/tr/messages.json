@@ -1894,5 +1894,92 @@
   },
   "semCount_other": {
     "message": "Anlamca yakın {1} yer imi"
+  },
+  "namingHeading": {
+    "message": "Yer imlerini yapay zekâyla adlandır"
+  },
+  "namingIntro": {
+    "message": "Bir ya da birden çok klasör seçin: yapay zekâ içlerindeki her yer imine bakar (OpenRouter'da web araştırması açıksa her sayfayı okur) ve sitenin ne olduğunu, ne işe yaradığını anlatan anlaşılır bir başlık önerir. Kaydetmeden önce her öneriyi düzenleyebilirsiniz; uygulayana kadar hiçbir şey değişmez. Önce yedek alınır ve her ad değişikliği kayıt sayfasından geri alınabilir."
+  },
+  "namingFilterPlaceholder": {
+    "message": "Klasörleri süz"
+  },
+  "namingFoldersLabel": {
+    "message": "Adlandırılacak klasörler"
+  },
+  "namingSubfolders": {
+    "message": "Alt klasörler de"
+  },
+  "namingResearch": {
+    "message": "Her sayfayı oku (daha yavaş, daha doğru, daha pahalı)"
+  },
+  "namingUiLanguage": {
+    "message": "Başlıkları benim dilimde yaz"
+  },
+  "namingStart": {
+    "message": "Başlık öner"
+  },
+  "namingChooseFolder": {
+    "message": "Önce en az bir klasör işaretleyin."
+  },
+  "namingEmpty": {
+    "message": "Seçilen klasörlerde adlandırılacak yer imi yok."
+  },
+  "namingEstimateSize_one": {
+    "message": "1 yer imi."
+  },
+  "namingEstimateSize_other": {
+    "message": "{1} yer imi."
+  },
+  "namingEstimateResearch": {
+    "message": "Yapay zekâ her sayfayı okur."
+  },
+  "namingConfirmStart": {
+    "message": "Yapay zekâdan yeni başlıklar istensin mi? {1} Uygulayana kadar hiçbir şey değişmez."
+  },
+  "namingPlanningTitle": {
+    "message": "Adlandırılıyor: {1}"
+  },
+  "namingReadyTitle": {
+    "message": "{1} için yeni başlıklar"
+  },
+  "namingDoneTitle": {
+    "message": "Yeniden adlandırıldı: {1}"
+  },
+  "namingFound_one": {
+    "message": "1 yeni başlık"
+  },
+  "namingFound_other": {
+    "message": "{1} yeni başlık"
+  },
+  "namingNothing": {
+    "message": "Yapay zekâ tüm başlıkları zaten anlaşılır buldu."
+  },
+  "namingWaiting": {
+    "message": "Yapay zekâ yer imlerini adlandırıyor…"
+  },
+  "namingWaitingResearch": {
+    "message": "Yapay zekâ sayfaları okuyup adlandırıyor…"
+  },
+  "namingEditHint": {
+    "message": "Değiştirmek için bir başlığa tıklayın; kutudan çıkınca kaydedilir."
+  },
+  "namingEditLabel": {
+    "message": "{1} için yeni başlık"
+  },
+  "namingApply_one": {
+    "message": "1 yer imini yeniden adlandır"
+  },
+  "namingApply_other": {
+    "message": "{1} yer imini yeniden adlandır"
+  },
+  "namingConfirmApply": {
+    "message": "{1} yer imi yeniden adlandırılsın mı? Önce yer imlerinizin yedeği alınır ve her ad değişikliği kayıt sayfasından geri alınabilir."
+  },
+  "namingConfirmApplyNoBackup": {
+    "message": "{1} yer imi yeniden adlandırılsın mı? Google Drive'a bağlı değilsiniz, bu yüzden önce yedek alınmaz; yine de her ad değişikliği kayıt sayfasından geri alınabilir."
+  },
+  "namingInvalid": {
+    "message": "Bir başlık en az 2 karakter olmalı (en fazla 120)."
   }
 }

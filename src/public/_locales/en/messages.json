@@ -1899,5 +1899,92 @@
   },
   "semCount_other": {
     "message": "{1} bookmarks close in meaning"
+  },
+  "namingHeading": {
+    "message": "Name bookmarks with AI"
+  },
+  "namingIntro": {
+    "message": "Choose one or more folders: the AI looks at every bookmark in them (with web research on OpenRouter it reads each page) and proposes a clear title that says what the site is and what it is for. You can edit every proposal before saving; nothing changes until you apply. A backup is made first, and every rename can be undone on the log page."
+  },
+  "namingFilterPlaceholder": {
+    "message": "Filter folders"
+  },
+  "namingFoldersLabel": {
+    "message": "Folders to name"
+  },
+  "namingSubfolders": {
+    "message": "Include subfolders"
+  },
+  "namingResearch": {
+    "message": "Read each page (slower, more accurate, costs more)"
+  },
+  "namingUiLanguage": {
+    "message": "Write the titles in my language"
+  },
+  "namingStart": {
+    "message": "Propose titles"
+  },
+  "namingChooseFolder": {
+    "message": "Tick at least one folder first."
+  },
+  "namingEmpty": {
+    "message": "The chosen folders have no bookmarks to name."
+  },
+  "namingEstimateSize_one": {
+    "message": "1 bookmark."
+  },
+  "namingEstimateSize_other": {
+    "message": "{1} bookmarks."
+  },
+  "namingEstimateResearch": {
+    "message": "The AI reads each page."
+  },
+  "namingConfirmStart": {
+    "message": "Ask the AI for new titles? {1} Nothing changes until you apply them."
+  },
+  "namingPlanningTitle": {
+    "message": "Naming: {1}"
+  },
+  "namingReadyTitle": {
+    "message": "New titles for {1}"
+  },
+  "namingDoneTitle": {
+    "message": "Renamed: {1}"
+  },
+  "namingFound_one": {
+    "message": "1 new title"
+  },
+  "namingFound_other": {
+    "message": "{1} new titles"
+  },
+  "namingNothing": {
+    "message": "The AI found every title clear already."
+  },
+  "namingWaiting": {
+    "message": "The AI is naming the bookmarks…"
+  },
+  "namingWaitingResearch": {
+    "message": "The AI is reading the pages and naming them…"
+  },
+  "namingEditHint": {
+    "message": "Click a title to change it; it is saved as you leave the box."
+  },
+  "namingEditLabel": {
+    "message": "New title for {1}"
+  },
+  "namingApply_one": {
+    "message": "Rename 1 bookmark"
+  },
+  "namingApply_other": {
+    "message": "Rename {1} bookmarks"
+  },
+  "namingConfirmApply": {
+    "message": "Rename {1} bookmark(s)? Your bookmarks are backed up first, and each rename can be undone on the log page."
+  },
+  "namingConfirmApplyNoBackup": {
+    "message": "Rename {1} bookmark(s)? Not connected to Google Drive, so no backup is made first; each rename can still be undone on the log page."
+  },
+  "namingInvalid": {
+    "message": "A title needs at least 2 characters (at most 120)."
   }
 }

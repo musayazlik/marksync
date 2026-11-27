@@ -6,6 +6,7 @@ import {
   type EncryptionStatus,
   aiBulkItem,
   aiTidyItem,
+  aiNamingItem,
   type TidyJob,
   semanticJobItem,
   DEFAULT_EMBEDDING_MODEL,
@@ -35,6 +36,7 @@ import { $, emblemState, revealOnClick, RELEASES_URL, setEmblem, showToast, stat
 import { detectBrowser } from '../../platform/browser-info';
 import type { BackupInfo } from '../../services/backup-service';
 import type { TidyEstimate } from '../../services/tidy-service';
+import type { NamingEstimate } from '../../services/naming-service';
 import type { ImportMode, ImportResult } from '../../sync/importer';
 
 localizePage();
@@ -520,6 +522,7 @@ async function loadAiFolders() {
   );
   bulkFolder.value = aiFolders.some((f) => f.id === keep) ? keep : '';
   fillTidyScopes();
+  fillNamingFolders();
   await renderAiStatus();
 }
 
@@ -541,6 +544,7 @@ async function initAi() {
     renderBudget(),
     aiBulkItem.getValue().then((j) => renderBulk(j ?? undefined)),
     aiTidyItem.getValue().then((j) => renderTidy(j ?? undefined)),
+    aiNamingItem.getValue().then((j) => renderNaming(j ?? undefined)),
     // Checked even when another provider is chosen, so switching shows the state at once.
     renderBuiltin(),
   ]);
@@ -651,6 +655,7 @@ settingsItem.watch((s) => {
   estimateTimer = setTimeout(() => {
     void renderTidyEstimate();
     void renderSemantic();
+    void renderNamingEstimate();
   }, 400);
   if (s && (s.aiModel !== currentModel || s.aiResearch !== researchOn)) {
     currentModel = s.aiModel;
@@ -1519,6 +1524,284 @@ $('#tidy-discard').addEventListener('click', () =>
       const job = await aiTidyItem.getValue();
       if (job?.state !== 'done' && job?.proposals.some(tidyOpen) && !confirm(t('aiBulkConfirmDiscard'))) return;
       await send({ type: 'aiTidyDiscard' });
+    },
+    actionError,
+  ),
+);
+
+// ---------- name bookmarks with AI ----------
+
+const namingChosenFolders = new Set<string>();
+const namingChosen = new Set<string>();
+const namingSeen = new Set<string>();
+let namingJobId = '';
+
+function namingOptions() {
+  return {
+    folderIds: [...namingChosenFolders],
+    subfolders: $<HTMLInputElement>('#naming-sub').checked,
+    research: $<HTMLInputElement>('#naming-research').checked,
+    uiLanguage: $<HTMLInputElement>('#naming-ui-lang').checked,
+  };
+}
+
+/** The folder picker: every folder with a tick box, filtered by the search above it. */
+function fillNamingFolders() {
+  const q = $<HTMLInputElement>('#naming-filter').value.trim().toLocaleLowerCase();
+  for (const id of [...namingChosenFolders]) if (!aiFolders.some((f) => f.id === id)) namingChosenFolders.delete(id);
+  const shown = aiFolders.filter((f) => !q || f.path.toLocaleLowerCase().includes(q)).slice(0, 400);
+  $('#naming-folders').replaceChildren(
+    ...shown.map((f) => {
+      const li = document.createElement('li');
+      const label = el('label', 'tick-label');
+      const box = document.createElement('input');
+      box.type = 'checkbox';
+      box.className = 'tick';
+      box.dataset.id = f.id;
+      box.checked = namingChosenFolders.has(f.id);
+      label.append(box, el('span', 'small', f.path));
+      li.append(label);
+      return li;
+    }),
+  );
+}
+
+let namingEstimateRun = 0;
+let namingEstimateTimer: ReturnType<typeof setTimeout> | undefined;
+async function renderNamingEstimate(): Promise<NamingEstimate | undefined> {
+  const run = ++namingEstimateRun;
+  const box = $('#naming-estimate');
+  if (!namingChosenFolders.size) {
+    box.textContent = t('namingChooseFolder');
+    box.classList.remove('warn-text');
+    return undefined;
+  }
+  try {
+    const e = await send({ type: 'aiNamingEstimate', options: namingOptions() });
+    if (run === namingEstimateRun) {
+      box.textContent = namingEstimateText(e);
+      box.classList.remove('warn-text');
+    }
+    return e;
+  } catch (err) {
+    if (run === namingEstimateRun) {
+      box.textContent = err instanceof Error ? err.message : String(err);
+      box.classList.add('warn-text');
+    }
+    return undefined;
+  }
+}
+const scheduleNamingEstimate = () => {
+  clearTimeout(namingEstimateTimer);
+  namingEstimateTimer = setTimeout(() => void renderNamingEstimate(), 300);
+};
+
+function namingEstimateText(e: NamingEstimate): string {
+  const size = tn('namingEstimateSize', e.bookmarks) + (e.research ? ` ${t('namingEstimateResearch')}` : '');
+  if (e.provider !== 'openrouter') return `${size} ${tn('tidyEstimateFree', e.requests)}`;
+  if (e.usd === undefined) return `${size} ${tn('tidyEstimateUnknown', e.requests)}`;
+  return `${size} ${tn('tidyEstimateCost', e.requests, formatUsd(e.usd))}`;
+}
+
+const namingOpen = (p: TidyItem) => p.kind === 'retitle' && !p.appliedAt;
+
+function namingRow(p: TidyItem, job: TidyJob): HTMLLIElement {
+  const li = el('li', 'bulk-row');
+  li.dataset.kind = p.appliedAt ? 'applied' : p.applyError ? 'failed' : 'move';
+  if (p.kind !== 'retitle') return li;
+  const tick = document.createElement('input');
+  tick.type = 'checkbox';
+  tick.className = 'tick';
+  tick.dataset.id = p.id;
+  tick.checked = namingChosen.has(p.id);
+  tick.disabled = !namingOpen(p) || job.state !== 'ready';
+  tick.setAttribute('aria-label', t('tidyAriaRetitle', p.title, p.newTitle));
+  if (!namingOpen(p)) tick.style.visibility = 'hidden';
+  const main = el('div', 'bulk-main');
+  main.append(el('span', 'bulk-title was', p.title || p.url || ''));
+  let host = '';
+  try {
+    host = new URL(p.url ?? '').hostname.replace(/^www\./, '');
+  } catch {
+    // Not an address: the folder is enough.
+  }
+  main.append(el('span', 'bulk-sub', [host, shortPath(p.folderPath), p.applyError].filter(Boolean).join(' · ')));
+  const target = el('div', 'bulk-target');
+  if (namingOpen(p) && job.state === 'ready') {
+    const input = document.createElement('input');
+    input.className = 'naming-input';
+    input.value = p.newTitle;
+    input.maxLength = 120;
+    input.dataset.id = p.id;
+    input.setAttribute('aria-label', t('namingEditLabel', p.title));
+    target.append(input);
+  } else {
+    target.append(el('span', 'bulk-arrow', '→'), el('span', 'bulk-path', p.newTitle));
+    if (p.appliedAt) target.append(el('span', 'pill done', '✓'));
+    else if (p.applyError) target.append(el('span', 'pill warn', t('aiStatusError')));
+  }
+  li.append(tick, main, target);
+  return li;
+}
+
+function renderNaming(job: TidyJob | undefined) {
+  const run = $('#naming-run');
+  const start = $<HTMLButtonElement>('#naming-start');
+  run.hidden = !job;
+  start.disabled = !!job && job.state !== 'done';
+  start.title = start.disabled ? t('aiBulkBusy') : '';
+  if (!job) {
+    namingJobId = '';
+    return;
+  }
+  if (job.id !== namingJobId) {
+    namingJobId = job.id;
+    namingChosen.clear();
+    namingSeen.clear();
+  }
+  for (const p of job.proposals) {
+    if (namingSeen.has(p.id)) continue;
+    namingSeen.add(p.id);
+    if (namingOpen(p)) namingChosen.add(p.id);
+  }
+  for (const id of [...namingChosen]) {
+    const p = job.proposals.find((x) => x.id === id);
+    if (!p || !namingOpen(p)) namingChosen.delete(id);
+  }
+  const planning = job.state === 'planning';
+  $('#naming-title').textContent = t(planning ? 'namingPlanningTitle' : job.state === 'done' ? 'namingDoneTitle' : 'namingReadyTitle', job.scopePath);
+  $('#naming-meta').textContent = planning ? t('tidyProgress', job.step, job.steps) : tn('namingFound', job.proposals.length);
+  $('#naming-cost').textContent = job.provider === 'openrouter' ? formatUsd(job.cost) : t('tidyFree');
+  const gauge = $('#naming-gauge');
+  gauge.hidden = !planning;
+  const pct = job.steps ? Math.round((job.step / job.steps) * 100) : 0;
+  gauge.setAttribute('aria-valuenow', String(pct));
+  gauge.querySelector<HTMLElement>('span')!.style.width = `${pct}%`;
+  const note = $('#naming-note');
+  const noteText =
+    job.state === 'done' && job.applied
+      ? [t('tidyApplied', job.applied.done, job.applied.failed), job.applied.backedUp ? t('dupDoneBackup') : ''].filter(Boolean).join(' ')
+      : job.stopped === 'budget'
+        ? t('aiErrBudget')
+        : job.stopped === 'error'
+          ? t('aiBulkStoppedError', job.stopMessage ?? '')
+          : job.stopped === 'interrupted'
+            ? t('tidyInterrupted')
+            : job.stopped === 'cancelled'
+              ? t('tidyCancelled')
+              : job.state === 'ready' && !job.proposals.length
+                ? t('namingNothing')
+                : job.failures
+                  ? tn('tidyFailures', job.failures)
+                  : '';
+  note.hidden = !noteText;
+  note.textContent = noteText;
+  note.className = `notice small ${job.state === 'done' ? 'ok' : job.stopped === 'cancelled' || !job.stopped ? '' : 'warn'}`;
+  // Keep what the user is typing: redraw only rows that are not being edited.
+  const editing = document.activeElement instanceof HTMLInputElement && document.activeElement.classList.contains('naming-input') ? document.activeElement : null;
+  const rows = job.proposals.map((p) => (editing && editing.dataset.id === p.id ? editing.closest<HTMLLIElement>('li')! : namingRow(p, job)));
+  if (planning) {
+    const waiting = el('li', 'bulk-row waiting');
+    waiting.append(el('span', 'bulk-spinner'), el('span', 'muted small', t(job.research ? 'namingWaitingResearch' : 'namingWaiting')));
+    rows.push(waiting);
+  }
+  $('#naming-list').replaceChildren(...rows);
+  if (editing) editing.focus();
+  const open = job.proposals.filter(namingOpen);
+  $('#naming-toolbar').hidden = !open.length || job.state !== 'ready';
+  const all = $<HTMLInputElement>('#naming-all');
+  all.checked = open.length > 0 && open.every((p) => namingChosen.has(p.id));
+  all.indeterminate = !all.checked && open.some((p) => namingChosen.has(p.id));
+  const apply = $<HTMLButtonElement>('#naming-apply');
+  apply.hidden = job.state === 'done';
+  apply.textContent = tn('namingApply', namingChosen.size);
+  apply.disabled = job.state !== 'ready' || namingChosen.size === 0;
+  $('#naming-stop').hidden = !planning;
+  const discard = $<HTMLButtonElement>('#naming-discard');
+  discard.hidden = planning || job.state === 'applying';
+  discard.textContent = t(job.state === 'done' ? 'aiBulkClose' : 'aiBulkDiscard');
+  $('#naming-log').hidden = job.state !== 'done';
+}
+
+aiNamingItem.watch((job) => renderNaming(job ?? undefined));
+$('#naming-filter').addEventListener('input', fillNamingFolders);
+$('#naming-folders').addEventListener('change', (e) => {
+  const box = e.target as HTMLInputElement;
+  if (!box.dataset.id) return;
+  if (box.checked) namingChosenFolders.add(box.dataset.id);
+  else namingChosenFolders.delete(box.dataset.id);
+  scheduleNamingEstimate();
+});
+for (const id of ['#naming-sub', '#naming-research', '#naming-ui-lang']) $(id).addEventListener('change', scheduleNamingEstimate);
+$('#naming-list').addEventListener('change', (e) => {
+  const target = e.target as HTMLInputElement;
+  if (!target.dataset.id) return;
+  if (target.classList.contains('tick')) {
+    if (target.checked) namingChosen.add(target.dataset.id);
+    else namingChosen.delete(target.dataset.id);
+    void aiNamingItem.getValue().then((j) => renderNaming(j ?? undefined));
+    return;
+  }
+  if (target.classList.contains('naming-input')) {
+    // Saved with the run, so closing Settings keeps the edit.
+    void send({ type: 'aiNamingEdit', id: target.dataset.id, title: target.value })
+      .then((saved) => (target.value = saved))
+      .catch(showError);
+  }
+});
+$('#naming-list').addEventListener('keydown', (e) => {
+  const target = e.target as HTMLInputElement;
+  if (e.key === 'Enter' && target.classList.contains('naming-input')) target.blur();
+});
+$('#naming-all').addEventListener('change', async () => {
+  const job = await aiNamingItem.getValue();
+  if (!job) return;
+  const on = $<HTMLInputElement>('#naming-all').checked;
+  for (const p of job.proposals.filter(namingOpen)) {
+    if (on) namingChosen.add(p.id);
+    else namingChosen.delete(p.id);
+  }
+  renderNaming(job);
+});
+$('#naming-start').addEventListener('click', () =>
+  withBusy(
+    $<HTMLButtonElement>('#naming-start'),
+    async () => {
+      if (!namingChosenFolders.size) throw new Error(t('namingChooseFolder'));
+      const estimate = await renderNamingEstimate();
+      if (!estimate) throw new Error($('#naming-estimate').textContent ?? t('aiNotReady'));
+      if (!confirm(t('namingConfirmStart', namingEstimateText(estimate)))) return;
+      await send({ type: 'aiNamingStart', options: namingOptions() });
+      $('#naming-run').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    },
+    actionError,
+  ),
+);
+$('#naming-stop').addEventListener('click', () => withBusy($<HTMLButtonElement>('#naming-stop'), () => send({ type: 'aiNamingCancel' }), actionError));
+$('#naming-apply').addEventListener('click', () =>
+  withBusy(
+    $<HTMLButtonElement>('#naming-apply'),
+    async () => {
+      if (!namingChosen.size) return;
+      // An edit still in the box is saved first.
+      const active = document.activeElement;
+      if (active instanceof HTMLInputElement && active.classList.contains('naming-input') && active.dataset.id) {
+        await send({ type: 'aiNamingEdit', id: active.dataset.id, title: active.value });
+      }
+      const connected = (await statusItem.getValue()).connected;
+      if (!confirm(t(connected ? 'namingConfirmApply' : 'namingConfirmApplyNoBackup', namingChosen.size))) return;
+      await send({ type: 'aiNamingApply', ids: [...namingChosen] });
+    },
+    actionError,
+  ),
+);
+$('#naming-discard').addEventListener('click', () =>
+  withBusy(
+    $<HTMLButtonElement>('#naming-discard'),
+    async () => {
+      const job = await aiNamingItem.getValue();
+      if (job?.state !== 'done' && job?.proposals.some(namingOpen) && !confirm(t('aiBulkConfirmDiscard'))) return;
+      await send({ type: 'aiNamingDiscard' });
     },
     actionError,
   ),

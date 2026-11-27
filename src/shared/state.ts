@@ -5,6 +5,7 @@ import type { Spend } from '../core/budget';
 import type { TagEntry, TagMap } from '../core/tags';
 import type { TidyProposal } from '../core/tidy';
 import type { DigestFrequency, DigestPick } from '../core/digest';
+import type { SemanticIndexFile } from '../core/semantic';
 import type { LinkReason, Snapshot } from '../core/links';
 import type { KeyUsage, ModelInfo } from '../core/openrouter-data';
 import type { LocalState } from '../sync/engine';
@@ -39,6 +40,10 @@ export interface Settings {
   aiMonthlyBudget: number;
   /** "Rediscover" in the popup: forgotten bookmarks, once a day or a week; off by default. */
   digestFrequency: DigestFrequency;
+  /** Search by meaning (embeddings, see services/semantic-service.ts); opt-in. */
+  semanticEnabled: boolean;
+  /** Embedding model; empty = the default for the provider. */
+  semanticModel: string;
 }
 
 /** Strong at research and judgement; any OpenRouter model ID can be entered in Settings. */
@@ -68,7 +73,12 @@ export const DEFAULT_SETTINGS: Settings = {
   aiResearch: true,
   aiMonthlyBudget: 0,
   digestFrequency: 'off',
+  semanticEnabled: false,
+  semanticModel: '',
 };
+
+/** On OpenRouter; any embedding model ID (or a model on the user's server) can be set instead. */
+export const DEFAULT_EMBEDDING_MODEL = 'openai/text-embedding-3-small';
 
 export type ErrorCode = 'auth' | 'mass-delete' | 'config' | 'network' | 'locked' | 'unknown';
 
@@ -103,6 +113,7 @@ export interface DriveIds {
   stateFileId?: string;
   encryptionFileId?: string;
   tagsFileId?: string;
+  semanticFileId?: string;
 }
 
 export const settingsItem = storage.defineItem<Settings>('local:settings', {
@@ -281,6 +292,20 @@ export const aiTidyItem = storage.defineItem<TidyJob>('local:aiTidy');
 /** The current (or last) bulk sorting run; written only by the background script. */
 export const aiBulkItem = storage.defineItem<BulkJob>('local:aiBulk');
 
+/** This browser's copy of the semantic index (also in Drive as semantic-index.json). */
+export const semanticIndexItem = storage.defineItem<SemanticIndexFile & { version?: string }>('local:semanticIndex');
+
+/** The current or last indexing run. */
+export interface SemanticJob {
+  state: 'indexing' | 'done' | 'stopped';
+  done: number;
+  total: number;
+  cost: number;
+  startedAt: number;
+  error?: string;
+}
+export const semanticJobItem = storage.defineItem<SemanticJob>('local:semanticJob');
+
 /** The current "Rediscover" digest of this browser (services/digest-service.ts). */
 export interface DigestState {
   createdAt?: number;
@@ -373,6 +398,9 @@ export async function getSettings(): Promise<Settings> {
         ? Math.round(Math.min(10_000, Math.max(0, s.aiMonthlyBudget)) * 100) / 100
         : d.aiMonthlyBudget,
     digestFrequency: s.digestFrequency === 'daily' || s.digestFrequency === 'weekly' ? s.digestFrequency : 'off',
+    semanticEnabled: typeof s.semanticEnabled === 'boolean' ? s.semanticEnabled : d.semanticEnabled,
+    semanticModel:
+      typeof s.semanticModel === 'string' && ENDPOINT_MODEL.test(s.semanticModel.trim()) ? s.semanticModel.trim() : d.semanticModel,
   };
 }
 

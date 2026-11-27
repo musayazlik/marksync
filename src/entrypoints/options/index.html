@@ -471,6 +471,42 @@
             </div>
           </div>
 
+          <!-- Search by meaning: embeddings of every bookmark, opt-in. -->
+          <div id="semantic" class="panel">
+            <div class="panel-block stack">
+              <div class="stack tight">
+                <h3 data-i18n="semHeading"></h3>
+                <p class="muted small" data-i18n="semIntro"></p>
+              </div>
+            </div>
+            <div class="setting">
+              <div class="setting-text">
+                <label for="semanticEnabled" data-i18n="semEnabledLabel"></label>
+                <p class="muted small" data-i18n="semPrivacy"></p>
+              </div>
+              <input id="semanticEnabled" type="checkbox" />
+            </div>
+            <div class="setting stacked">
+              <div class="setting-text">
+                <label for="sem-model" data-i18n="semModelLabel"></label>
+                <p id="sem-model-help" class="muted small"></p>
+              </div>
+              <div class="key-row">
+                <input id="sem-model" autocomplete="off" spellcheck="false" maxlength="200" />
+                <button id="sem-model-save" data-i18n="aiKeySave"></button>
+              </div>
+            </div>
+            <div class="panel-block stack">
+              <p id="sem-status" class="small" role="status"></p>
+              <div id="sem-gauge" class="bulk-gauge" role="progressbar" aria-valuemin="0" aria-valuemax="100" hidden><span></span></div>
+              <div class="row wrap">
+                <button id="sem-build" class="primary"></button>
+                <button id="sem-stop" data-i18n="aiBulkStop" hidden></button>
+                <button id="sem-delete" class="quiet danger" data-i18n="semDelete"></button>
+              </div>
+            </div>
+          </div>
+
           <!-- Tidy up the library: folder merges, renames, empty folders, titles; applied only after review. -->
           <div id="tidy" class="panel bulk">
             <div class="panel-block stack">

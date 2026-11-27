@@ -47,7 +47,10 @@
       <div id="tag-bar" class="tag-bar" role="group" data-i18n-aria-label="tagsBarLabel" hidden></div>
 
       <section id="find-results" class="find-results" hidden>
-        <p id="results-count" class="muted small" role="status"></p>
+        <div class="results-head">
+          <p id="results-count" class="muted small" role="status"></p>
+          <button id="meaning" type="button" class="quiet meaning" data-i18n="semSearchButton" data-i18n-title="semSearchHint" hidden></button>
+        </div>
         <ul id="results" class="results" role="listbox" data-i18n-aria-label="findLabel"></ul>
         <p class="muted small find-hint" data-i18n="findHint"></p>
       </section>

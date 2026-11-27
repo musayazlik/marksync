@@ -1797,5 +1797,107 @@
   },
   "digestGone": {
     "message": "This bookmark is no longer there."
+  },
+  "semHeading": {
+    "message": "Search by meaning"
+  },
+  "semIntro": {
+    "message": "Find bookmarks by what they are about, even when the words differ (\"how to make dough rise\" finds \"Bread baking basics\"). Each bookmark is turned into a vector once; the index is shared with your other browsers through Google Drive, and only new or changed bookmarks are sent again."
+  },
+  "semEnabledLabel": {
+    "message": "Search by meaning in the popup"
+  },
+  "semPrivacy": {
+    "message": "When you build the index, the title, the address without the part after \"?\", what AI sorting found out about the site and the tags of each synced bookmark are sent to the AI provider chosen above (OpenRouter or your own server). Each search by meaning sends the query."
+  },
+  "semModelLabel": {
+    "message": "Embedding model"
+  },
+  "semModelHelpOpenRouter": {
+    "message": "Empty: {1}. Any embedding model on OpenRouter works; changing it builds a new index."
+  },
+  "semModelHelpCustom": {
+    "message": "The embedding model on your server, e.g. nomic-embed-text or mxbai-embed-large on Ollama. Changing it builds a new index."
+  },
+  "semIndexed": {
+    "message": "{1} of {2} bookmarks indexed with {3}."
+  },
+  "semPendingTokens_one": {
+    "message": "1 bookmark to index (about {2} tokens)."
+  },
+  "semPendingTokens_other": {
+    "message": "{1} bookmarks to index (about {2} tokens)."
+  },
+  "semPendingFree_one": {
+    "message": "1 bookmark to index, free with your server."
+  },
+  "semPendingFree_other": {
+    "message": "{1} bookmarks to index, free with your server."
+  },
+  "semPendingCost_one": {
+    "message": "1 bookmark to index, about {2} on OpenRouter."
+  },
+  "semPendingCost_other": {
+    "message": "{1} bookmarks to index, about {2} on OpenRouter."
+  },
+  "semProgress": {
+    "message": "Indexing {1} of {2}…"
+  },
+  "semBuild": {
+    "message": "Build the index"
+  },
+  "semUpdate_one": {
+    "message": "Index 1 new bookmark"
+  },
+  "semUpdate_other": {
+    "message": "Index {1} new bookmarks"
+  },
+  "semDelete": {
+    "message": "Delete the index"
+  },
+  "semConfirmBuild": {
+    "message": "Build the index? {1}"
+  },
+  "semConfirmDelete": {
+    "message": "Delete the index here and in Google Drive? Search by meaning needs it to be built again."
+  },
+  "semNoBuiltin": {
+    "message": "The browser's built-in model cannot make embeddings. Choose OpenRouter or your own server above."
+  },
+  "semNoModel": {
+    "message": "Enter the embedding model of your server first."
+  },
+  "semOff": {
+    "message": "Turn on search by meaning first."
+  },
+  "semDimsChanged": {
+    "message": "The model answered with a different vector size. Delete the index and build it again."
+  },
+  "semInterrupted": {
+    "message": "The browser stopped Marksync while indexing. Update the index to continue."
+  },
+  "semNoIndex": {
+    "message": "There is no index yet. Build it in Settings → AI sorting → Search by meaning."
+  },
+  "semSearchButton": {
+    "message": "✨ By meaning"
+  },
+  "semSearchHint": {
+    "message": "Find bookmarks about this, even with other words (Alt+Enter)"
+  },
+  "semSearching": {
+    "message": "Searching by meaning…"
+  },
+  "semScore": {
+    "message": "How close in meaning"
+  },
+  "semNone": {
+    "message": "Nothing close in meaning to \"{1}\"."
+  },
+  "semCount_one": {
+    "message": "1 bookmark close in meaning"
+  },
+  "semCount_other": {
+    "message": "{1} bookmarks close in meaning"
   }
 }

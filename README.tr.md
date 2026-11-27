@@ -20,6 +20,7 @@ oradadır. Üçüncü taraf bir sunucu yoktur; her şey Google Drive'ınızdaki
 - Aynı yer imleri zaten olan bir tarayıcı bağlandığında kopya oluşmaz
 - Bir eşitleme yer imlerinin çoğunu silecekse durur ve onay ister
 - Google Drive'a otomatik ve elle yedekleme, tek tıkla geri yükleme
+- Anlamla arama: hiçbir kelime eşleşmese bile yer imlerini konusuna göre bulun (isteğe bağlı; OpenRouter'da ya da kendi sunucunuzda embedding, indeks Drive üzerinden paylaşılır)
 - Yeniden keşfet: günde ya da haftada bir, popup unuttuğunuz birkaç yer imini (bazıları son kaydettiklerinizle ilgili) açmanız, tutmanız, arşivlemeniz ya da silmeniz için getirir; varsayılan kapalı, hiçbir şey tarayıcıdan çıkmaz
 - Tarayıcılar arasında eşitlenen etiketler: yapay zekâ önerir, popup'ta düzenlersiniz, popup aramasında `#etiket` ile süzersiniz
 - Sürüm geçmişi: herhangi bir yedeği şimdiki yer imlerinizle karşılaştırın (kaldırılan, taşınan, adı değişen, eklenen; klasöre göre), tek bir yer imini ya da klasörü geri getirin, bir yer imini hâlâ içeren yedeği bulun

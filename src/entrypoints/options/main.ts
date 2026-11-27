@@ -7,6 +7,8 @@ import {
   aiBulkItem,
   aiTidyItem,
   type TidyJob,
+  semanticJobItem,
+  DEFAULT_EMBEDDING_MODEL,
   aiSpendItem,
   aiUsageItem,
   endpointKeyItem,
@@ -127,6 +129,7 @@ const fields = {
   aiResearch: 'checkbox',
   aiMonthlyBudget: 'number',
   digestFrequency: 'text',
+  semanticEnabled: 'checkbox',
 } as const satisfies Partial<Record<keyof Settings, string>>;
 
 async function loadSettings() {
@@ -542,6 +545,7 @@ async function initAi() {
     renderBuiltin(),
   ]);
   void renderTidyEstimate();
+  void renderSemantic();
 }
 
 aiEnabled.addEventListener('change', () => {
@@ -644,7 +648,10 @@ settingsItem.watch((s) => {
   void renderBudget();
   // Provider or model changed: the estimate changes with it.
   clearTimeout(estimateTimer);
-  estimateTimer = setTimeout(() => void renderTidyEstimate(), 400);
+  estimateTimer = setTimeout(() => {
+    void renderTidyEstimate();
+    void renderSemantic();
+  }, 400);
   if (s && (s.aiModel !== currentModel || s.aiResearch !== researchOn)) {
     currentModel = s.aiModel;
     researchOn = s.aiResearch;
@@ -1512,6 +1519,94 @@ $('#tidy-discard').addEventListener('click', () =>
       const job = await aiTidyItem.getValue();
       if (job?.state !== 'done' && job?.proposals.some(tidyOpen) && !confirm(t('aiBulkConfirmDiscard'))) return;
       await send({ type: 'aiTidyDiscard' });
+    },
+    actionError,
+  ),
+);
+
+// ---------- search by meaning ----------
+
+const semModel = $<HTMLInputElement>('#sem-model');
+let semRun = 0;
+
+async function renderSemantic() {
+  const run = ++semRun;
+  const [s, status] = await Promise.all([getSettings(), send({ type: 'semStatus' }).catch((err: unknown) => err as Error)]);
+  if (run !== semRun) return;
+  semModel.placeholder = s.aiProvider === 'openrouter' ? DEFAULT_EMBEDDING_MODEL : 'nomic-embed-text';
+  if (document.activeElement !== semModel) semModel.value = s.semanticModel;
+  $('#sem-model-help').textContent = t(s.aiProvider === 'openrouter' ? 'semModelHelpOpenRouter' : 'semModelHelpCustom', DEFAULT_EMBEDDING_MODEL);
+  const box = $('#sem-status');
+  const build = $<HTMLButtonElement>('#sem-build');
+  if (status instanceof Error) {
+    box.textContent = status.message;
+    box.className = 'small warn-text';
+    build.textContent = t('semBuild');
+    build.disabled = true;
+    return;
+  }
+  const job = status.job;
+  const indexing = job?.state === 'indexing';
+  const parts = [status.model ? t('semIndexed', status.indexed, status.total, status.model) : ''];
+  if (status.problem) parts.push(status.problem);
+  else if (status.pending && !indexing) {
+    parts.push(
+      status.usd === undefined
+        ? tn('semPendingTokens', status.pending, status.tokens.toLocaleString())
+        : status.usd === 0
+          ? tn('semPendingFree', status.pending)
+          : tn('semPendingCost', status.pending, formatUsd(status.usd)),
+    );
+  }
+  if (indexing) parts.push(t('semProgress', job.done, job.total));
+  else if (job?.error) parts.push(job.error);
+  box.textContent = parts.filter(Boolean).join(' ');
+  box.className = `small ${status.problem || job?.error ? 'warn-text' : 'muted'}`;
+  const gauge = $('#sem-gauge');
+  gauge.hidden = !indexing;
+  const pct = job?.total ? Math.round((job.done / job.total) * 100) : 0;
+  gauge.setAttribute('aria-valuenow', String(pct));
+  gauge.querySelector<HTMLElement>('span')!.style.width = `${pct}%`;
+  build.textContent = status.indexed ? tn('semUpdate', status.pending) : t('semBuild');
+  build.disabled = !status.enabled || !!status.problem || !status.pending || indexing;
+  $('#sem-stop').hidden = !indexing;
+  $<HTMLButtonElement>('#sem-delete').disabled = !status.indexed || indexing;
+}
+
+semanticJobItem.watch(() => void renderSemantic());
+$('#sem-model-save').addEventListener('click', () =>
+  withBusy(
+    $<HTMLButtonElement>('#sem-model-save'),
+    async () => {
+      const model = semModel.value.trim();
+      if (model && !ENDPOINT_MODEL.test(model)) throw new Error(t('aiEndpointModelInvalid'));
+      await saveSetting('semanticModel', model);
+      await renderSemantic();
+    },
+    actionError,
+  ),
+);
+$('#sem-build').addEventListener('click', () =>
+  withBusy(
+    $<HTMLButtonElement>('#sem-build'),
+    async () => {
+      const status = await send({ type: 'semStatus' });
+      const cost =
+        status.usd === undefined ? tn('semPendingTokens', status.pending, status.tokens.toLocaleString()) : status.usd === 0 ? tn('semPendingFree', status.pending) : tn('semPendingCost', status.pending, formatUsd(status.usd));
+      if (!confirm(t('semConfirmBuild', cost))) return;
+      await send({ type: 'semBuild' });
+    },
+    actionError,
+  ),
+);
+$('#sem-stop').addEventListener('click', () => withBusy($<HTMLButtonElement>('#sem-stop'), () => send({ type: 'semStop' }), actionError));
+$('#sem-delete').addEventListener('click', () =>
+  withBusy(
+    $<HTMLButtonElement>('#sem-delete'),
+    async () => {
+      if (!confirm(t('semConfirmDelete'))) return;
+      await send({ type: 'semDelete' });
+      await renderSemantic();
     },
     actionError,
   ),

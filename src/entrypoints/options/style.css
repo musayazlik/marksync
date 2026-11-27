@@ -202,7 +202,10 @@ main {
   gap: 8px;
 }
 
-#ai-key {
+#ai-key,
+#ai-endpoint,
+#ai-endpoint-model,
+#ai-endpoint-key {
   flex: 1 1 220px;
   min-width: 0;
 }
@@ -1000,4 +1003,11 @@ input[type='checkbox'].tick:indeterminate::after {
   .setting:has(> input[type='checkbox']) {
     flex-wrap: nowrap;
   }
+}
+
+/* Built-in model download. */
+#ai-builtin-progress {
+  flex: 1 1 200px;
+  height: 8px;
+  accent-color: var(--iris);
 }

@@ -1,14 +1,16 @@
 import { browser } from 'wxt/browser';
 import type { ChatMessage } from '../core/ai-sort';
+import { OPENROUTER_ENDPOINT, parseModelIds, type Endpoint } from '../core/ai-provider';
 import { parseKeyUsage, parseModels, type KeyUsage, type ModelInfo } from '../core/openrouter-data';
 
 /**
- * Minimal OpenRouter client (OpenAI-compatible chat completions).
- * https://openrouter.ai/docs/api-reference/overview
+ * Minimal client for OpenAI-compatible chat completions: OpenRouter
+ * (https://openrouter.ai/docs/api-reference/overview) or an endpoint the user
+ * chose (Ollama, LM Studio, vLLM, ...). OpenRouter-only parts (attribution
+ * headers, server tools, cost, key usage) are used only with OpenRouter.
  */
-const API = 'https://openrouter.ai/api/v1';
 /** Optional host permission, asked for when the user turns AI sorting on. */
-export const OPENROUTER_ORIGIN = 'https://openrouter.ai/*';
+export const OPENROUTER_ORIGIN = OPENROUTER_ENDPOINT.origin;
 /** A model that browses can take a while; give up after this long. */
 const TIMEOUT_MS = 150_000;
 /**
@@ -19,7 +21,16 @@ const TIMEOUT_MS = 150_000;
  */
 const KEEPALIVE_MS = 20_000;
 
-export type OpenRouterErrorCode = 'auth' | 'credits' | 'rate-limit' | 'model' | 'permission' | 'network' | 'unknown';
+export type OpenRouterErrorCode =
+  | 'auth'
+  | 'credits'
+  | 'rate-limit'
+  | 'model'
+  | 'permission'
+  | 'network'
+  /** The on-device model cannot run here, or is not downloaded yet. */
+  | 'unavailable'
+  | 'unknown';
 
 export class OpenRouterError extends Error {
   override name = 'OpenRouterError';
@@ -32,9 +43,9 @@ export class OpenRouterError extends Error {
   }
 }
 
-/** True once the user has allowed requests to openrouter.ai. */
-export function hasOpenRouterPermission(): Promise<boolean> {
-  return browser.permissions.contains({ origins: [OPENROUTER_ORIGIN] });
+/** True once the user has allowed requests to the endpoint (openrouter.ai by default). */
+export function hasOpenRouterPermission(endpoint: Endpoint = OPENROUTER_ENDPOINT): Promise<boolean> {
+  return browser.permissions.contains({ origins: [endpoint.origin] });
 }
 
 function codeFor(status: number): OpenRouterErrorCode {
@@ -45,13 +56,19 @@ function codeFor(status: number): OpenRouterErrorCode {
   return status >= 500 ? 'network' : 'unknown';
 }
 
-async function send(path: string, apiKey: string | undefined, init: RequestInit, controller: AbortController): Promise<Response> {
-  if (!(await hasOpenRouterPermission())) {
-    throw new OpenRouterError('Marksync is not allowed to contact openrouter.ai.', 'permission');
+async function send(
+  endpoint: Endpoint,
+  path: string,
+  apiKey: string | undefined,
+  init: RequestInit,
+  controller: AbortController,
+): Promise<Response> {
+  if (!(await hasOpenRouterPermission(endpoint))) {
+    throw new OpenRouterError(`Marksync is not allowed to contact ${endpoint.label}.`, 'permission');
   }
   let res: Response;
   try {
-    res = await fetch(`${API}${path}`, {
+    res = await fetch(`${endpoint.base}${path}`, {
       ...init,
       signal: controller.signal,
       // No cookies: the API key is the only credential.
@@ -60,50 +77,64 @@ async function send(path: string, apiKey: string | undefined, init: RequestInit,
         ...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {}),
         'Content-Type': 'application/json',
         // App attribution on openrouter.ai (optional headers).
-        'HTTP-Referer': 'https://github.com/musayazlik/marksync',
-        'X-OpenRouter-Title': 'Marksync',
+        ...(endpoint.openRouter
+          ? { 'HTTP-Referer': 'https://github.com/musayazlik/marksync', 'X-OpenRouter-Title': 'Marksync' }
+          : {}),
         ...(init.headers as Record<string, string> | undefined),
       },
     });
   } catch (err) {
-    throw networkError(err);
+    throw networkError(err, endpoint.label);
   }
   if (!res.ok) {
     const body: unknown = await res.json().catch(() => undefined);
-    throw new OpenRouterError(errorMessage(body) ?? `OpenRouter answered ${res.status}.`, codeFor(res.status), res.status);
+    throw new OpenRouterError(errorMessage(body) ?? `${endpoint.label} answered ${res.status}.`, codeFor(res.status), res.status);
   }
   return res;
 }
 
-function networkError(err: unknown): OpenRouterError {
+function networkError(err: unknown, label: string): OpenRouterError {
   if (err instanceof OpenRouterError) return err;
   const aborted = err instanceof DOMException && (err.name === 'AbortError' || err.name === 'TimeoutError');
-  return new OpenRouterError(aborted ? 'OpenRouter did not answer in time.' : 'Could not reach OpenRouter.', 'network');
+  return new OpenRouterError(aborted ? `${label} did not answer in time.` : `Could not reach ${label}.`, 'network');
 }
 
 function errorMessage(body: unknown): string | undefined {
-  const message = (body as { error?: { message?: unknown } } | undefined)?.error?.message;
+  const error = (body as { error?: unknown } | undefined)?.error;
+  // OpenAI and OpenRouter: { error: { message } }; Ollama and some servers: { error: "..." }.
+  const message = typeof error === 'string' ? error : (error as { message?: unknown } | undefined)?.message;
   return typeof message === 'string' && message ? message.slice(0, 300) : undefined;
 }
 
-/** Runs `task` with a timeout and the service-worker keep-alive. */
-async function guarded<T>(task: (controller: AbortController) => Promise<T>): Promise<T> {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+/**
+ * Keeps the service worker alive while `task` runs (see KEEPALIVE_MS). Also
+ * used for the on-device model, which can take a while on a slow machine.
+ */
+export async function keepingAlive<T>(task: () => Promise<T>): Promise<T> {
   const keepAlive = setInterval(() => void browser.runtime.getPlatformInfo().catch(() => undefined), KEEPALIVE_MS);
   try {
-    return await task(controller);
-  } catch (err) {
-    throw networkError(err);
+    return await task();
   } finally {
-    clearTimeout(timer);
     clearInterval(keepAlive);
   }
 }
 
-async function request(path: string, apiKey?: string): Promise<unknown> {
-  return guarded(async (controller) => {
-    const res = await send(path, apiKey, {}, controller);
+/** Runs `task` with a timeout and the service-worker keep-alive. */
+async function guarded<T>(label: string, task: (controller: AbortController) => Promise<T>): Promise<T> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+  try {
+    return await keepingAlive(() => task(controller));
+  } catch (err) {
+    throw networkError(err, label);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function request(path: string, apiKey?: string, endpoint: Endpoint = OPENROUTER_ENDPOINT): Promise<unknown> {
+  return guarded(endpoint.label, async (controller) => {
+    const res = await send(endpoint, path, apiKey, {}, controller);
     return res.json().catch(() => undefined);
   });
 }
@@ -140,6 +171,8 @@ export class CompletionReader {
   private sources = new Map<string, string | undefined>();
   private cost: number | undefined;
 
+  constructor(private readonly label = 'OpenRouter') {}
+
   add(chunk: Chunk): void {
     const error = chunk.error?.message ?? chunk.choices?.[0]?.error?.message;
     if (error) throw new OpenRouterError(error.slice(0, 300), 'model');
@@ -175,7 +208,7 @@ export class CompletionReader {
   }
 
   result(): Completion {
-    if (!this.text.trim()) throw new OpenRouterError('OpenRouter returned an empty answer.', 'model');
+    if (!this.text.trim()) throw new OpenRouterError(`${this.label} returned an empty answer.`, 'model');
     return {
       text: this.text,
       sources: [...this.sources].map(([url, title]) => (title ? { url, title } : { url })),
@@ -185,16 +218,21 @@ export class CompletionReader {
 }
 
 /**
- * Sends a chat completion and returns the reply text. With `research`, the
- * model may read the bookmarked page and search the web through OpenRouter's
- * server tools before it answers.
+ * Sends a chat completion and returns the reply text. With `research` (only on
+ * OpenRouter), the model may read the bookmarked page and search the web
+ * through OpenRouter's server tools before it answers. Other endpoints get
+ * `schema` as structured output when they support it.
  */
 export async function chatCompletion(opts: {
-  apiKey: string;
+  apiKey?: string;
   model: string;
   messages: ChatMessage[];
   research?: boolean;
+  /** JSON schema of the reply, for endpoints other than OpenRouter. */
+  schema?: Record<string, unknown>;
+  endpoint?: Endpoint;
 }): Promise<Completion> {
+  const endpoint = opts.endpoint ?? OPENROUTER_ENDPOINT;
   const body: Record<string, unknown> = {
     model: opts.model,
     messages: opts.messages,
@@ -202,39 +240,63 @@ export async function chatCompletion(opts: {
     max_tokens: 2000,
     stream: true,
   };
-  if (opts.research) {
+  if (endpoint.openRouter && opts.research) {
     body.tools = [
       // Reading a page with OpenRouter's own fetcher is free; pages are trimmed to keep the prompt small.
       { type: 'openrouter:web_fetch', parameters: { engine: 'auto', max_content_tokens: 6000 } },
       { type: 'openrouter:web_search', parameters: { engine: 'auto', max_results: 3, max_total_results: 6 } },
     ];
-  } else {
+  } else if (endpoint.openRouter || !opts.schema) {
     // JSON mode; models without it still get the JSON-only instruction in the prompt.
     body.response_format = { type: 'json_object' };
+  } else {
+    // Ollama, LM Studio, vLLM and llama.cpp turn the schema into a grammar.
+    body.response_format = { type: 'json_schema', json_schema: { name: 'sort_reply', strict: true, schema: opts.schema } };
   }
 
-  return guarded(async (controller) => {
-    const res = await send('/chat/completions', opts.apiKey, { method: 'POST', body: JSON.stringify(body) }, controller);
-    const reader = new CompletionReader();
-    if (!res.body || !(res.headers.get('content-type') ?? '').includes('text/event-stream')) {
-      reader.add((await res.json()) as Chunk);
-      return reader.result();
-    }
-    const stream = res.body.pipeThrough(new TextDecoderStream()).getReader();
-    let buffer = '';
-    for (;;) {
-      const { done, value } = await stream.read();
-      if (done) break;
-      buffer += value;
-      let newline: number;
-      while ((newline = buffer.indexOf('\n')) >= 0) {
-        reader.addLine(buffer.slice(0, newline).replace(/\r$/, ''));
-        buffer = buffer.slice(newline + 1);
+  const run = () =>
+    guarded(endpoint.label, async (controller) => {
+      const res = await send(endpoint, '/chat/completions', opts.apiKey, { method: 'POST', body: JSON.stringify(body) }, controller);
+      const reader = new CompletionReader(endpoint.label);
+      if (!res.body || !(res.headers.get('content-type') ?? '').includes('text/event-stream')) {
+        reader.add((await res.json()) as Chunk);
+        return reader.result();
       }
+      const stream = res.body.pipeThrough(new TextDecoderStream()).getReader();
+      let buffer = '';
+      for (;;) {
+        const { done, value } = await stream.read();
+        if (done) break;
+        buffer += value;
+        let newline: number;
+        while ((newline = buffer.indexOf('\n')) >= 0) {
+          reader.addLine(buffer.slice(0, newline).replace(/\r$/, ''));
+          buffer = buffer.slice(newline + 1);
+        }
+      }
+      if (buffer) reader.addLine(buffer);
+      return reader.result();
+    });
+
+  try {
+    return await run();
+  } catch (err) {
+    // A server that does not know structured output rejects the request: ask
+    // again without it (the prompt still asks for JSON only).
+    if (!endpoint.openRouter && body.response_format && err instanceof OpenRouterError && err.status === 400) {
+      delete body.response_format;
+      return run();
     }
-    if (buffer) reader.addLine(buffer);
-    return reader.result();
-  });
+    throw err;
+  }
+}
+
+/**
+ * The models an OpenAI-compatible endpoint offers (`GET /models`). Also the
+ * "Test" in Settings for such an endpoint: it shows the address and key work.
+ */
+export async function fetchEndpointModels(endpoint: Endpoint, apiKey?: string): Promise<string[]> {
+  return parseModelIds(await request('/models', apiKey, endpoint));
 }
 
 /** Checks an API key without spending credits. Returns the key's label, if any. */

@@ -384,7 +384,7 @@
     "message": "Düzenleme kaydını aç"
   },
   "aiIntro": {
-    "message": "Bir gelen kutusu klasörü seçin. Bu tarayıcıda o klasöre bir yer imi eklediğinizde, OpenRouter üzerindeki bir yapay zekâ modeli klasörleriniz arasından en uygun olanı seçer ve yer imini birkaç saniye sonra oraya taşır."
+    "message": "Bir gelen kutusu klasörü seçin. Bu tarayıcıda o klasöre bir yer imi eklediğinizde, bir yapay zekâ modeli klasörleriniz arasından en uygun olanı seçer ve yer imini birkaç saniye sonra oraya taşır. Model OpenRouter'da, kendi çalıştırdığınız bir sunucuda (Ollama, LM Studio, ...) ya da bu cihazda çalışabilir."
   },
   "aiPrivacy": {
     "message": "Yalnızca bu açıkken: yer iminin başlığı, \"?\" işaretinden sonraki kısmı olmadan adresi ve klasörlerinizin adları OpenRouter'a ve seçtiğiniz modele gönderilir. Web araştırması açıksa OpenRouter bu adresi de açar ve gerekirse web'de arama yapar. Diğer tarayıcılar, orada da açmadığınız sürece hiçbir şey göndermez."
@@ -462,7 +462,7 @@
     "message": "Taşınan {1}, gelen kutusunda kalan {2}, başarısız {3}. Ayrıntılar düzenleme kaydında."
   },
   "aiNotReady": {
-    "message": "Önce yapay zekâ ile düzenlemeyi açın, gelen kutusu klasörünü seçin ve bir API anahtarı kaydedin."
+    "message": "Önce yapay zekâ ile düzenlemeyi açın, gelen kutusu klasörünü seçin ve yapay zekâ sağlayıcısının kurulumunu tamamlayın."
   },
   "aiPermissionMissing": {
     "message": "Marksync'in openrouter.ai ile bağlantı kurma izni yok. İzin vermek için düzenlemeyi kapatıp yeniden açın."
@@ -1258,5 +1258,143 @@
   },
   "errEncryptionFile": {
     "message": "Drive'daki şifreleme ayarları (encryption.json) bozuk."
+  },
+  "aiProviderLabel": {
+    "message": "Yapay zekâ sağlayıcısı"
+  },
+  "aiProviderOpenRouter": {
+    "message": "OpenRouter"
+  },
+  "aiProviderCustom": {
+    "message": "Kendi sunucunuz (OpenAI uyumlu)"
+  },
+  "aiProviderCustomShort": {
+    "message": "kendi sunucunuz"
+  },
+  "aiProviderBuiltin": {
+    "message": "Bu tarayıcının yerleşik yapay zekâsı"
+  },
+  "aiProviderHelpOpenRouter": {
+    "message": "Yüzlerce model, web araştırması; yer imi başına küçük bir ücret. OpenRouter API anahtarı gerekir."
+  },
+  "aiProviderHelpCustom": {
+    "message": "Ücretsiz ve gizli: Ollama, LM Studio, vLLM, llama.cpp ya da OpenAI uyumlu herhangi bir adres. Web araştırması yok."
+  },
+  "aiProviderHelpBuiltin": {
+    "message": "Ücretsiz, çevrimdışı, hiçbir şey bu cihazdan çıkmaz. Chrome küçük bir modeli bir kez indirir. Web araştırması yok ve daha az klasör sunulur."
+  },
+  "aiPrivacyCustom": {
+    "message": "Yalnızca bu açıkken: yer iminin başlığı, \"?\" işaretinden sonraki kısmı olmadan adresi ve klasörlerinizin adları {1} adresine gönderilir. OpenRouter'a hiçbir şey gönderilmez. Diğer tarayıcılar, orada da açmadığınız sürece hiçbir şey göndermez."
+  },
+  "aiPrivacyBuiltin": {
+    "message": "Model bu cihazda çalışır: yer iminin başlığı, adresi ve klasör adlarınız bu bilgisayardan hiç çıkmaz."
+  },
+  "aiEndpointLabel": {
+    "message": "Sunucu adresi"
+  },
+  "aiEndpointHelp": {
+    "message": "OpenAI uyumlu API'nin temel adresi; ör. Ollama için http://localhost:11434/v1, LM Studio için http://localhost:1234/v1. Marksync yalnızca bu adrese bağlanmak için izin ister."
+  },
+  "aiEndpointNone": {
+    "message": "Kayıtlı adres yok."
+  },
+  "aiEndpointSaved": {
+    "message": "Kayıtlı: {1}"
+  },
+  "aiEndpointInsecure": {
+    "message": "Kayıtlı: {1}. Bu adres şifrelenmemiş (http) ve ağınızda değil: internetteki bir sunucu için https kullanın."
+  },
+  "aiEndpointSavedToast": {
+    "message": "Adres kaydedildi. Marksync artık {1} adresine bağlanabilir."
+  },
+  "aiEndpointInvalid": {
+    "message": "Kullanıcı adı, \"?\" ya da \"#\" içermeyen bir http veya https adresi girin; ör. http://localhost:11434/v1."
+  },
+  "aiEndpointTestOk_one": {
+    "message": "Bağlantı kuruldu. Sunucuda {1} model var."
+  },
+  "aiEndpointTestOk_other": {
+    "message": "Bağlantı kuruldu. Sunucuda {1} model var; Model alanından birini seçin."
+  },
+  "aiEndpointTestNoModels": {
+    "message": "Bağlantı kuruldu ama sunucu hiç model listelemedi. Model adını kendiniz girin."
+  },
+  "aiEndpointModelLabel": {
+    "message": "Model"
+  },
+  "aiEndpointModelHelp": {
+    "message": "Modelin sunucudaki adı; ör. llama3.2:3b ya da qwen3:8b. Yukarıdaki \"Test\" sunucudaki modelleri listeler."
+  },
+  "aiEndpointModelInvalid": {
+    "message": "Model adını sunucunun listelediği gibi girin (harf, rakam ve . : / @ + - _)."
+  },
+  "aiEndpointModelSaved": {
+    "message": "Model kaydedildi: {1}"
+  },
+  "aiEndpointKeyLabel": {
+    "message": "API anahtarı (isteğe bağlı)"
+  },
+  "aiEndpointKeyNone": {
+    "message": "Kayıtlı anahtar yok. Yerel sunucular genellikle anahtar istemez."
+  },
+  "aiEndpointKeyHelp": {
+    "message": "Yalnızca yukarıdaki adrese Bearer belirteci olarak gönderilir. Yalnızca bu tarayıcıda saklanır, Google Drive'a hiç yüklenmez."
+  },
+  "aiEndpointKeyRejected": {
+    "message": "Sunucu anahtarı reddetti. Anahtarı kontrol edin ya da sunucu istemiyorsa kaldırın."
+  },
+  "aiBuiltinLabel": {
+    "message": "Cihaz üzerindeki model"
+  },
+  "aiBuiltinHelp": {
+    "message": "Windows, macOS, Linux ya da Chromebook Plus üzerinde Chrome 138 veya üstü; 4 GB'tan fazla belleği olan bir GPU ya da 16 GB RAM ve 4 işlemci çekirdeği; indirme için yaklaşık 22 GB boş disk alanı. Gerekçeler ve site notları İngilizce, İspanyolca, Japonca, Almanca ya da Fransızca yazılır."
+  },
+  "aiBuiltinPrepare": {
+    "message": "Modeli indir"
+  },
+  "aiBuiltinUnsupported": {
+    "message": "Bu tarayıcıda yerleşik bir yapay zekâ modeli yok. Chrome 138 veya üstünü kullanın ya da başka bir sağlayıcı seçin."
+  },
+  "aiBuiltinUnavailable": {
+    "message": "Bu cihaz yerleşik modeli çalıştıramıyor (aşağıdaki gereksinimlere bakın). Başka bir sağlayıcı seçin."
+  },
+  "aiBuiltinDownloadable": {
+    "message": "Model henüz indirilmedi. Bir kez indirin (birkaç GB), sonra çevrimdışı çalışır."
+  },
+  "aiBuiltinDownloading": {
+    "message": "Chrome modeli indiriyor. Bu biraz sürebilir."
+  },
+  "aiBuiltinReady": {
+    "message": "Model bu cihazda hazır."
+  },
+  "aiBuiltinNotReady": {
+    "message": "Önce yerleşik modeli indirin (aşağıda)."
+  },
+  "aiNoEndpoint": {
+    "message": "Önce sunucunuzun adresini kaydedin."
+  },
+  "aiNoEndpointModel": {
+    "message": "Önce sunucunuzdaki modeli seçin."
+  },
+  "aiPermissionMissingHost": {
+    "message": "Marksync'in {1} adresine bağlanma izni yok. İzin vermek için adresi yeniden kaydedin."
+  },
+  "aiPermissionDeniedHost": {
+    "message": "Yapay zekâ ile düzenleme için {1} adresine bağlanma izni gerekiyor."
+  },
+  "aiErrUnavailable": {
+    "message": "Model şu anda çalışamıyor (indirilmemiş ya da bu cihazda desteklenmiyor)."
+  },
+  "aiErrAuthEndpoint": {
+    "message": "Sunucu API anahtarını reddetti."
+  },
+  "aiErrModelEndpoint": {
+    "message": "Model hata verdi ya da isteği reddetti. Ayarlar'daki model adını kontrol edin."
+  },
+  "aiErrPermissionEndpoint": {
+    "message": "Marksync'in bu sunucuya bağlanma izni yok. Ayarlar'da adresini yeniden kaydedin."
+  },
+  "aiErrNetworkEndpoint": {
+    "message": "Model yanıt vermedi: sunucu çalışmıyor, erişilemiyor ya da çok yavaş."
   }
 }

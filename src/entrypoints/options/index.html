@@ -265,7 +265,7 @@
             <a class="button" href="./sorter-log.html" data-i18n="aiOpenLog"></a>
           </div>
           <p class="muted" data-i18n="aiIntro"></p>
-          <p class="notice small" data-i18n="aiPrivacy"></p>
+          <p id="ai-privacy" class="notice small"></p>
           <div class="panel">
             <div class="setting">
               <div class="setting-text"><label for="aiSortEnabled" data-i18n="aiEnabledLabel"></label></div>
@@ -277,7 +277,66 @@
                 <option value="" data-i18n="aiInboxNone"></option>
               </select>
             </div>
-            <div class="setting stacked">
+            <div class="setting">
+              <div class="setting-text">
+                <label for="aiProvider" data-i18n="aiProviderLabel"></label>
+                <p id="ai-provider-help" class="muted small"></p>
+              </div>
+              <select id="aiProvider">
+                <option value="openrouter" data-i18n="aiProviderOpenRouter"></option>
+                <option value="custom" data-i18n="aiProviderCustom"></option>
+                <option value="builtin" data-i18n="aiProviderBuiltin"></option>
+              </select>
+            </div>
+            <!-- OpenAI-compatible endpoint (Ollama, LM Studio, vLLM, ...). -->
+            <div class="setting stacked" data-provider="custom">
+              <div class="setting-text">
+                <label for="ai-endpoint" data-i18n="aiEndpointLabel"></label>
+                <p id="ai-endpoint-state" class="muted small"></p>
+              </div>
+              <div class="key-row">
+                <input id="ai-endpoint" type="url" autocomplete="off" spellcheck="false" maxlength="300" placeholder="http://localhost:11434/v1" />
+                <button id="ai-endpoint-save" data-i18n="aiKeySave"></button>
+                <button id="ai-endpoint-test" data-i18n="aiTest"></button>
+              </div>
+              <p class="muted small" data-i18n="aiEndpointHelp"></p>
+            </div>
+            <div class="setting stacked" data-provider="custom">
+              <div class="setting-text">
+                <label for="ai-endpoint-model" data-i18n="aiEndpointModelLabel"></label>
+              </div>
+              <div class="key-row">
+                <input id="ai-endpoint-model" list="ai-endpoint-models" autocomplete="off" spellcheck="false" maxlength="200" placeholder="llama3.2:3b" />
+                <datalist id="ai-endpoint-models"></datalist>
+                <button id="ai-endpoint-model-save" data-i18n="aiKeySave"></button>
+              </div>
+              <p class="muted small" data-i18n="aiEndpointModelHelp"></p>
+            </div>
+            <div class="setting stacked" data-provider="custom">
+              <div class="setting-text">
+                <label for="ai-endpoint-key" data-i18n="aiEndpointKeyLabel"></label>
+                <p id="ai-endpoint-key-state" class="muted small"></p>
+              </div>
+              <div class="key-row">
+                <input id="ai-endpoint-key" type="password" autocomplete="off" spellcheck="false" maxlength="500" />
+                <button id="ai-endpoint-key-save" data-i18n="aiKeySave"></button>
+                <button id="ai-endpoint-key-remove" class="danger" data-i18n="aiKeyRemove" hidden></button>
+              </div>
+              <p class="muted small" data-i18n="aiEndpointKeyHelp"></p>
+            </div>
+            <!-- The browser's own on-device model (Chrome: Gemini Nano). -->
+            <div class="setting stacked" data-provider="builtin">
+              <div class="setting-text">
+                <span class="setting-title" data-i18n="aiBuiltinLabel"></span>
+                <p id="ai-builtin-state" class="small" role="status"></p>
+              </div>
+              <div class="row wrap">
+                <button id="ai-builtin-prepare" data-i18n="aiBuiltinPrepare" hidden></button>
+                <progress id="ai-builtin-progress" max="1" hidden></progress>
+              </div>
+              <p class="muted small" data-i18n="aiBuiltinHelp"></p>
+            </div>
+            <div class="setting stacked" data-provider="openrouter">
               <div class="setting-text">
                 <label for="ai-key" data-i18n="aiKeyLabel"></label>
                 <p id="ai-key-state" class="muted small"></p>
@@ -290,7 +349,7 @@
               </div>
               <p class="muted small" data-i18n="aiKeyHelp"></p>
             </div>
-            <div class="setting stacked model-setting">
+            <div class="setting stacked model-setting" data-provider="openrouter">
               <div class="setting-text">
                 <label for="ai-model-search" data-i18n="aiModelLabel"></label>
                 <p id="ai-model-help" class="muted small"></p>
@@ -330,7 +389,7 @@
                 </div>
               </div>
             </div>
-            <div class="setting">
+            <div class="setting" data-provider="openrouter">
               <div class="setting-text">
                 <label for="aiResearch" data-i18n="aiResearchLabel"></label>
                 <p class="muted small" data-i18n="aiResearchHelp"></p>
@@ -341,7 +400,7 @@
               <div class="setting-text"><label for="aiAllowNewFolders" data-i18n="aiAllowNewLabel"></label></div>
               <input id="aiAllowNewFolders" type="checkbox" />
             </div>
-            <div class="setting">
+            <div class="setting" data-provider="openrouter">
               <div class="setting-text">
                 <label for="aiMonthlyBudget" data-i18n="aiBudgetLabel"></label>
                 <p id="ai-budget-help" class="muted small"></p>
@@ -367,7 +426,7 @@
               </div>
               <div class="bulk-form">
                 <select id="bulk-folder" data-i18n-aria-label="aiBulkFolderLabel"></select>
-                <label class="inline-switch">
+                <label class="inline-switch" data-provider="openrouter">
                   <input id="bulk-research" type="checkbox" />
                   <span class="small" data-i18n="aiBulkResearch"></span>
                 </label>

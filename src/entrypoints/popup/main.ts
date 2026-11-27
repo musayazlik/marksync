@@ -228,10 +228,12 @@ async function renderBudget() {
 }
 aiSpendItem.watch(() => void renderBudget());
 
-/** The card is shown while AI sorting is on and openrouter.ai is allowed. */
+/** The card is shown while AI sorting on OpenRouter is on and openrouter.ai is allowed. */
 async function initUsage() {
   const s = await getSettings();
-  const allowed = s.aiSortEnabled && (await browser.permissions.contains({ origins: [OPENROUTER_ORIGIN] }));
+  // Balance and spending are OpenRouter's; a local model or endpoint costs nothing here.
+  const allowed =
+    s.aiSortEnabled && s.aiProvider === 'openrouter' && (await browser.permissions.contains({ origins: [OPENROUTER_ORIGIN] }));
   $('#usage').hidden = !allowed;
   if (!allowed) return;
   await modelLabel(s);

@@ -14,7 +14,8 @@ src/
     types.ts     Data model: SyncRecord, SyncState, BackupFile
     records.ts   Diff with the last sync, first-sync matching, merge, sanitize, restore
     netscape.ts  HTML export that every browser can import
-    ai-sort.ts   AI sorting: folder list, prompt, checking the model's reply
+    ai-sort.ts   AI sorting: folder list, prompt, reply schema, checking the model's reply
+    ai-provider.ts  AI providers: endpoint addresses, model lists, on-device model limits
     openrouter-data.ts  OpenRouter model list and key usage: parsing, search, gauge
     budget.ts    Monthly AI spending cap
     dedupe.ts    Duplicate finder: URL normalization and grouping
@@ -30,7 +31,8 @@ src/
   platform/    Browser and Google specifics
     identity.ts    Google sign-in with launchWebAuthFlow
     drive.ts       Google Drive v3 REST client
-    openrouter.ts  OpenRouter client: chat completions, model list, key usage
+    openrouter.ts  OpenAI-compatible client (OpenRouter or the user's server): chat completions, model lists, key usage
+    builtin-ai.ts  The browser's on-device model (Prompt API): availability, download, prompt
   services/    Wires the engine to Drive and extension storage
   entrypoints/ background (events, alarms, messages), popup, options, sorter-log, duplicates, links
 tests/         In-memory Chromium and Firefox fakes, end-to-end sync tests
@@ -259,6 +261,27 @@ web (on by default) and whether new folders may be created. Turning it on asks f
    OpenRouter reported. `sorter-log.html` shows them with filters, search and **Undo** (moves the bookmark
    back to the inbox, removes a folder the model created if it is empty, and
    is not sorted again). The log is per browser and not synced.
+
+**Providers** (`services/ai-client.ts`). Settings picks who runs the model;
+sorting and bulk sorting both ask through the same runner:
+
+| Provider | Requests go to | Permission | Research | Cost and cap |
+|---|---|---|---|---|
+| `openrouter` (default) | `https://openrouter.ai/api/v1` | `https://openrouter.ai/*` | yes | reported, monthly cap applies |
+| `custom` | the saved base URL, e.g. `http://localhost:11434/v1` (Ollama), `http://localhost:1234/v1` (LM Studio) | that host only, asked when the address is saved | no | none |
+| `builtin` | the browser's own model (`LanguageModel`, Chrome 138+) | none | no | none |
+
+The `custom` endpoint gets the same chat-completions request without
+OpenRouter's attribution headers and server tools, an optional Bearer key
+(`local:aiEndpointKey`, never uploaded) and the reply schema as
+`response_format: json_schema` (the folder refs as an enum); a server that
+answers 400 to that is asked again without it. "Test" lists its models
+(`GET /models`). The `builtin` model runs in the service worker, gets a
+fresh session per bookmark, the reply schema as `responseConstraint`, at
+most 120 folders (its context is small) and writes in English, Spanish,
+Japanese, German or French. Its download (a few GB) needs a click, so
+Settings starts it. Log entries and bulk runs record the provider; a bulk
+run keeps the provider and model it started with.
 
 **Model picker and usage.** Settings lists OpenRouter's models
 (`GET /api/v1/models`, cached in `local:aiModels` for 6 hours) with search,

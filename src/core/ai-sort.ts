@@ -217,6 +217,37 @@ export function buildSortPrompt(input: {
 }
 
 /**
+ * JSON schema of the reply asked for in buildSortPrompt, for providers that
+ * can constrain their output (the on-device model, local servers). The folder
+ * refs are listed, so a small model cannot invent one. The reply is still
+ * checked by parseSortReply.
+ */
+export function sortReplySchema(folders: FolderOption[], allowNewFolders: boolean): Record<string, unknown> {
+  const refs = folders.map((f) => f.ref);
+  const ref = refs.length ? { type: 'string', enum: refs } : { type: 'string' };
+  const nullable = (schema: Record<string, unknown>) => ({ anyOf: [schema, { type: 'null' }] });
+  const text = { type: 'string' };
+  const properties: Record<string, unknown> = {
+    folder: nullable(ref),
+    confidence: { type: 'number' },
+    reason: text,
+    site: {
+      type: 'object',
+      properties: { name: text, category: text, summary: text, purpose: text },
+      required: ['name', 'category', 'summary', 'purpose'],
+    },
+  };
+  if (allowNewFolders) {
+    properties.newFolder = nullable({
+      type: 'object',
+      properties: { parent: ref, name: text },
+      required: ['parent', 'name'],
+    });
+  }
+  return { type: 'object', properties, required: Object.keys(properties) };
+}
+
+/**
  * Finds the JSON object in a reply: inside a ```json fence if there is one,
  * otherwise the first "{" from which the text parses (a model that browsed
  * may write a sentence before its answer).

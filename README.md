@@ -29,6 +29,7 @@ other file there.
 - Duplicate finder: pages bookmarked more than once (even with http/https, a trailing slash or `utm_` parameters as the only difference); keep one copy, with a backup taken first
 - Link checker: finds bookmarks whose pages are gone or have moved; update a moved bookmark to its new address, or point a dead one to its saved copy in the [Wayback Machine](https://web.archive.org)
 - Optional AI sorting with your own [OpenRouter](https://openrouter.ai) key: pick an inbox folder, and the model (Claude Opus by default) researches each bookmark you add to it, moves it to the folder that fits best and explains what the site is and what it is used for; every decision is listed on a log page with Undo
+- Free, private AI sorting without OpenRouter: point it at your own OpenAI-compatible server (Ollama, LM Studio, vLLM, llama.cpp) or use the browser's built-in on-device model (Chrome 138+, Gemini Nano)
 - AI extras: pick the model from OpenRouter's full list (search, free / web-research filters, prices), sort a whole existing folder with a review-and-approve preview, a monthly spending cap, and your OpenRouter balance and spending in the popup
 - Instant search across all bookmarks from the popup (title, address, folder and what AI sorting learned about the site; ignores accents)
 - Optional end-to-end encryption: the sync file, backups and browser lists in Drive are encrypted with a passphrase only you know (AES-256-GCM, PBKDF2)
@@ -93,9 +94,10 @@ You need a Google Cloud project with the Drive API and an OAuth client of type
 - *Disconnect* unlinks only the browser you click it in; your other browsers stay connected.
   To remove Marksync's access everywhere, use https://myaccount.google.com/permissions.
 - AI sorting is off by default. Only when you turn it on in a browser (which asks for permission
-  to contact `openrouter.ai`), that browser sends the title and address (without the query string)
-  of each bookmark you add to the inbox, plus your folder names, to OpenRouter and the model you
-  chose. Your OpenRouter key is kept in that browser's local storage and never uploaded to Drive.
+  to contact `openrouter.ai`, or the address of your own server), that browser sends the title and
+  address (without the query string) of each bookmark you add to the inbox, plus your folder names,
+  to that provider and the model you chose. With the browser's built-in model nothing leaves the
+  device. API keys are kept in that browser's local storage and never uploaded to Drive.
 - The link checker runs only when you start it (which asks for permission to open every site).
   It requests each bookmark's address without your cookies, never opens addresses on your own
   computer or local network, and looks up the address of each page that is gone at `archive.org`.

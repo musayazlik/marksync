@@ -1,10 +1,9 @@
-import { browser } from 'wxt/browser';
 import { folderPath } from '../core/ai-sort';
 import { isOpenable } from '../core/search';
-import { aiModelsItem, aiBulkItem, getSettings, openRouterKeyItem, type BulkJob, type BulkProposal } from '../shared/state';
+import { aiBulkItem, getSettings, type BulkJob, type BulkProposal } from '../shared/state';
 import { t } from '../shared/i18n';
-import { chatCompletion, hasOpenRouterPermission } from '../platform/openrouter';
 import { detectSpecialRoots } from '../sync/local-tree';
+import { aiRunner, assertPermission } from './ai-client';
 import { applyPlanned, sortOne } from '../sync/sorter';
 import { addLog, overBudget, recordSpend, usageSoon } from './sorter-service';
 import { localBookmarks } from './sync-service';
@@ -19,10 +18,8 @@ import { localBookmarks } from './sync-service';
 
 /** At most this many bookmarks per run. */
 export const BULK_MAX = 100;
-/** Requests to OpenRouter at the same time. */
-const PARALLEL = 3;
 /** Errors that fail every bookmark the same way: planning stops. */
-const FATAL = new Set(['auth', 'credits', 'permission']);
+const FATAL = new Set(['auth', 'credits', 'permission', 'unavailable']);
 
 let writes: Promise<unknown> = Promise.resolve();
 /** Read-modify-write of the job, one at a time. */
@@ -40,19 +37,19 @@ function updateJob(change: (job: BulkJob) => BulkJob | void): Promise<BulkJob | 
   return run;
 }
 
-async function settingsForRun() {
-  const [s, apiKey, cache] = await Promise.all([getSettings(), openRouterKeyItem.getValue(), aiModelsItem.getValue()]);
-  if (!apiKey) throw new Error(t('aiNoKey'));
-  if (!(await hasOpenRouterPermission())) throw new Error(t('aiPermissionMissing'));
-  const known = cache?.models.find((m) => m.id === s.aiModel);
-  return { s, apiKey, toolsOk: known?.tools ?? true };
+/** The settings and model for a run; a run keeps the provider and model it started with. */
+async function settingsForRun(job?: BulkJob) {
+  const s = await getSettings();
+  const runner = await aiRunner(s, job ? { provider: job.provider ?? 'openrouter', model: job.model } : undefined);
+  await assertPermission(runner, s);
+  return { s, runner, budget: runner.budgeted ? s.aiMonthlyBudget : 0 };
 }
 
 export async function startBulk(folderId: string, research: boolean): Promise<BulkJob> {
   const current = await aiBulkItem.getValue();
   if (current && (current.state === 'planning' || current.state === 'applying')) throw new Error(t('aiBulkBusy'));
-  const { s, toolsOk } = await settingsForRun();
-  if (await overBudget({ budget: s.aiMonthlyBudget })) throw new Error(t('aiErrBudget'));
+  const { s, runner, budget } = await settingsForRun();
+  if (await overBudget({ budget })) throw new Error(t('aiErrBudget'));
   const bookmarks = localBookmarks();
   const tree = await bookmarks.getTree();
   const children = await bookmarks.getChildren(folderId);
@@ -65,8 +62,9 @@ export async function startBulk(folderId: string, research: boolean): Promise<Bu
     id: crypto.randomUUID(),
     folderId,
     folderPath: folderPath(tree, folderId) ?? '',
-    model: s.aiModel,
-    research: research && toolsOk,
+    model: runner.model,
+    provider: runner.provider,
+    research: research && runner.canResearch,
     allowNewFolders: s.aiAllowNewFolders,
     state: 'planning',
     queue,
@@ -86,10 +84,11 @@ let planning: Promise<void> | undefined;
 function plan(jobId: string): Promise<void> {
   planning ??= (async () => {
     try {
-      const { s, apiKey } = await settingsForRun();
+      const started = await aiBulkItem.getValue();
+      if (!started || started.id !== jobId) return;
+      const { s, runner, budget } = await settingsForRun(started);
       const bookmarks = localBookmarks();
       const special = await detectSpecialRoots(bookmarks);
-      const language = browser.i18n.getUILanguage();
       const taken = new Set<string>();
 
       const next = async (): Promise<string | undefined> => {
@@ -102,7 +101,7 @@ function plan(jobId: string): Promise<void> {
         for (let id = await next(); id; id = await next()) {
           taken.add(id);
           const job = (await aiBulkItem.getValue())!;
-          const blocked = (await overBudget({ budget: s.aiMonthlyBudget })) ? true : undefined;
+          const blocked = (await overBudget({ budget })) ? true : undefined;
           if (blocked) {
             await updateJob((j) => {
               if (j.id === jobId && j.state === 'planning') Object.assign(j, { state: 'ready', stopped: 'budget', stopMessage: t('aiErrBudget') });
@@ -113,8 +112,8 @@ function plan(jobId: string): Promise<void> {
             {
               bookmarks,
               exclude: special.exclude,
-              language,
-              complete: (messages, { research }) => chatCompletion({ apiKey, model: job.model, messages, research }),
+              language: runner.language,
+              complete: (messages, opts) => runner.complete(messages, opts),
             },
             {
               inboxId: job.folderId,
@@ -122,12 +121,14 @@ function plan(jobId: string): Promise<void> {
               skip: s.aiInboxFolderId ? [s.aiInboxFolderId] : [],
               allowNewFolders: job.allowNewFolders,
               model: job.model,
+              provider: runner.provider,
               research: job.research,
+              ...(runner.maxFolders ? { maxFolders: runner.maxFolders } : {}),
               plan: true,
             },
             id,
           );
-          if (outcome) await recordSpend(outcome.cost);
+          if (outcome && runner.budgeted) await recordSpend(outcome.cost);
           await updateJob((j) => {
             if (j.id !== jobId) return;
             j.queue = j.queue.filter((q) => q !== id);
@@ -144,12 +145,12 @@ function plan(jobId: string): Promise<void> {
           });
         }
       };
-      await Promise.all(Array.from({ length: PARALLEL }, worker));
+      await Promise.all(Array.from({ length: runner.parallel }, worker));
       // Something taken but never answered (worker stopped early): planning is over either way.
       await updateJob((j) => {
         if (j.id === jobId && j.state === 'planning' && !j.queue.some((q) => !taken.has(q))) j.state = 'ready';
       });
-      usageSoon();
+      if (runner.budgeted) usageSoon();
     } catch (err) {
       await updateJob((j) => {
         if (j.id === jobId && j.state === 'planning') {

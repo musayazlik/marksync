@@ -1,5 +1,6 @@
 import { storage } from '#imports';
 import type { SiteInfo } from '../core/ai-sort';
+import { AI_PROVIDERS, ENDPOINT_MODEL, parseEndpoint, type AiProvider } from '../core/ai-provider';
 import type { Spend } from '../core/budget';
 import type { LinkReason, Snapshot } from '../core/links';
 import type { KeyUsage, ModelInfo } from '../core/openrouter-data';
@@ -15,8 +16,14 @@ export interface Settings {
   backupRetention: number;
   /** Name of this browser in backups and import lists; empty = detected. */
   deviceName: string;
-  /** AI sorting: bookmarks added to the inbox folder in this browser are filed by a model on OpenRouter. */
+  /** AI sorting: bookmarks added to the inbox folder in this browser are filed by a model. */
   aiSortEnabled: boolean;
+  /** Who runs the model: OpenRouter, an OpenAI-compatible endpoint, or the browser's built-in model. */
+  aiProvider: AiProvider;
+  /** Base URL of the OpenAI-compatible endpoint, e.g. "http://localhost:11434/v1"; empty = none. */
+  aiEndpoint: string;
+  /** Model name on that endpoint, e.g. "llama3.2:3b"; empty = none. */
+  aiEndpointModel: string;
   /** Local ID of the inbox folder in this browser; empty = none chosen. */
   aiInboxFolderId: string;
   /** OpenRouter model ID, e.g. "google/gemini-3.5-flash-lite". */
@@ -47,6 +54,9 @@ export const DEFAULT_SETTINGS: Settings = {
   backupRetention: 30,
   deviceName: '',
   aiSortEnabled: false,
+  aiProvider: 'openrouter',
+  aiEndpoint: '',
+  aiEndpointModel: '',
   aiInboxFolderId: '',
   aiModel: DEFAULT_AI_MODEL,
   aiAllowNewFolders: false,
@@ -111,6 +121,8 @@ export const deviceIdItem = storage.defineItem<string>('local:deviceId', {
  * Drive), and read only by the background script.
  */
 export const openRouterKeyItem = storage.defineItem<string>('local:openRouterKey');
+/** Optional API key of the OpenAI-compatible endpoint; like the OpenRouter key, never uploaded. */
+export const endpointKeyItem = storage.defineItem<string>('local:aiEndpointKey');
 
 /** OpenRouter's model list, cached so Settings opens instantly (refreshed every few hours). */
 export const aiModelsItem = storage.defineItem<{ fetchedAt: number; models: ModelInfo[] }>('local:aiModels');
@@ -152,8 +164,10 @@ export interface SortLogEntry {
   reason?: string;
   confidence?: number;
   model: string;
+  /** Who ran the model; missing in entries from before 0.5 (OpenRouter). */
+  provider?: AiProvider;
   error?: string;
-  /** 'auth' | 'credits' | 'rate-limit' | 'model' | 'permission' | 'network' | 'reply' | 'unknown'. */
+  /** 'auth' | 'credits' | 'rate-limit' | 'model' | 'permission' | 'network' | 'unavailable' | 'reply' | 'unknown'. */
   errorCode?: string;
   /** Set when the user moved the bookmark back with Undo. */
   undoneAt?: number;
@@ -161,7 +175,7 @@ export interface SortLogEntry {
   site?: SiteInfo;
   /** Web pages the model used (http/https only). */
   sources?: { url: string; title?: string }[];
-  /** OpenRouter's reported cost of the request, in USD. */
+  /** OpenRouter's reported cost of the request, in USD (other providers report none). */
   cost?: number;
   /** True when the model was allowed to read the page and search the web. */
   researched?: boolean;
@@ -183,6 +197,8 @@ export interface BulkJob {
   folderId: string;
   folderPath: string;
   model: string;
+  /** Missing in runs from before 0.5 (OpenRouter). */
+  provider?: AiProvider;
   research: boolean;
   allowNewFolders: boolean;
   state: 'planning' | 'ready' | 'applying' | 'done';
@@ -265,6 +281,10 @@ export async function getSettings(): Promise<Settings> {
     backupRetention: clampInt(s.backupRetention, 1, 365, d.backupRetention),
     deviceName: typeof s.deviceName === 'string' ? s.deviceName.slice(0, 60) : d.deviceName,
     aiSortEnabled: typeof s.aiSortEnabled === 'boolean' ? s.aiSortEnabled : d.aiSortEnabled,
+    aiProvider: AI_PROVIDERS.includes(s.aiProvider as AiProvider) ? (s.aiProvider as AiProvider) : d.aiProvider,
+    aiEndpoint: typeof s.aiEndpoint === 'string' && parseEndpoint(s.aiEndpoint) ? parseEndpoint(s.aiEndpoint)!.base : d.aiEndpoint,
+    aiEndpointModel:
+      typeof s.aiEndpointModel === 'string' && ENDPOINT_MODEL.test(s.aiEndpointModel.trim()) ? s.aiEndpointModel.trim() : d.aiEndpointModel,
     aiInboxFolderId:
       typeof s.aiInboxFolderId === 'string' && s.aiInboxFolderId.length <= 100 ? s.aiInboxFolderId : d.aiInboxFolderId,
     aiModel: typeof s.aiModel === 'string' && s.aiModel.length <= 100 && MODEL_ID.test(s.aiModel.trim()) ? s.aiModel.trim() : d.aiModel,

@@ -41,6 +41,8 @@ import {
   onBookmarkRemoved,
   sortInboxNow,
   testOpenRouter,
+  listEndpointModels,
+  builtinStatus,
   undoSortEntry,
 } from '../services/sorter-service';
 import { isApplying, keepLocalBookmarks, resyncFromDrive, runSync, syncIfRemoteChanged } from '../services/sync-service';
@@ -221,6 +223,10 @@ export default defineBackground(() => {
         return listFolderChoices();
       case 'aiTestKey':
         return testOpenRouter();
+      case 'aiEndpointModels':
+        return listEndpointModels();
+      case 'aiBuiltinStatus':
+        return builtinStatus();
       case 'aiListModels':
         return listModels(req.refresh === true);
       case 'aiUsage':
@@ -286,7 +292,7 @@ export default defineBackground(() => {
     'connect', 'disconnect', 'syncNow', 'checkNow', 'resyncFromDrive', 'keepLocal', 'backupNow', 'listBackups',
     'restoreBackup', 'deleteBackup', 'listBrowsers', 'removeBrowser', 'importFromBrowser', 'importHtml',
     'exportHtml', 'getRedirectUrl', 'settingsChanged', 'aiListFolders', 'aiTestKey', 'aiSortNow', 'aiUndo',
-    'aiClearLog', 'aiListModels', 'aiUsage', 'aiBulkStart', 'aiBulkCancel', 'aiBulkApply', 'aiBulkDiscard',
+    'aiClearLog', 'aiListModels', 'aiUsage', 'aiEndpointModels', 'aiBuiltinStatus', 'aiBulkStart', 'aiBulkCancel', 'aiBulkApply', 'aiBulkDiscard',
     'dupScan', 'dupRemove', 'linkScan', 'linkStop', 'linkFix', 'linkFixAll',
     'encStatus', 'encEnable', 'encUnlock', 'encLock', 'encDisable', 'encReset',
   ]);

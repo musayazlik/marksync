@@ -9,6 +9,7 @@ import type { BrowserInfo } from '../services/import-service';
 import type { BulkApplyResult } from '../services/bulk-service';
 import type { SortNowResult } from '../services/sorter-service';
 import type { BulkJob, EncryptionStatus } from './state';
+import type { BuiltinState } from '../platform/builtin-ai';
 import type { ImportMode, ImportResult } from '../sync/importer';
 
 /** Requests from the popup and options page to the background script. */
@@ -34,6 +35,8 @@ export type Request =
   | { type: 'aiTestKey' }
   | { type: 'aiListModels'; refresh?: boolean }
   | { type: 'aiUsage' }
+  | { type: 'aiEndpointModels' }
+  | { type: 'aiBuiltinStatus' }
   | { type: 'aiBulkStart'; folderId: string; research: boolean }
   | { type: 'aiBulkCancel' }
   | { type: 'aiBulkApply'; bookmarkIds: string[] }
@@ -76,6 +79,8 @@ export interface ResponseData {
   aiTestKey: string;
   aiListModels: ModelInfo[];
   aiUsage: KeyUsage;
+  aiEndpointModels: string[];
+  aiBuiltinStatus: BuiltinState;
   aiBulkStart: BulkJob;
   aiBulkCancel: void;
   aiBulkApply: BulkApplyResult;

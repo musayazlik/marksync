@@ -13,6 +13,7 @@ src/
   core/        Pure logic, no browser APIs, fully unit-tested
     types.ts     Data model: SyncRecord, SyncState, BackupFile
     records.ts   Diff with the last sync, first-sync matching, merge, sanitize, restore
+    position.ts  Fractional position keys: key between two keys, longest stable run
     netscape.ts  HTML export that every browser can import
     ai-sort.ts   AI sorting: folder list, prompt, reply schema, checking the model's reply
     ai-provider.ts  AI providers: endpoint addresses, model lists, on-device model limits
@@ -70,6 +71,26 @@ everywhere. Each browser stores its own map `localId → UUID`.
 The top-level folders are not records. They have fixed keys:
 `toolbar`, `menu`, `other`, `mobile`. Chromium has no Bookmarks Menu, so a
 regular folder named "Bookmarks Menu" inside "Other bookmarks" stands in for it.
+
+## Order (sync file schema 2)
+
+Each record has a fractional position key `pos` (`core/position.ts`):
+base-36 strings compared as text, siblings sorted by key (equal keys, from
+two browsers inserting at the same spot, by ID). When the local tree is read,
+the items of a folder that are still in the order of the last sync (the
+longest increasing run of their old keys) keep their keys; only moved and
+new items get a key between their new neighbours, and only those get a new
+`positionAt`. So two browsers that move different items of a folder before
+syncing both keep their moves; a move of the same item still goes to the
+newer `positionAt`. `index` stays in every record as the item's rank, for
+the browser API, backups and older readers.
+
+A schema 1 file (before 0.7) is read and every folder gets keys in its
+current order (the same keys in every browser, clocks unchanged); it is
+written back as schema 2. Versions before 0.7 refuse a schema 2 file and ask
+for an update instead of syncing. A folder with a record without a key (an
+old backup restored, an orphan moved to "other") or with keys longer than
+24 characters is renumbered in its current order by `sanitize`.
 
 ## One sync run (`sync/engine.ts`)
 
@@ -319,8 +340,8 @@ click) and stops at the first key, credit or permission error.
 
 ## Known limits / roadmap
 
-- Order uses integer positions; concurrent reorders of one folder resolve to
-  the latest one. Fractional indexes would merge them.
+- Two browsers moving the *same* item before syncing: the later move wins
+  (moves of different items in one folder both survive, see "Order").
 - Changes from other browsers arrive on the next alarm (no push).
 - Not synced: favicons, separators, Firefox tags and keywords.
 - Ideas: more UI languages, Safari build, a per-sync-run change log (which browser changed what), changing the

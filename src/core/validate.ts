@@ -1,3 +1,4 @@
+import { isPosKey } from './position';
 import type { RecordMap, SyncRecord } from './types';
 
 /**
@@ -55,7 +56,7 @@ export function sanitizeRemoteRecords(input: unknown, now: number): { records: R
 
 function toRecord(key: string, r: unknown): SyncRecord | undefined {
   if (!isPlainObject(r)) return undefined;
-  const { id, kind, parentId, index, title, url, contentAt, positionAt, deletedAt } = r;
+  const { id, kind, parentId, index, title, url, contentAt, positionAt, deletedAt, pos } = r;
   if (id !== key || typeof id !== 'string' || id.length === 0 || id.length > MAX_ID_LENGTH) return undefined;
   if (kind !== 'folder' && kind !== 'bookmark') return undefined;
   if (typeof parentId !== 'string' || parentId.length === 0 || parentId.length > MAX_ID_LENGTH || parentId === id) return undefined;
@@ -73,6 +74,8 @@ function toRecord(key: string, r: unknown): SyncRecord | undefined {
     kind,
     parentId,
     index,
+    // A malformed key is dropped (sanitize gives the folder new ones), not the record.
+    ...(isPosKey(pos) ? { pos } : {}),
     title,
     ...(kind === 'bookmark' ? { url: url as string } : {}),
     contentAt,

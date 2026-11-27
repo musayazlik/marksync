@@ -1,4 +1,4 @@
-import type { SyncState } from '../core/types';
+import { SYNC_SCHEMA, type SyncState } from '../core/types';
 import { DriveClient, DriveError, quote, type DriveCodec } from '../platform/drive';
 import { getAccessToken, invalidateToken } from '../platform/identity';
 import { t } from '../shared/i18n';
@@ -120,7 +120,8 @@ export class DriveRemoteStore implements RemoteStore {
       // the check in save() fails and the sync runs again.
       const meta = await this.drive.getMeta(id);
       const state = await this.drive.downloadJson<SyncState>(id);
-      if (typeof state !== 'object' || state === null || state.schema !== 1) {
+      // Schema 1 is read and written back as the current schema; anything newer needs an update.
+      if (typeof state !== 'object' || state === null || (state.schema !== 1 && state.schema !== SYNC_SCHEMA)) {
         throw new Error(t('errNewerSyncFile'));
       }
       return { state, version: meta.version ?? '' };

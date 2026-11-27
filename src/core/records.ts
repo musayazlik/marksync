@@ -1,3 +1,4 @@
+import { keysBetween, MAX_KEY_LENGTH, placeKeys } from './position';
 import {
   isRootKey,
   type IdMapping,
@@ -50,13 +51,32 @@ export function childrenByParent(
     list.push(r);
     groups.set(r.parentId, list);
   }
-  for (const list of groups.values()) list.sort(compareSiblings);
+  for (const list of groups.values()) list.sort(list.every((r) => r.pos !== undefined) ? byPos : byIndex);
   return groups;
 }
 
-/** Same index: the most recently placed item goes first, then by id. */
-function compareSiblings(a: SyncRecord, b: SyncRecord): number {
-  return a.index - b.index || b.positionAt - a.positionAt || (a.id < b.id ? -1 : 1);
+const byId = (a: SyncRecord, b: SyncRecord) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
+/** Schema 2: by position key; equal keys (two browsers inserted at the same spot) by id. */
+const byPos = (a: SyncRecord, b: SyncRecord) => (a.pos! < b.pos! ? -1 : a.pos! > b.pos! ? 1 : byId(a, b));
+/** Folders with an item that has no key yet: by index; same index, the most recently placed first. */
+const byIndex = (a: SyncRecord, b: SyncRecord) => a.index - b.index || b.positionAt - a.positionAt || byId(a, b);
+
+/**
+ * Gives every live record a position key: a folder where an item has none
+ * (a schema 1 file, an old backup, an item moved to "other" by sanitize) or
+ * where keys got too long is renumbered in its current order. The same input
+ * gives the same keys in every browser. Clocks are not touched.
+ */
+export function ensurePositions(records: RecordMap): RecordMap {
+  let out: RecordMap | undefined;
+  for (const siblings of childrenByParent(records).values()) {
+    const missing = siblings.some((r) => r.pos === undefined || r.pos.length > MAX_KEY_LENGTH);
+    if (!missing) continue;
+    out ??= { ...records };
+    const keys = keysBetween(null, null, siblings.length);
+    siblings.forEach((r, i) => (out![r.id] = { ...r, pos: keys[i]! }));
+  }
+  return out ?? records;
 }
 
 function withUrl<T extends object>(base: T, url: string | undefined): T & { url?: string } {
@@ -92,11 +112,31 @@ export function buildLocalRecords(
     nextMapping[n.localId] = syncId;
   }
 
-  // Index each mirror record would have locally, ignoring items we keep but
-  // cannot show. Without this, every sibling after a kept item looks moved.
-  const mirrorRank = new Map<string, number>();
-  for (const siblings of childrenByParent(mirror, keep).values()) {
-    siblings.forEach((r, i) => mirrorRank.set(r.id, i));
+  // A mirror from a schema 1 file has no keys yet: give it the same keys
+  // the migration of that file gives, so nothing looks moved.
+  const known = ensurePositions(mirror);
+
+  // Position keys, folder by folder in the local order: items still in the
+  // order they had at the last sync keep their key, only the moved (or new)
+  // ones get a key between their neighbours. Items kept but not shown here
+  // are left out, so they never make their siblings look moved.
+  const byParent = new Map<string, { node: LocalSnapshot['nodes'][number]; id: string }[]>();
+  for (const n of snap.nodes) {
+    const parentId = localToSync.get(n.parentLocalId);
+    if (!parentId) continue;
+    const list = byParent.get(parentId) ?? [];
+    list.push({ node: n, id: localToSync.get(n.localId)! });
+    byParent.set(parentId, list);
+  }
+  const posOf = new Map<string, string>();
+  for (const [parentId, list] of byParent) {
+    list.sort((a, b) => a.node.index - b.node.index);
+    const old = list.map(({ id }) => {
+      const prev = known[id];
+      return isLive(prev) && prev.parentId === parentId ? prev.pos : undefined;
+    });
+    const keys = placeKeys(old);
+    list.forEach(({ id }, i) => posOf.set(id, keys[i]!));
   }
 
   const records: RecordMap = {};
@@ -104,17 +144,18 @@ export function buildLocalRecords(
     const id = localToSync.get(n.localId)!;
     const parentId = localToSync.get(n.parentLocalId);
     if (!parentId) continue;
+    const pos = posOf.get(id)!;
     const base = withUrl(
-      { id, kind: n.kind, parentId, index: n.index, title: n.title },
+      { id, kind: n.kind, parentId, index: n.index, pos, title: n.title },
       n.url,
     );
-    const prev = mirror[id];
+    const prev = known[id];
     if (!isLive(prev)) {
       records[id] = { ...base, contentAt: now, positionAt: now };
       continue;
     }
     const contentChanged = prev.title !== n.title || (prev.url ?? '') !== (n.url ?? '');
-    const positionChanged = prev.parentId !== parentId || mirrorRank.get(id) !== n.index;
+    const positionChanged = prev.parentId !== parentId || prev.pos !== pos;
     records[id] = {
       ...base,
       contentAt: contentChanged ? now : prev.contentAt,
@@ -123,7 +164,7 @@ export function buildLocalRecords(
     };
   }
 
-  for (const [id, prev] of Object.entries(mirror)) {
+  for (const [id, prev] of Object.entries(known)) {
     if (records[id]) continue;
     records[id] = !isLive(prev) || keep.has(id) ? prev : { ...prev, deletedAt: now };
   }
@@ -258,6 +299,7 @@ export function mergeRecords(local: RecordMap, remote: RecordMap): RecordMap {
         contentAt: content.contentAt,
         parentId: position.parentId,
         index: position.index,
+        ...(position.pos !== undefined ? { pos: position.pos } : {}),
         positionAt: position.positionAt,
       },
       content.url,
@@ -289,6 +331,8 @@ export function sanitize(records: RecordMap, now: number): RecordMap {
   const reparent = (r: SyncRecord) => {
     r.parentId = 'other';
     r.index = Number.MAX_SAFE_INTEGER;
+    // Its key belongs to the old folder; "other" is renumbered below.
+    delete r.pos;
   };
 
   for (const r of liveRecords(out)) if (!validParent(r)) reparent(r);
@@ -336,8 +380,11 @@ export function sanitize(records: RecordMap, now: number): RecordMap {
     }
   }
 
-  for (const siblings of childrenByParent(out).values()) {
-    siblings.forEach((r, i) => (out[r.id]!.index = i));
+  const keyed = ensurePositions(out);
+  for (const siblings of childrenByParent(keyed).values()) {
+    siblings.forEach((r, i) => {
+      out[r.id] = { ...keyed[r.id]!, index: i };
+    });
   }
   return out;
 }
@@ -369,6 +416,7 @@ export function recordsEqual(a: RecordMap, b: RecordMap): boolean {
       x.kind !== y.kind ||
       x.parentId !== y.parentId ||
       x.index !== y.index ||
+      x.pos !== y.pos ||
       x.title !== y.title ||
       x.url !== y.url ||
       x.contentAt !== y.contentAt ||

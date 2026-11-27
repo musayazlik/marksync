@@ -89,6 +89,9 @@ with `Release-As: 1.0.0`.
 refuse files with a higher schema, so a format change needs a new schema
 number and a migration path. Open an issue before starting one.
 
+History: schema 2 (0.7) added the fractional position key `pos` to every
+record (#9); schema 1 files are migrated on read.
+
 ## Reporting a sync problem
 
 Please include the browsers and versions, what you did in which browser, and

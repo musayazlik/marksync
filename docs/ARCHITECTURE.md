@@ -23,6 +23,7 @@ src/
     history.ts   Version history: backup-vs-now diff, partial restore plan, search in a backup
     tags.ts      Tags: cleaning, newest-edit-wins merge, tags.json validation
     tidy.ts      "Tidy up the library": folder summary, prompts, checking the plan, cost estimate
+    digest.ts    "Rediscover": picking forgotten bookmarks (seeded, no network)
     links.ts     Link checker: which addresses to check, verdicts, Wayback answers
     search.ts    Popup bookmark search (accent-insensitive, ranked, highlight ranges)
     crypto.ts    Passphrase → key (PBKDF2), AES-GCM envelopes, passphrase strength
@@ -411,6 +412,20 @@ first (a title or name changed since the plan is left alone). Every applied
 change is a `tidied` entry in the sorting log with what Undo needs: the old
 title or name, or the folder's parent, position and moved items, so a merged
 or removed folder comes back where it was.
+
+## Rediscover (`services/digest-service.ts`)
+
+Off by default (Settings → Sync → *Rediscover forgotten bookmarks*: every
+day or every week). When the popup opens and a digest is due, five
+bookmarks are picked from what is already in the browser, without any
+network request: bookmarks neither added nor opened in the last 60 days
+(Chromium's `dateLastUsed`, or opened from the digest, since Firefox has no
+such date), up to two of them related to a bookmark saved in the last 14
+days (same tag, same AI site category or same site), the rest at random
+(seeded by the day, so reopening the popup shows the same digest). Each pick
+can be opened, kept (it skips digests for 180 days), archived (moved to an
+"Archive" folder under Other bookmarks) or deleted. The digest lives in
+`local:digest` in each browser and is not synced.
 
 ## Tags
 

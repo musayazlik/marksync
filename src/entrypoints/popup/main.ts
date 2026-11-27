@@ -265,6 +265,86 @@ aiUsageItem.watch((u) => {
 settingsItem.watch(() => void initUsage());
 void initUsage();
 
+// ---------- rediscover ----------
+
+const digestDone = { opened: 'digestOpened', kept: 'digestKept', archived: 'digestArchived', deleted: 'digestDeleted' } as const;
+
+function ago(ms: number): string {
+  const days = Math.floor((Date.now() - ms) / 86_400_000);
+  if (days >= 365) return tn('digestYearsAgo', Math.floor(days / 365));
+  if (days >= 30) return tn('digestMonthsAgo', Math.floor(days / 30));
+  return tn('digestDaysAgo', Math.max(1, days));
+}
+
+async function renderDigest() {
+  const box = $('#digest');
+  const entries = await send({ type: 'digestGet' }).catch(() => null);
+  box.hidden = !entries?.length;
+  if (!entries?.length) return;
+  const open = entries.filter((e) => !e.done).length;
+  $('#digest-count').textContent = open ? String(open) : '✓';
+  $('#digest-list').replaceChildren(
+    ...entries.map((e) => {
+      const li = document.createElement('li');
+      li.className = `digest-item${e.done ? ' done' : ''}`;
+      const text = document.createElement('div');
+      text.className = 'digest-text';
+      const title = document.createElement('a');
+      title.className = 'digest-title';
+      title.textContent = e.title || e.url;
+      title.href = e.url;
+      title.title = e.url;
+      title.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        void send({ type: 'digestAct', id: e.id, action: 'open' })
+          .catch(() => undefined)
+          .then(() => openResult(e.url, ev.ctrlKey || ev.metaKey ? 'background' : 'tab'));
+      });
+      const why = document.createElement('span');
+      why.className = 'digest-why';
+      why.textContent = e.done
+        ? t(digestDone[e.done])
+        : e.reason === 'related' && e.relatedTo
+          ? t('digestRelated', e.relatedTo)
+          : [e.path, e.addedAt ? t('digestSaved', ago(e.addedAt)) : ''].filter(Boolean).join(' · ');
+      text.append(title, why);
+      let host = '';
+      try {
+        host = new URL(e.url).hostname;
+      } catch {
+        // Not an address: the avatar shows a dot.
+      }
+      li.append(avatar(host), text);
+      if (!e.done) {
+        const actions = document.createElement('div');
+        actions.className = 'digest-actions';
+        for (const action of ['keep', 'archive', 'delete'] as const) {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = action === 'delete' ? 'quiet danger' : 'quiet';
+          b.textContent = t(action === 'keep' ? 'digestKeep' : action === 'archive' ? 'digestArchive' : 'digestDelete');
+          b.addEventListener('click', () =>
+            withBusy(
+              b,
+              async () => {
+                if (action === 'delete' && !confirm(t('digestConfirmDelete', e.title || e.url))) return;
+                await send({ type: 'digestAct', id: e.id, action });
+                await renderDigest();
+              },
+              actionError,
+            ),
+          );
+          actions.append(b);
+        }
+        li.append(actions);
+      }
+      return li;
+    }),
+  );
+}
+settingsItem.watch(() => void renderDigest());
+void renderDigest();
+
 // ---------- search ----------
 
 const find = $<HTMLInputElement>('#find');

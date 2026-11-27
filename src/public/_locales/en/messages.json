@@ -1725,5 +1725,77 @@
   },
   "tidyLogRemove": {
     "message": "Empty folder \"{1}\" removed"
+  },
+  "digestSettingLabel": {
+    "message": "Rediscover forgotten bookmarks"
+  },
+  "digestSettingHelp": {
+    "message": "The popup shows a few bookmarks you have not opened in a long time, some related to what you saved lately. Made from what is already in this browser; nothing is sent anywhere."
+  },
+  "digestOff": {
+    "message": "Off"
+  },
+  "digestDaily": {
+    "message": "Every day"
+  },
+  "digestWeekly": {
+    "message": "Every week"
+  },
+  "digestHeading": {
+    "message": "Rediscover"
+  },
+  "digestRelated": {
+    "message": "Like \"{1}\", which you saved lately"
+  },
+  "digestSaved": {
+    "message": "saved {1}"
+  },
+  "digestDaysAgo_one": {
+    "message": "yesterday"
+  },
+  "digestDaysAgo_other": {
+    "message": "{1} days ago"
+  },
+  "digestMonthsAgo_one": {
+    "message": "a month ago"
+  },
+  "digestMonthsAgo_other": {
+    "message": "{1} months ago"
+  },
+  "digestYearsAgo_one": {
+    "message": "a year ago"
+  },
+  "digestYearsAgo_other": {
+    "message": "{1} years ago"
+  },
+  "digestKeep": {
+    "message": "Keep"
+  },
+  "digestArchive": {
+    "message": "Archive"
+  },
+  "digestDelete": {
+    "message": "Delete"
+  },
+  "digestOpened": {
+    "message": "Opened"
+  },
+  "digestKept": {
+    "message": "Kept; it will not come back for a while"
+  },
+  "digestArchived": {
+    "message": "Moved to the Archive folder"
+  },
+  "digestDeleted": {
+    "message": "Deleted"
+  },
+  "digestConfirmDelete": {
+    "message": "Delete the bookmark \"{1}\" in every browser?"
+  },
+  "digestArchiveFolder": {
+    "message": "Archive"
+  },
+  "digestGone": {
+    "message": "This bookmark is no longer there."
   }
 }

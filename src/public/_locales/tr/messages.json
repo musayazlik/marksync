@@ -1720,5 +1720,77 @@
   },
   "tidyLogRemove": {
     "message": "Boş \"{1}\" klasörü kaldırıldı"
+  },
+  "digestSettingLabel": {
+    "message": "Unutulan yer imlerini yeniden keşfet"
+  },
+  "digestSettingHelp": {
+    "message": "Popup, uzun süredir açmadığınız birkaç yer imini gösterir; bazıları son kaydettiklerinizle ilgilidir. Bu tarayıcıda zaten olanlardan hazırlanır; hiçbir yere bir şey gönderilmez."
+  },
+  "digestOff": {
+    "message": "Kapalı"
+  },
+  "digestDaily": {
+    "message": "Her gün"
+  },
+  "digestWeekly": {
+    "message": "Her hafta"
+  },
+  "digestHeading": {
+    "message": "Yeniden keşfet"
+  },
+  "digestRelated": {
+    "message": "Son kaydettiğiniz \"{1}\" gibi"
+  },
+  "digestSaved": {
+    "message": "{1} kaydedildi"
+  },
+  "digestDaysAgo_one": {
+    "message": "dün"
+  },
+  "digestDaysAgo_other": {
+    "message": "{1} gün önce"
+  },
+  "digestMonthsAgo_one": {
+    "message": "bir ay önce"
+  },
+  "digestMonthsAgo_other": {
+    "message": "{1} ay önce"
+  },
+  "digestYearsAgo_one": {
+    "message": "bir yıl önce"
+  },
+  "digestYearsAgo_other": {
+    "message": "{1} yıl önce"
+  },
+  "digestKeep": {
+    "message": "Kalsın"
+  },
+  "digestArchive": {
+    "message": "Arşivle"
+  },
+  "digestDelete": {
+    "message": "Sil"
+  },
+  "digestOpened": {
+    "message": "Açıldı"
+  },
+  "digestKept": {
+    "message": "Kalıyor; bir süre yeniden gelmeyecek"
+  },
+  "digestArchived": {
+    "message": "Arşiv klasörüne taşındı"
+  },
+  "digestDeleted": {
+    "message": "Silindi"
+  },
+  "digestConfirmDelete": {
+    "message": "\"{1}\" yer imi tüm tarayıcılarda silinsin mi?"
+  },
+  "digestArchiveFolder": {
+    "message": "Arşiv"
+  },
+  "digestGone": {
+    "message": "Bu yer imi artık yok."
   }
 }

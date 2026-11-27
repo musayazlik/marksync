@@ -210,7 +210,7 @@
     "message": "Henüz yedek yok."
   },
   "restoreHelp": {
-    "message": "Geri yükleme, bağlı tüm tarayıcılardaki yer imlerini değiştirir. Önce mevcut yer imlerinin yedeği alınır, böylece geri yüklemeyi geri alabilirsiniz."
+    "message": "Geri yükleme, bağlı tüm tarayıcılardaki yer imlerini değiştirir. Önce mevcut yer imlerinin yedeği alınır, böylece geri yüklemeyi geri alabilirsiniz. Yalnızca bazı yer imlerini veya klasörleri geri getirmek için Geçmiş'i açın."
   },
   "backupReasonScheduled": {
     "message": "otomatik"
@@ -1396,5 +1396,161 @@
   },
   "aiErrNetworkEndpoint": {
     "message": "Model yanıt vermedi: sunucu çalışmıyor, erişilemiyor ya da çok yavaş."
+  },
+  "historyOpen": {
+    "message": "Geçmiş"
+  },
+  "historyOpenHint": {
+    "message": "Bu yedeği şimdiki yer imlerinizle karşılaştırın ve tek tek öğeleri geri getirin"
+  },
+  "historyTitle": {
+    "message": "Sürüm geçmişi"
+  },
+  "historyIntro": {
+    "message": "O zamandan beri neyin değiştiğini görmek için bir yedek seçin: kaldırılan, taşınan, yeniden adlandırılan ve eklenen yer imleri, bulundukları klasöre göre gruplanır. Geri istediklerinizi işaretleyin; başka hiçbir şey değişmez."
+  },
+  "historyBackupLabel": {
+    "message": "Şimdiki yer imlerinizi şu tarihteki yedekle karşılaştırın"
+  },
+  "historyFilters": {
+    "message": "Değişiklikleri göster"
+  },
+  "historyFilterAll": {
+    "message": "Tümü"
+  },
+  "historyFilterPlaceholder": {
+    "message": "Başlık, adres ya da klasöre göre süz"
+  },
+  "historyLoading": {
+    "message": "Yedekle karşılaştırılıyor…"
+  },
+  "historyKindRemoved": {
+    "message": "Kaldırıldı"
+  },
+  "historyKindMoved": {
+    "message": "Taşındı"
+  },
+  "historyKindRenamed": {
+    "message": "Adı değişti"
+  },
+  "historyKindAdded": {
+    "message": "Eklendi"
+  },
+  "historyItems_one": {
+    "message": "{1} öğe"
+  },
+  "historyItems_other": {
+    "message": "{1} öğe"
+  },
+  "historyChanges_one": {
+    "message": "{1} değişiklik"
+  },
+  "historyChanges_other": {
+    "message": "{1} değişiklik"
+  },
+  "historyRestoreSelected_one": {
+    "message": "1 öğeyi geri getir"
+  },
+  "historyRestoreSelected_other": {
+    "message": "{1} öğeyi geri getir"
+  },
+  "historyChoose": {
+    "message": "{1} öğesini geri getir"
+  },
+  "historyUntitled": {
+    "message": "(başlıksız)"
+  },
+  "historyInside_one": {
+    "message": "içinde 1 öğeyle"
+  },
+  "historyInside_other": {
+    "message": "içinde {1} öğeyle"
+  },
+  "historyInsideAdded_one": {
+    "message": "içinde 1 öğe"
+  },
+  "historyInsideAdded_other": {
+    "message": "içinde {1} öğe"
+  },
+  "historyNowIn": {
+    "message": "şimdi {1} içinde"
+  },
+  "historyWasTitle": {
+    "message": "önceden \"{1}\""
+  },
+  "historyWasUrl": {
+    "message": "önceden {1}"
+  },
+  "historyAddedHint": {
+    "message": "Bu yedekten sonra eklendi: geri getirilecek bir şey yok."
+  },
+  "historySelectFolder": {
+    "message": "Tümünü seç"
+  },
+  "historyNoMatch": {
+    "message": "Süzgece uyan değişiklik yok."
+  },
+  "historyNoChanges": {
+    "message": "Bu yedekten beri hiçbir şey değişmedi."
+  },
+  "historyNoBackups": {
+    "message": "Henüz yedek yok. Ayarlar'dan bir yedek alın ya da zamanlanmış yedeği bekleyin."
+  },
+  "historyConfirm": {
+    "message": "{1} öğe, {2} tarihli yedekteki haliyle geri getirilsin mi? Önce mevcut yer imlerinizin yedeği alınır; başka hiçbir şey değişmez."
+  },
+  "historyDone_one": {
+    "message": "1 öğe geri geldi ve diğer tarayıcılarınızla eşitleniyor."
+  },
+  "historyDone_other": {
+    "message": "{1} öğe geri geldi ve diğer tarayıcılarınızla eşitleniyor."
+  },
+  "historyDoneFallback": {
+    "message": "Klasörü artık olmayan öğeler Diğer yer imleri altındaki \"{1}\" klasöründe."
+  },
+  "historyFailed_one": {
+    "message": "1 öğe geri getirilemedi."
+  },
+  "historyFailed_other": {
+    "message": "{1} öğe geri getirilemedi."
+  },
+  "historyDoneUndo": {
+    "message": "Bundan önceki yer imlerinin bir yedeği alındı."
+  },
+  "historyNoRoot": {
+    "message": "Geri yükleme yapılacak bir klasör bulunamadı."
+  },
+  "historyRestoredFolder": {
+    "message": "Geri yüklenenler ({1})"
+  },
+  "historyFindHeading": {
+    "message": "Yedeklerde ara"
+  },
+  "historyFindIntro": {
+    "message": "Bir yer imi hangi yedekte hâlâ vardı? Tüm yedeklerde başlığa ya da adrese göre arayın."
+  },
+  "historyFindPlaceholder": {
+    "message": "ör. example.com/tarifler"
+  },
+  "historyFindButton": {
+    "message": "Ara"
+  },
+  "historyFindShort": {
+    "message": "En az iki karakter yazın."
+  },
+  "historyFinding": {
+    "message": "Yedeklerde aranıyor…"
+  },
+  "historyFound_one": {
+    "message": "1 yedekte bulundu."
+  },
+  "historyFound_other": {
+    "message": "{1} yedekte bulundu."
+  },
+  "historyFoundNone": {
+    "message": "Böyle bir yer imi olan yedek yok."
+  },
+  "historyFindOpen": {
+    "message": "Bu yedekle karşılaştır"
   }
 }

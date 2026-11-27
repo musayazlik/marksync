@@ -21,6 +21,7 @@ import { updateBadge } from '../services/badge';
 import { removeDuplicates, scanDuplicates } from '../services/dedupe-service';
 import { fixAllLinks, fixLink, markInterruptedScan, startLinkScan, stopLinkScan } from '../services/links-service';
 import { applyBulk, cancelBulk, discardBulk, resumeBulk, startBulk } from '../services/bulk-service';
+import { compareBackup, restoreFromBackup, searchBackups } from '../services/history-service';
 // Also installs the encryption codec for every Drive client (see drive-store.ts).
 import {
   disableEncryption,
@@ -204,6 +205,16 @@ export default defineBackground(() => {
         return restoreBackup(req.id);
       case 'deleteBackup':
         return deleteBackup(req.id);
+      case 'historyCompare':
+        if (typeof req.id !== 'string' || !req.id) throw new Error(t('errNotBackup'));
+        return compareBackup(req.id);
+      case 'historyRestore':
+        if (typeof req.id !== 'string' || !Array.isArray(req.ids) || req.ids.length > 10_000 || !req.ids.every((x) => typeof x === 'string')) {
+          throw new Error(t('errNotBackup'));
+        }
+        return restoreFromBackup(req.id, req.ids);
+      case 'historySearch':
+        return searchBackups(typeof req.query === 'string' ? req.query : '');
       case 'listBrowsers':
         await publishSnapshot().catch(() => undefined);
         return listBrowsers();
@@ -290,7 +301,7 @@ export default defineBackground(() => {
   const pageOrigin = browser.runtime.getURL('');
   const knownTypes = new Set<Request['type']>([
     'connect', 'disconnect', 'syncNow', 'checkNow', 'resyncFromDrive', 'keepLocal', 'backupNow', 'listBackups',
-    'restoreBackup', 'deleteBackup', 'listBrowsers', 'removeBrowser', 'importFromBrowser', 'importHtml',
+    'restoreBackup', 'deleteBackup', 'historyCompare', 'historyRestore', 'historySearch', 'listBrowsers', 'removeBrowser', 'importFromBrowser', 'importHtml',
     'exportHtml', 'getRedirectUrl', 'settingsChanged', 'aiListFolders', 'aiTestKey', 'aiSortNow', 'aiUndo',
     'aiClearLog', 'aiListModels', 'aiUsage', 'aiEndpointModels', 'aiBuiltinStatus', 'aiBulkStart', 'aiBulkCancel', 'aiBulkApply', 'aiBulkDiscard',
     'dupScan', 'dupRemove', 'linkScan', 'linkStop', 'linkFix', 'linkFixAll',

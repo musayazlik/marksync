@@ -19,6 +19,7 @@ src/
     openrouter-data.ts  OpenRouter model list and key usage: parsing, search, gauge
     budget.ts    Monthly AI spending cap
     dedupe.ts    Duplicate finder: URL normalization and grouping
+    history.ts   Version history: backup-vs-now diff, partial restore plan, search in a backup
     links.ts     Link checker: which addresses to check, verdicts, Wayback answers
     search.ts    Popup bookmark search (accent-insensitive, ranked, highlight ranges)
     crypto.ts    Passphrase → key (PBKDF2), AES-GCM envelopes, passphrase strength
@@ -162,6 +163,21 @@ edit made now: backup items come back, everything else gets a tombstone, and
 the result syncs to every browser. A backup of the current state is made
 before each restore.
 
+**Version history** (`history.html`, `services/history-service.ts`) compares
+one backup with the current local tree (`core/history.ts` `diffBackup`):
+removed, moved, renamed and added items, grouped by the folder they were in
+then. A removed or added folder is one change with the number of items in
+it; a reorder inside a folder is not listed. Ticked items come back through
+`planRestore`: a removed bookmark or folder (with its contents) is created
+again in its old folder, or in a "Restored (date)" folder under Other
+bookmarks when that folder is gone too; a moved item is moved back; a
+renamed item gets its old title and address. Items added since the backup
+cannot be "restored". The plan runs through the bookmarks API with sync on
+hold, after a `before-restore` backup (the compared backup is kept), and the
+result syncs as ordinary local changes. "Find in backups" downloads the
+newest 60 backups and lists those with a bookmark whose title or address
+contains the search.
+
 ## Importing from other browsers
 
 An extension cannot read another browser's bookmarks directly, so there are two sources:
@@ -304,7 +320,7 @@ click) and stops at the first key, credit or permission error.
   the latest one. Fractional indexes would merge them.
 - Changes from other browsers arrive on the next alarm (no push).
 - Not synced: favicons, separators, Firefox tags and keywords.
-- Ideas: more UI languages, Safari build, conflict history view, changing the
+- Ideas: more UI languages, Safari build, a per-sync-run change log (which browser changed what), changing the
   encryption passphrase without turning encryption off and on.
 
 ## Encryption (optional, `services/encryption-service.ts`)

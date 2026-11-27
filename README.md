@@ -23,6 +23,7 @@ other file there.
 - No duplicates when you connect a browser that already has the same bookmarks
 - Safety stop when a sync would delete most of your bookmarks
 - Automatic and manual backups in Google Drive, restore with one click
+- Version history: compare any backup with your bookmarks now (removed, moved, renamed, added, grouped by folder), bring back a single bookmark or folder, and find the backup that still had a bookmark
 - Import from another browser (with Marksync, or from any browser's HTML export), merged without duplicates or into a new folder
 - Export to a standard HTML bookmarks file
 - Interface in English and Turkish; a badge on the toolbar icon when sync needs you

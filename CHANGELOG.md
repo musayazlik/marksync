@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.7.0](https://github.com/musayazlik/marksync/compare/v0.6.0...v0.7.0) (2026-11-27)
+
+
+### ⚠ BREAKING CHANGES
+
+* **sync:** the sync file format is now schema 2. Marksync before 0.7 refuses it and asks to update; update Marksync in every browser.
+
+### Features
+
+* **popup:** rediscover forgotten bookmarks once a day or a week ([e9c9aad](https://github.com/musayazlik/marksync/commit/e9c9aad630fff04992b71c187ced84d5feed9cc6)), closes [#14](https://github.com/musayazlik/marksync/issues/14)
+* **search:** search bookmarks by meaning with embeddings ([1a2ab63](https://github.com/musayazlik/marksync/commit/1a2ab632a72289b5fc05c9bbd76eaf1db10d9069)), closes [#13](https://github.com/musayazlik/marksync/issues/13)
+* **sync:** keep both reorders when two browsers reorder the same folder ([198ef72](https://github.com/musayazlik/marksync/commit/198ef72e38e7b7a1cbf72eb611700cdb6d709191)), closes [#9](https://github.com/musayazlik/marksync/issues/9)
+
 ## [0.6.0](https://github.com/musayazlik/marksync/compare/v0.5.0...v0.6.0) (2026-11-27)
 
 

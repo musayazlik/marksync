@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.6.0](https://github.com/musayazlik/marksync/compare/v0.5.0...v0.6.0) (2026-11-27)
+
+
+### Features
+
+* **ai:** tidy up the whole library with AI suggestions you approve ([5b8598b](https://github.com/musayazlik/marksync/commit/5b8598b384ad0d2460f07e2aadfddae5323b058b)), closes [#11](https://github.com/musayazlik/marksync/issues/11)
+* **tags:** tags synced between browsers, proposed by AI sorting and searchable from the popup ([6f6193f](https://github.com/musayazlik/marksync/commit/6f6193ff7d8b08a2524f5b86fa06b7c3bba6abd0)), closes [#12](https://github.com/musayazlik/marksync/issues/12)
+
 ## [0.5.0](https://github.com/musayazlik/marksync/compare/v0.4.1...v0.5.0) (2026-11-27)
 
 

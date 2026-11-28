@@ -37,10 +37,13 @@ $('#unlock-title').textContent = t('unlockTitle');
 $('#unlock-text').textContent = t('unlockText');
 $('#unlock-button').textContent = t('unlock');
 $<HTMLInputElement>('#find').placeholder = t('search');
+$('#find').setAttribute('aria-label', t('search'));
+$('#passphrase').setAttribute('aria-label', t('unlockTitle'));
 
 function show(id: 'welcome' | 'unlock' | 'library' | 'none') {
   for (const name of ['welcome', 'unlock', 'library'] as const) $(`#${name}`).hidden = name !== id;
-  $('#sign-out').hidden = id === 'welcome' || id === 'none';
+  // On an error screen (wrong account...) the user must be able to sign out and try again.
+  $('#sign-out').hidden = id === 'welcome';
 }
 
 function message(text: string, tone: 'error' | 'info' = 'info') {

@@ -49,8 +49,8 @@ Releases are made by [release-please](https://github.com/googleapis/release-plea
 3. The workflow then builds the store packages from the tag and attaches them
    to the release, with `SHA256SUMS.txt`:
    `marksync-X.Y.Z-chrome.zip` (Chrome Web Store), `-edge.zip`, `-opera.zip`,
-   and, when `WXT_GECKO_ID` is set, `-firefox.zip` plus `-sources.zip` for
-   Firefox Add-ons reviewers.
+   `-sources.zip` (the source code, for store reviewers) and, when
+   `WXT_GECKO_ID` is set, `-firefox.zip` for Firefox Add-ons.
 4. Upload the packages to the stores. Store submission is manual for now.
 
 If packages are missing from a release (a failed upload, or `WXT_GECKO_ID`
@@ -64,6 +64,11 @@ secrets):
 
 - `WXT_GOOGLE_CLIENT_ID`: the production OAuth client (docs/GOOGLE_SETUP.md). Required.
 - `WXT_GECKO_ID`: a Firefox add-on ID you own. Without it the release has no Firefox package.
+- `VIEWER_URL`: the web viewer's address (e.g. `https://<user>.github.io/marksync`). Without it,
+  shared folders cannot be offered (invitations need the viewer's join page).
+- For the web viewer workflow (`.github/workflows/viewer.yml`): `VIEWER_GOOGLE_CLIENT_ID`
+  (required to publish it), `VIEWER_GOOGLE_API_KEY` and `GOOGLE_PROJECT_NUMBER` (for the
+  shared-folder join page). See docs/GOOGLE_SETUP.md.
 
 The release pull request is opened by GitHub Actions, so GitHub does not run
 CI on it. CI already ran on every commit it contains.

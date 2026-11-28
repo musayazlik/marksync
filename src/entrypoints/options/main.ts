@@ -201,10 +201,10 @@ async function loadBackups() {
       if (!confirm(t('confirmDeleteBackup'))) return;
       void withBusy(del, () => send({ type: 'deleteBackup', id: b.id }).then(loadBackups), actionError);
     });
-    // Compare with now and bring back single items (history.html).
+    // Compare with now and bring back single items (backup-history.html).
     const historyLink = document.createElement('a');
     historyLink.className = 'button';
-    historyLink.href = `./history.html?id=${encodeURIComponent(b.id)}`;
+    historyLink.href = `./backup-history.html?id=${encodeURIComponent(b.id)}`;
     historyLink.textContent = t('historyOpen');
     historyLink.title = t('historyOpenHint');
     actions.append(historyLink, ' ', restore, ' ', del);
@@ -1549,6 +1549,14 @@ $('#tidy-discard').addEventListener('click', () =>
 
 // ---------- shared folders ----------
 
+/** Invitations go through the web viewer's join page; without its address, sharing cannot work. */
+const viewerConfigured = !!(import.meta.env.WXT_VIEWER_URL ?? '').trim();
+if (!viewerConfigured) {
+  $<HTMLButtonElement>('#share-create').disabled = true;
+  $<HTMLButtonElement>('#share-create').title = t('sharedNeedsViewer');
+  $('#share-create').insertAdjacentElement('afterend', Object.assign(document.createElement('p'), { className: 'muted small', textContent: t('sharedNeedsViewer') }));
+}
+
 const roleKey = { owner: 'sharedRoleOwner', writer: 'sharedRoleWriter', reader: 'sharedRoleReader' } as const;
 
 async function renderShares() {
@@ -1562,6 +1570,24 @@ async function renderShares() {
       head.append(el('strong', '', s.name), el('span', 'pill', t(roleKey[s.role])));
       const meta = el('p', `small ${s.error ? 'warn-text' : 'muted'}`, s.error ?? [s.owner ? t('sharedOwner', s.owner) : '', s.lastSyncAt ? t('lastSync', timeAgo(s.lastSyncAt)) : '', s.path].filter(Boolean).join(' · '));
       const actions = el('div', 'row wrap');
+      // Stopped at the mass-delete guard: the user decides.
+      if (s.massDelete) {
+        for (const action of ['apply', 'keep'] as const) {
+          const b = el('button', action === 'apply' ? 'danger small-button' : 'small-button', t(action === 'apply' ? 'shareApplyDeletion' : 'shareKeepMine'));
+          b.type = 'button';
+          b.addEventListener('click', () =>
+            withBusy(
+              b,
+              async () => {
+                await send({ type: 'shareResolve', fileId: s.fileId, action });
+                await renderShares();
+              },
+              actionError,
+            ),
+          );
+          actions.append(b);
+        }
+      }
       const copy = el('button', 'quiet small-button', t(s.link ? 'sharedCopyLink' : 'sharedCopyCode'));
       copy.type = 'button';
       copy.addEventListener('click', () => {

@@ -21,6 +21,8 @@ export function toTidyProposals(
   items: ProposalsFile['items'],
   tree: SortTreeNode[],
   local: (recordOrRoot: string) => string | undefined,
+  /** Folders that are roots for the sync (top-level ones, Chromium's "Bookmarks Menu" stand-in). */
+  protectedIds: ReadonlySet<string> = new Set(),
 ): TidyProposal[] {
   const out: TidyProposal[] = [];
   const path = (id: string) => folderPath(tree, id) ?? '';
@@ -28,7 +30,7 @@ export function toTidyProposals(
     if (p.kind === 'move' || p.kind === 'retitle') {
       const id = local(p.recordId);
       const hit = id ? findTreeNode(tree, id) : undefined;
-      if (!id || !hit || !hit.parentId) continue;
+      if (!id || !hit || !hit.parentId || protectedIds.has(id)) continue;
       if (p.kind === 'retitle') {
         if (hit.node.url === undefined || hit.node.title === p.title) continue;
         out.push({ id: p.id, kind: 'retitle', bookmarkId: id, title: hit.node.title, newTitle: p.title, ...(hit.node.url ? { url: hit.node.url } : {}), folderPath: path(hit.parentId) });
@@ -54,7 +56,7 @@ export function toTidyProposals(
     const id = local(p.folderId);
     const hit = id ? findTreeNode(tree, id) : undefined;
     // Top-level folders are never renamed or merged away.
-    if (!id || !hit || hit.node.url !== undefined || !hit.parentId || hit.parentId === tree[0]?.id) continue;
+    if (!id || !hit || hit.node.url !== undefined || !hit.parentId || hit.parentId === tree[0]?.id || protectedIds.has(id)) continue;
     if (p.kind === 'rename') {
       if (hit.node.title === p.name) continue;
       out.push({ id: p.id, kind: 'rename', folderId: id, title: hit.node.title, folderPath: path(id), name: p.name, ...(p.reason ? { reason: p.reason } : {}) });
@@ -102,14 +104,18 @@ export async function checkAssistantProposals(): Promise<AssistantCheck> {
     throw err;
   }
   const job = await aiTidyItem.getValue();
-  if (job && job.state !== 'done' && job.proposals.some((p) => !p.appliedAt)) return { imported: 0, waiting: items.length };
+  const busy = job && (job.state === 'planning' || job.state === 'applying' || (job.state === 'ready' && job.proposals.some((p) => !p.appliedAt)));
+  if (busy) return { imported: 0, waiting: items.length };
 
   const api = localBookmarks();
   const [state, tree] = await Promise.all([syncStateItem.getValue(), api.getTree()]);
   const { snapshot } = await readLocal(api, state.menuFolderId);
   const byRecord = new Map(Object.entries(state.mapping).map(([localId, recordId]) => [recordId, localId]));
   const local = (ref: string) => (isRootKey(ref) ? snapshot.roots[ref as RootKey] : byRecord.get(ref));
-  const proposals = toTidyProposals(items, tree, local);
+  const roots = new Set([...Object.values(snapshot.roots).filter((x): x is string => !!x), ...(state.menuFolderId ? [state.menuFolderId] : [])]);
+  // Not synced yet: the IDs cannot be matched, so the proposals wait.
+  if (!Object.keys(state.mapping).length) return { imported: 0, waiting: items.length };
+  const proposals = toTidyProposals(items, tree, local, roots);
   if (proposals.length) {
     const from = [...new Set(items.map((p) => p.from).filter(Boolean))].join(', ');
     const next: TidyJob = {
@@ -128,7 +134,8 @@ export async function checkAssistantProposals(): Promise<AssistantCheck> {
     };
     await aiTidyItem.setValue(next);
   }
-  // Taken over (or no longer applicable): the file is done.
-  await drive.delete(file.id).catch(() => undefined);
+  // Taken over (or no longer applicable): the file is done, unless the assistant added more meanwhile.
+  const now = await drive.getMeta(file.id).catch(() => undefined);
+  if (now && now.version === file.version) await drive.delete(file.id).catch(() => undefined);
   return { imported: proposals.length, waiting: 0 };
 }

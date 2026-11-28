@@ -79,11 +79,14 @@ export async function startBulk(folderId: string, research: boolean): Promise<Bu
   return job;
 }
 
-let planning: Promise<void> | undefined;
+/** The run that is asking the model, by job: a new job never waits for a stopped one. */
+const planning = new Map<string, Promise<void>>();
 
 /** Asks the model about the queued bookmarks, a few at a time, until done or stopped. */
 function plan(jobId: string): Promise<void> {
-  planning ??= (async () => {
+  const running = planning.get(jobId);
+  if (running) return running;
+  const run = (async () => {
     try {
       const started = await aiBulkItem.getValue();
       if (!started || started.id !== jobId) return;
@@ -102,7 +105,9 @@ function plan(jobId: string): Promise<void> {
       const worker = async () => {
         for (let id = await next(); id; id = await next()) {
           taken.add(id);
-          const job = (await aiBulkItem.getValue())!;
+          const job = await aiBulkItem.getValue();
+          // Discarded or replaced meanwhile: this worker is done.
+          if (!job || job.id !== jobId) return;
           const blocked = (await overBudget({ budget })) ? true : undefined;
           if (blocked) {
             await updateJob((j) => {
@@ -161,10 +166,11 @@ function plan(jobId: string): Promise<void> {
         }
       });
     } finally {
-      planning = undefined;
+      planning.delete(jobId);
     }
   })();
-  return planning;
+  planning.set(jobId, run);
+  return run;
 }
 
 /** "Stop": proposals so far stay and can be applied. */

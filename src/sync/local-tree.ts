@@ -198,7 +198,17 @@ export async function applyRecords(
   api: BookmarksApi,
   merged: RecordMap,
   mapping: IdMapping,
-  opts: { menuFolderId?: string; special?: SpecialRoots } = {},
+  opts: {
+    menuFolderId?: string;
+    special?: SpecialRoots;
+    /**
+     * Saves the mapping of the items created so far: called every few
+     * creations and when applying fails. Without it, an interrupted run
+     * would forget which local bookmarks it created, and the next sync would
+     * create them a second time.
+     */
+    saveMapping?: (mapping: IdMapping) => Promise<void>;
+  } = {},
 ): Promise<ApplyResult> {
   const special = opts.special ?? (await detectSpecialRoots(api));
   const exclude = new Set(special.exclude);
@@ -222,6 +232,14 @@ export async function applyRecords(
 
   const skipped = new Set<string>();
   const nextMapping: IdMapping = {};
+  let unsaved = 0;
+  const progress = () => ({ ...mapping, ...nextMapping });
+  const createdOne = async () => {
+    if (opts.saveMapping && ++unsaved >= 50) {
+      unsaved = 0;
+      await opts.saveMapping(progress());
+    }
+  };
   const markSkipped = (id: string) => {
     skipped.add(id);
     for (const child of groups.get(id) ?? []) markSkipped(child.id);
@@ -246,15 +264,16 @@ export async function applyRecords(
             changes++;
           }
         } else {
-          const created = await api.create({
+          const made = await api.create({
             parentId: localParent,
             title: rec.title,
             ...(rec.kind === 'bookmark' ? { url: rec.url } : {}),
           });
-          localId = created.id;
+          localId = made.id;
           syncToLocal.set(rec.id, localId);
           nextMapping[localId] = rec.id;
           changes++;
+          await createdOne();
         }
       } catch (err) {
         console.warn('[marksync] could not apply', rec, err);
@@ -265,73 +284,85 @@ export async function applyRecords(
     }
   };
 
-  for (const key of ROOT_KEYS) {
-    const localRoot = rootLocal[key];
-    if (localRoot) await place(key, localRoot);
-    else for (const rec of groups.get(key) ?? []) markSkipped(rec.id);
-  }
-
-  const live = new Set(liveRecords(merged).map((r) => r.id));
-  for (const n of snapshot.nodes) {
-    const syncId = mapping[n.localId];
-    if (!syncId || live.has(syncId)) continue;
-    try {
-      await (n.kind === 'folder' ? api.removeTree(n.localId) : api.remove(n.localId));
-      changes++;
-    } catch {
-      // Already gone with a removed parent folder.
+  try {
+    for (const key of ROOT_KEYS) {
+      const localRoot = rootLocal[key];
+      if (localRoot) await place(key, localRoot);
+      else for (const rec of groups.get(key) ?? []) markSkipped(rec.id);
     }
-  }
 
-  // Order pass, on a fresh copy of the tree.
-  const childIds = new Map<string, string[]>();
-  const syncedIds = new Map<string, string[]>();
-  const collect = (node: BookmarkNode) => {
-    if (!node.children) return;
-    childIds.set(node.id, node.children.map((c) => c.id));
-    syncedIds.set(
-      node.id,
-      node.children.filter((c) => isSyncable(c) && c.id !== menuFolderId && !exclude.has(c.id)).map((c) => c.id),
-    );
-    node.children.forEach(collect);
-  };
-  (await api.getTree()).forEach(collect);
-
-  /** Puts the records that are in `localParent` in the order of `records`. */
-  const orderIn = async (records: SyncRecord[], localParent: string) => {
-    const all = childIds.get(localParent) ?? [];
-    const synced = syncedIds.get(localParent) ?? [];
-    const present = new Set(synced);
-    const target = records
-      .filter((r) => !skipped.has(r.id))
-      .map((r) => syncToLocal.get(r.id))
-      .filter((id): id is string => !!id && present.has(id));
-    for (let i = 0; i < target.length; i++) {
-      const want = target[i]!;
-      const before = synced[i];
-      if (before === want || before === undefined) continue;
-      await api.move(want, { parentId: localParent, index: all.indexOf(before) });
-      changes++;
-      all.splice(all.indexOf(want), 1);
-      all.splice(all.indexOf(before), 0, want);
-      synced.splice(synced.indexOf(want), 1);
-      synced.splice(i, 0, want);
+    const live = new Set(liveRecords(merged).map((r) => r.id));
+    for (const n of snapshot.nodes) {
+      const syncId = mapping[n.localId];
+      if (!syncId || live.has(syncId)) continue;
+      try {
+        await (n.kind === 'folder' ? api.removeTree(n.localId) : api.remove(n.localId));
+        changes++;
+      } catch {
+        // Already gone with a removed parent folder.
+      }
     }
-  };
 
-  const reorderTree = async (parentKey: string, localFolders: string[]): Promise<void> => {
-    const records = groups.get(parentKey) ?? [];
-    for (const folder of localFolders) await orderIn(records, folder);
-    for (const rec of records) {
-      const localId = syncToLocal.get(rec.id);
-      if (rec.kind === 'folder' && localId && !skipped.has(rec.id)) await reorderTree(rec.id, [localId]);
+    // Order pass, on a fresh copy of the tree.
+    const childIds = new Map<string, string[]>();
+    const syncedIds = new Map<string, string[]>();
+    const collect = (node: BookmarkNode) => {
+      if (!node.children) return;
+      childIds.set(node.id, node.children.map((c) => c.id));
+      syncedIds.set(
+        node.id,
+        node.children.filter((c) => isSyncable(c) && c.id !== menuFolderId && !exclude.has(c.id)).map((c) => c.id),
+      );
+      node.children.forEach(collect);
+    };
+    (await api.getTree()).forEach(collect);
+
+    /** Puts the records that are in `localParent` in the order of `records`. */
+    const orderIn = async (records: SyncRecord[], localParent: string) => {
+      const all = childIds.get(localParent) ?? [];
+      const synced = syncedIds.get(localParent) ?? [];
+      const present = new Set(synced);
+      const target = records
+        .filter((r) => !skipped.has(r.id))
+        .map((r) => syncToLocal.get(r.id))
+        .filter((id): id is string => !!id && present.has(id));
+      for (let i = 0; i < target.length; i++) {
+        const want = target[i]!;
+        const before = synced[i];
+        if (before === want || before === undefined) continue;
+        try {
+          await api.move(want, { parentId: localParent, index: all.indexOf(before) });
+        } catch (err) {
+          // A wrong order is fixed by the next sync; it must not stop this one.
+          console.warn('[marksync] could not reorder', want, err);
+          continue;
+        }
+        changes++;
+        all.splice(all.indexOf(want), 1);
+        all.splice(all.indexOf(before), 0, want);
+        synced.splice(synced.indexOf(want), 1);
+        synced.splice(i, 0, want);
+      }
+    };
+
+    const reorderTree = async (parentKey: string, localFolders: string[]): Promise<void> => {
+      const records = groups.get(parentKey) ?? [];
+      for (const folder of localFolders) await orderIn(records, folder);
+      for (const rec of records) {
+        const localId = syncToLocal.get(rec.id);
+        if (rec.kind === 'folder' && localId && !skipped.has(rec.id)) await reorderTree(rec.id, [localId]);
+      }
+    };
+    for (const key of ROOT_KEYS) {
+      const localRoot = rootLocal[key];
+      if (!localRoot) continue;
+      const extra = Object.keys(aliases).filter((id) => aliases[id] === key);
+      await reorderTree(key, [localRoot, ...extra]);
     }
-  };
-  for (const key of ROOT_KEYS) {
-    const localRoot = rootLocal[key];
-    if (!localRoot) continue;
-    const extra = Object.keys(aliases).filter((id) => aliases[id] === key);
-    await reorderTree(key, [localRoot, ...extra]);
+  } catch (err) {
+    // Keep what was created, so the next sync does not create it again.
+    await opts.saveMapping?.(progress()).catch(() => undefined);
+    throw err;
   }
 
   return { mapping: nextMapping, skipped, menuFolderId, changes };

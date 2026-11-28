@@ -118,8 +118,11 @@ Picker API* and the viewer's origin, enable the Picker API, and set the
 variables `VIEWER_GOOGLE_API_KEY` and `GOOGLE_PROJECT_NUMBER` (the
 project number from the Cloud console's dashboard). Set `VIEWER_URL` (e.g.
 `https://<user>.github.io/marksync`) so store builds of the extension put
-the invitation link into the e-mails; without it, people join with the code.
-For a local build put it in `.env` as `VITE_GOOGLE_CLIENT_ID` and run
+the invitation link into the e-mails. Without it, Settings does not offer
+sharing: an invited person can only open the shared file after confirming
+it in the join page's file picker (that is how `drive.file` grants access).
+For a local build put it in `.env` as `VITE_GOOGLE_CLIENT_ID` (and
+`VITE_GOOGLE_API_KEY`, `VITE_GOOGLE_APP_ID` for the join page) and run
 `pnpm build:viewer` (output in `.output/viewer`).
 
 The MCP server's client ID and secret are set by each user in their MCP

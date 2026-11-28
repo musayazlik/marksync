@@ -124,6 +124,19 @@ describe('WebDAV details', () => {
     for (const bad of ['ftp://x/', 'https://u:p@x/', 'https://x/?a=1', 'nope']) expect(parseWebDavUrl(bad)).toBeUndefined();
   });
 
+  it('updates only files that still exist, keeping their properties', async () => {
+    const dav = new FakeWebDav();
+    vi.stubGlobal('fetch', dav.fetch);
+    const c = new WebDavClient({ url: dav.base, username: 'ana', password: 'app-pass' });
+    const folder = await c.ensureFolder('Marksync');
+    const f = await c.createJson('me.json', folder, { n: 1 }, { label: 'Brave' });
+    // Files are read without a trailing slash (a strict server answers 404 otherwise).
+    expect((await c.getMeta(f.id)).appProperties).toEqual({ label: 'Brave' });
+    await c.delete(f.id);
+    await expect(c.updateJson(f.id, { n: 2 })).rejects.toMatchObject({ status: 404 });
+    expect(dav.nodes.has(f.id)).toBe(false);
+  });
+
   it('never leaves the base folder', async () => {
     const dav = new FakeWebDav();
     vi.stubGlobal('fetch', dav.fetch);

@@ -209,7 +209,7 @@ edit made now: backup items come back, everything else gets a tombstone, and
 the result syncs to every browser. A backup of the current state is made
 before each restore.
 
-**Version history** (`history.html`, `services/history-service.ts`) compares
+**Version history** (`backup-history.html`, `services/history-service.ts`) compares
 one backup with the current local tree (`core/history.ts` `diffBackup`):
 removed, moved, renamed and added items, grouped by the folder they were in
 then. A removed or added folder is one change with the number of items in
@@ -512,7 +512,12 @@ There is no Marksync server and no new scope.
   viewer never writes the file, and every sync restores the folder from it,
   so local changes are put back.
 - **Leaving** keeps the bookmarks as an ordinary folder under Other
-  bookmarks (it joins the personal sync again).
+  bookmarks (it joins the personal sync again). If the same account joined
+  the folder in another browser too, that browser then has both the shared
+  folder and this personal copy: leave in every browser, or delete the copy.
+- **Stopped by the guard**: a shared folder whose sync would delete most of
+  its bookmarks stops, and Settings offers to apply the deletion or keep this
+  browser's copies. A member whose role became viewer goes on as a viewer.
 - Shared files are not end-to-end encrypted, since the other members do not
   have the owner's passphrase; Settings says so. WebDAV has no sharing.
 

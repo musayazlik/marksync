@@ -7,7 +7,7 @@ import { flattenBookmarks, fold, matchRanges, searchBookmarks, splitQuery, type 
 import { budgetState, currentSpend, nextMonthStart } from '../../core/budget';
 import { formatUsd, usageGauge, type KeyUsage } from '../../core/openrouter-data';
 import { OPENROUTER_ORIGIN } from '../../platform/openrouter';
-import { $, emblemState, revealOnClick, setEmblem, timeAgo, withBusy } from '../../shared/ui';
+import { $, emblemState, revealOnClick, setEmblem, showToast, timeAgo, withBusy } from '../../shared/ui';
 
 localizePage();
 const actionError = $('#action-error');
@@ -503,12 +503,17 @@ function select(index: number) {
 
 /** Opens a result: in a new tab, or in the background (popup stays open), or in the current tab. */
 async function openResult(url: string, how: 'tab' | 'background' | 'here') {
-  if (how === 'here') {
-    await browser.tabs.update({ url });
-    window.close();
-  } else {
-    await browser.tabs.create({ url, active: how === 'tab' });
-    if (how === 'tab') window.close();
+  try {
+    if (how === 'here') {
+      await browser.tabs.update({ url });
+      window.close();
+    } else {
+      await browser.tabs.create({ url, active: how === 'tab' });
+      if (how === 'tab') window.close();
+    }
+  } catch {
+    // Browsers refuse some addresses (file:, some ftp:) from extensions.
+    showToast(actionError, t('openFailed', url));
   }
 }
 

@@ -133,16 +133,36 @@ describe('sync with a tampered or corrupt sync file', () => {
   });
 });
 
+/**
+ * Runs `work` at two sizes and checks the time grows about linearly: four
+ * times the input may take at most ~9 times as long (quadratic would be 16).
+ * Comparing two runs on the same machine keeps this stable on slow or busy
+ * CI runners, unlike a fixed time limit.
+ */
+function expectLinear(work: (n: number) => void, small: number) {
+  const time = (n: number) => {
+    const started = performance.now();
+    work(n);
+    return performance.now() - started;
+  };
+  time(small); // warm up
+  const a = time(small);
+  const b = time(small * 4);
+  expect(b).toBeLessThan(a * 9 + 150);
+}
+
+const chain = (n: number): RecordMap => {
+  const records: RecordMap = {};
+  for (let i = 0; i < n; i++) {
+    records[`f${i}`] = rec({ id: `f${i}`, kind: 'folder', url: undefined, parentId: i === 0 ? 'toolbar' : `f${i - 1}` });
+  }
+  return records;
+};
+
 describe('bounded tree processing', () => {
   it('caps nesting depth and stays fast on a long chain', () => {
-    const records: RecordMap = {};
-    const n = 20_000;
-    for (let i = 0; i < n; i++) {
-      records[`f${i}`] = rec({ id: `f${i}`, kind: 'folder', url: undefined, parentId: i === 0 ? 'toolbar' : `f${i - 1}` });
-    }
-    const started = Date.now();
-    const out = sanitize(records, NOW);
-    expect(Date.now() - started).toBeLessThan(2000);
+    expectLinear((n) => sanitize(chain(n), NOW), 5_000);
+    const out = sanitize(chain(20_000), NOW);
 
     const depth = (id: string) => {
       let d = 0;
@@ -158,10 +178,7 @@ describe('bounded tree processing', () => {
 describe('HTML import parser', () => {
   it('runs in linear time on unclosed tags', () => {
     for (const unit of ['<A HREF="x">', '<H3>', '<DL ', '<']) {
-      const html = '<DL><p>' + unit.repeat(Math.floor(2_000_000 / unit.length));
-      const started = Date.now();
-      parseNetscapeHtml(html);
-      expect(Date.now() - started).toBeLessThan(1500);
+      expectLinear((n) => parseNetscapeHtml('<DL><p>' + unit.repeat(Math.floor(n / unit.length))), 500_000);
     }
   });
 

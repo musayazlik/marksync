@@ -6,7 +6,7 @@ import { deviceIdItem, snapshotMetaItem, syncStateItem } from '../shared/state';
 import { importIntoLocal, type ImportMode, type ImportResult } from '../sync/importer';
 import { readLocal } from '../sync/local-tree';
 import { appFolders, assertInFolder, driveClient, withFolders } from './drive-store';
-import { exclusive, localBookmarks } from './sync-service';
+import { exclusive, localBookmarks, sharedContainer } from './sync-service';
 
 /**
  * Every connected browser keeps a copy of its own bookmark tree in
@@ -44,7 +44,8 @@ function hash(text: string): string {
 
 async function localSource(): Promise<ImportSource> {
   const { menuFolderId } = await syncStateItem.getValue();
-  const { snapshot } = await readLocal(localBookmarks(), menuFolderId);
+  // Other people's shared folders never go into "Import from another browser".
+  const { snapshot } = await readLocal(localBookmarks(), menuFolderId, await sharedContainer());
   return snapshotToSource(snapshot);
 }
 

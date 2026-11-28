@@ -19,6 +19,7 @@ import { LockedError } from './errors';
 import { exclusive } from './sync-service';
 import { t } from '../shared/i18n';
 import {
+  backendItem,
   driveIdsItem,
   encryptionKeyItem,
   encryptionStatusItem,
@@ -54,18 +55,26 @@ function rawDrive(): FileStore {
   return rawClient();
 }
 
-/** Tied to the account's Marksync folder: after switching accounts it is not used. */
-let infoCache: { at: number; folderId?: string; info: EncryptionInfo | null } | undefined;
+/**
+ * Tied to the account's Marksync folder and the storage in use: after
+ * switching accounts, servers or backends it is not used.
+ */
+let infoCache: { at: number; folderId?: string; backend: string; info: EncryptionInfo | null } | undefined;
+
+async function storageKey(): Promise<string> {
+  const b = await backendItem.getValue();
+  return b.kind === 'webdav' ? `webdav:${b.url}:${b.username}` : 'drive';
+}
 
 async function cacheInfo(info: EncryptionInfo | null) {
-  infoCache = { at: Date.now(), folderId: (await driveIdsItem.getValue()).folderId, info };
+  infoCache = { at: Date.now(), folderId: (await driveIdsItem.getValue()).folderId, backend: await storageKey(), info };
 }
 
 /** encryption.json from Drive (cached for a minute), or null when encryption is off. */
 async function remoteInfo(fresh = false): Promise<EncryptionInfo | null> {
   if (!fresh && infoCache && Date.now() - infoCache.at < INFO_MAX_AGE_MS) {
     const { folderId } = await driveIdsItem.getValue();
-    if (folderId && folderId === infoCache.folderId) return infoCache.info;
+    if (folderId && folderId === infoCache.folderId && infoCache.backend === (await storageKey())) return infoCache.info;
   }
   const drive = rawDrive();
   const info = await withFolders(drive, async (f) => {
@@ -105,7 +114,7 @@ async function localKey(): Promise<{ keyId: string; raw: Uint8Array<ArrayBuffer>
 
 const codec: DriveCodec = {
   async encode(data) {
-    const [info, key] = await Promise.all([remoteInfo(), localKey()]);
+    const [info, key] = await Promise.all([remoteInfo(true), localKey()]);
     if (!info) {
       // Turned off (or reset) in another browser: forget the old key.
       if (key) await encryptionKeyItem.removeValue();

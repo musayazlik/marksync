@@ -154,6 +154,18 @@ async function mergeOnce(drive: FileStore): Promise<boolean> {
     if (recordId) resolved[recordId] = entry;
     else pending[localId] = entry;
   }
+  // A bookmark whose shared ID changed (the sync file was made again) or that
+  // left the personal sync (it is in a shared folder now): its tags follow the
+  // local bookmark instead of being dropped with the old ID.
+  const localOf = store.localOf ?? {};
+  for (const [recordId, entry] of Object.entries(store.items)) {
+    if (!live.size || live.has(recordId)) continue;
+    const localId = localOf[recordId];
+    if (!localId) continue;
+    const now = state.mapping[localId];
+    if (now && now !== recordId) resolved[now] = mergeTags(resolved[now] ? { [now]: resolved[now]! } : {}, { [now]: entry })[now]!;
+    else if (!now && !pending[localId]) pending[localId] = entry;
+  }
   const local = mergeTags(store.items, resolved);
   // Without a sync yet there is nothing to prune against.
   const merged = live.size ? pruneTags(mergeTags(local, remote), live, now) : mergeTags(local, remote);
@@ -193,7 +205,11 @@ async function mergeOnce(drive: FileStore): Promise<boolean> {
     for (const [rid, e] of Object.entries(s.items)) if (!local[rid] || e.at > local[rid]!.at) newer[rid] = e;
     const stillPending = { ...pending };
     for (const [lid, e] of Object.entries(s.pending)) if (!store.pending[lid] || e.at > store.pending[lid]!.at) stillPending[lid] = e;
-    return { items: mergeTags(merged, newer), pending: stillPending, ...(version ? { version } : {}) };
+    const items = mergeTags(merged, newer);
+    // Remember which local bookmark each tagged record is, for the case above.
+    const nextLocalOf: Record<string, string> = {};
+    for (const [lid, rid] of Object.entries(state.mapping)) if (items[rid]) nextLocalOf[rid] = lid;
+    return { items, pending: stillPending, localOf: nextLocalOf, ...(version ? { version } : {}) };
   });
   return true;
 }

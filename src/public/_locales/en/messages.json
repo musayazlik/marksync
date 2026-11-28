@@ -128,9 +128,6 @@
   "welcomeNoDuplicates": {
     "message": "Bookmarks that are already in several browsers are matched, not duplicated."
   },
-  "accountHeading": {
-    "message": "Google account"
-  },
   "disconnect": {
     "message": "Disconnect"
   },
@@ -535,20 +532,11 @@
   "aiLogEmpty": {
     "message": "Nothing here yet. Bookmarks you add to the inbox folder will show up here once the AI has filed them."
   },
-  "aiLogTotals": {
-    "message": "{1} moved · {2} left in the inbox · {3} failed"
-  },
   "columnBookmark": {
     "message": "Bookmark"
   },
-  "columnMove": {
-    "message": "From → To"
-  },
   "columnReason": {
     "message": "Reason"
-  },
-  "columnResult": {
-    "message": "Result"
   },
   "aiStatusMoved": {
     "message": "Moved"
@@ -2199,5 +2187,29 @@
   },
   "shareEmailMessageCode": {
     "message": "I shared the bookmark folder “{1}” with you through Marksync. In Marksync's Settings → Shared folders → Join, use the code {2}."
+  },
+  "sharedNeedsViewer": {
+    "message": "Sharing needs the web viewer (its join page lets invited people open the shared folder). This build has no viewer address set."
+  },
+  "errInvalidRequest": {
+    "message": "Invalid request."
+  },
+  "openFailed": {
+    "message": "The browser does not let extensions open {1}."
+  },
+  "importFileLabel": {
+    "message": "Bookmarks HTML file"
+  },
+  "shareMassDeleteLocal": {
+    "message": "{1} of {2} bookmarks were removed here. Apply the deletion for everyone, or keep them?"
+  },
+  "shareMassDeleteRemote": {
+    "message": "{1} of {2} bookmarks were removed by another member. Apply the deletion here too, or keep your copies?"
+  },
+  "shareApplyDeletion": {
+    "message": "Apply the deletion"
+  },
+  "shareKeepMine": {
+    "message": "Keep my copies"
   }
 }

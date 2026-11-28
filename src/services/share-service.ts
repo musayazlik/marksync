@@ -7,7 +7,7 @@ import { PRECONDITION_FAILED } from '../platform/store';
 import { t } from '../shared/i18n';
 import { backendItem, sharesItem, statusItem, type ShareEntry, type SharesStore } from '../shared/state';
 import { readLocal } from '../sync/local-tree';
-import { ConflictError, syncOnce, type RemoteStore } from '../sync/engine';
+import { ConflictError, MassDeleteError, syncOnce, type RemoteStore, type SyncOptions } from '../sync/engine';
 import { scopedBookmarks, ScopeGoneError } from '../sync/scoped-bookmarks';
 import { deviceLabel } from '../platform/browser-info';
 import { appFolders } from './drive-store';
@@ -108,32 +108,50 @@ export class SharedRemote implements RemoteStore {
 }
 
 /** Syncs one shared folder with its file. */
-async function syncShare(entry: ShareEntry): Promise<void> {
+async function syncShare(entry: ShareEntry, opts: SyncOptions = {}): Promise<void> {
   const d = await drive();
   const remote = new SharedRemote(d, entry.fileId, entry.role === 'reader');
   try {
     // A viewer's local edits are put back: the shared file always wins.
     const restore = entry.role === 'reader' ? sanitizeRemoteRecords((await remote.load())?.state.records, Date.now()).records : undefined;
     const label = await deviceLabel();
+    const others = (await sharesItem.getValue()).shares.filter((s) => s.fileId !== entry.fileId).map((s) => s.localFolderId);
     await exclusive(() =>
       syncOnce(
         {
           bookmarks: scopedBookmarks(localBookmarks(), entry.localFolderId),
           remote,
+          // Another shared folder moved inside this one stays in its own file.
+          exclude: others,
           local: {
             load: async () => (await sharesItem.getValue()).shares.find((s) => s.fileId === entry.fileId)?.state ?? entry.state,
             save: async (state) => void (await patchShare(entry.fileId, { state })),
           },
           deviceLabel: label,
         },
-        restore ? { restore } : {},
+        restore ? { ...opts, restore } : opts,
       ),
     );
-    await patchShare(entry.fileId, { lastSyncAt: Date.now(), error: undefined });
+    await patchShare(entry.fileId, { lastSyncAt: Date.now(), error: undefined, massDelete: undefined });
   } catch (err) {
+    if (err instanceof MassDeleteError) {
+      await patchShare(entry.fileId, {
+        error: t(err.source === 'local' ? 'shareMassDeleteLocal' : 'shareMassDeleteRemote', err.deletions, err.total),
+        massDelete: { deletions: err.deletions, total: err.total, source: err.source },
+      });
+      return;
+    }
     let message = describeError(err).message;
     if (err instanceof ScopeGoneError) message = t('shareFolderGone');
-    else if (err instanceof DriveError && (err.status === 403 || err.status === 404)) message = t('shareLostAccess');
+    else if (err instanceof DriveError && (err.status === 403 || err.status === 404)) {
+      // Made a viewer meanwhile: go on as a viewer instead of stopping.
+      const access = await d.access(entry.fileId).catch(() => undefined);
+      if (access && !access.canEdit && entry.role !== 'reader') {
+        await patchShare(entry.fileId, { role: 'reader', error: undefined });
+        return;
+      }
+      message = t('shareLostAccess');
+    }
     await patchShare(entry.fileId, { error: message });
   }
 }
@@ -160,6 +178,7 @@ export function sharesSettled(): Promise<void> {
 }
 
 export interface ShareView {
+  massDelete?: ShareEntry['massDelete'];
   fileId: string;
   name: string;
   path: string;
@@ -182,6 +201,7 @@ export async function listShares(): Promise<ShareView[]> {
       ...(s.owner ? { owner: s.owner } : {}),
       ...(s.lastSyncAt ? { lastSyncAt: s.lastSyncAt } : {}),
       ...(s.error ? { error: s.error } : {}),
+      ...(s.massDelete ? { massDelete: s.massDelete } : {}),
       ...(link ? { link } : {}),
     };
   });
@@ -274,6 +294,8 @@ export async function joinShare(code: string): Promise<ShareView> {
  * Nothing changes for the other members.
  */
 export async function leaveShare(fileId: string): Promise<void> {
+  // A sync of this folder that is running finishes first.
+  await sharesSettled();
   const entry = (await sharesItem.getValue()).shares.find((s) => s.fileId === fileId);
   if (!entry) throw new Error(t('shareUnknown'));
   await update((s) => ({ ...s, shares: s.shares.filter((x) => x.fileId !== fileId) }));
@@ -284,6 +306,27 @@ export async function leaveShare(fileId: string): Promise<void> {
     if (other) await api.move(entry.localFolderId, { parentId: other }).catch(() => undefined);
   }
   void runSync().catch(() => undefined);
+}
+
+/**
+ * After the mass-delete guard stopped a shared folder: apply the deletion
+ * (it is what the user or the other members meant), or keep this browser's
+ * copies (they come back into the shared file).
+ */
+export async function resolveShare(fileId: string, action: 'apply' | 'keep'): Promise<void> {
+  const entry = (await sharesItem.getValue()).shares.find((s) => s.fileId === fileId);
+  if (!entry) throw new Error(t('shareUnknown'));
+  let opts: SyncOptions;
+  if (action === 'apply') opts = { allowMassDelete: true };
+  else if (entry.massDelete?.source === 'remote') opts = { keepLocal: true };
+  else {
+    // Removed here by mistake: the folder comes back as it is in the shared file.
+    const remote = await new SharedRemote(await drive(), fileId, true).load();
+    opts = { restore: sanitizeRemoteRecords(remote?.state.records, Date.now()).records };
+  }
+  await syncShare(entry, opts);
+  const after = (await sharesItem.getValue()).shares.find((s) => s.fileId === fileId);
+  if (after?.error) throw new Error(after.error);
 }
 
 /** Who has access, for Settings. */

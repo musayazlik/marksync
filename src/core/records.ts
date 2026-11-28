@@ -4,6 +4,7 @@ import {
   type IdMapping,
   type LocalSnapshot,
   type RecordMap,
+  type RootKey,
   type SyncRecord,
 } from './types';
 
@@ -318,7 +319,7 @@ export function mergeRecords(local: RecordMap, remote: RecordMap): RecordMap {
  * Every browser computes the same result from the same input.
  * Runs in linear time: each record's depth is computed once.
  */
-export function sanitize(records: RecordMap, now: number): RecordMap {
+export function sanitize(records: RecordMap, now: number, fallbackRoot: RootKey = 'other'): RecordMap {
   const out: RecordMap = {};
   for (const [id, r] of Object.entries(records)) {
     if (r.deletedAt !== undefined && now - r.deletedAt > TOMBSTONE_TTL_MS) continue;
@@ -328,8 +329,9 @@ export function sanitize(records: RecordMap, now: number): RecordMap {
   const validParent = (r: SyncRecord) =>
     isRootKey(r.parentId) || (isLive(out[r.parentId]) && out[r.parentId]!.kind === 'folder');
 
+  // Where orphans go: "other", or the only root of a shared folder's view.
   const reparent = (r: SyncRecord) => {
-    r.parentId = 'other';
+    r.parentId = fallbackRoot;
     r.index = Number.MAX_SAFE_INTEGER;
     // Its key belongs to the old folder; "other" is renumbered below.
     delete r.pos;

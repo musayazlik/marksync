@@ -179,6 +179,8 @@ export interface TagsStore {
   pending: Record<string, TagEntry>;
   /** Drive version of tags.json after the last merge. */
   version?: string;
+  /** Shared record ID → local bookmark ID at the last merge (to follow a bookmark whose ID changed). */
+  localOf?: Record<string, string>;
 }
 export const tagsItem = storage.defineItem<TagsStore>('local:tags', { fallback: { items: {}, pending: {} } });
 
@@ -315,6 +317,8 @@ export interface ShareEntry {
   state: LocalState;
   lastSyncAt?: number;
   error?: string;
+  /** The last sync stopped at the mass-delete guard: the user decides in Settings. */
+  massDelete?: { deletions: number; total: number; source: 'local' | 'remote' };
 }
 export interface SharesStore {
   /** Local "Marksync Shared" folder: left out of the personal sync. */
@@ -447,6 +451,18 @@ export async function getSettings(): Promise<Settings> {
  * are not touched; the Chromium "Bookmarks Menu" stand-in is remembered.
  */
 export async function resetAccountState(): Promise<void> {
+  // Tags stay with this browser's bookmarks: they wait (by local ID) until the
+  // bookmarks have shared IDs again, so a reset or a new sync file keeps them.
+  const tags = await tagsItem.getValue();
+  const { mapping } = await syncStateItem.getValue();
+  const pending: Record<string, TagEntry> = { ...tags.pending };
+  for (const [localId, recordId] of Object.entries(mapping)) {
+    const entry = tags.items[recordId];
+    if (entry && !pending[localId]) pending[localId] = entry;
+  }
+  await tagsItem.setValue({ items: {}, pending });
+  // The semantic index belongs to the old account's bookmarks.
+  await semanticIndexItem.removeValue();
   const { menuFolderId } = await syncStateItem.getValue();
   await syncStateItem.setValue({ mapping: {}, mirror: {}, keep: [], ...(menuFolderId ? { menuFolderId } : {}) });
   await driveIdsItem.setValue({});
@@ -454,8 +470,6 @@ export async function resetAccountState(): Promise<void> {
   await encryptionKeyItem.removeValue();
   await encryptionStatusItem.setValue({ state: 'off' });
   await snapshotMetaItem.setValue({});
-  // Tags belong to the account's bookmarks.
-  await tagsItem.setValue({ items: {}, pending: {} });
   // Shared folders belong to the account too; their local folders stay as they are.
   const shares = await sharesItem.getValue();
   await sharesItem.setValue({ ...(shares.containerId ? { containerId: shares.containerId } : {}), shares: [] });

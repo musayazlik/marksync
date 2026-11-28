@@ -26,6 +26,7 @@ import { applyNaming, cancelNaming, discardNaming, editNaming, estimateNaming, r
 import { compareBackup, restoreFromBackup, searchBackups } from '../services/history-service';
 import { allTags, setTags, tagsByLocalId } from '../services/tags-service';
 import { actOnDigest, getDigest } from '../services/digest-service';
+import { checkAssistantProposals } from '../services/assistant-service';
 import { buildIndex, deleteIndex, resumeIndex, searchByMeaning, semanticReady, semanticStatus, stopIndex } from '../services/semantic-service';
 // Also installs the encryption codec for every Drive client (see drive-store.ts).
 import {
@@ -300,6 +301,8 @@ export default defineBackground(() => {
         return applyNaming(req.ids);
       case 'aiNamingDiscard':
         return discardNaming();
+      case 'aiAssistantCheck':
+        return checkAssistantProposals();
       case 'aiTidyEstimate':
         return estimateTidy(typeof req.scopeId === 'string' ? req.scopeId : '');
       case 'aiTidyStart':
@@ -366,7 +369,7 @@ export default defineBackground(() => {
     'exportHtml', 'getRedirectUrl', 'settingsChanged', 'aiListFolders', 'aiTestKey', 'aiSortNow', 'aiUndo',
     'aiClearLog', 'aiListModels', 'aiUsage', 'aiEndpointModels', 'aiBuiltinStatus', 'tagsGet', 'tagsSet', 'digestGet', 'digestAct', 'semStatus', 'semBuild', 'semStop', 'semDelete', 'semSearch', 'semReady', 'aiBulkStart', 'aiBulkCancel', 'aiBulkApply', 'aiBulkDiscard',
     'aiTidyEstimate', 'aiTidyStart', 'aiTidyCancel', 'aiTidyApply', 'aiTidyDiscard',
-    'aiNamingEstimate', 'aiNamingStart', 'aiNamingCancel', 'aiNamingEdit', 'aiNamingApply', 'aiNamingDiscard',
+    'aiNamingEstimate', 'aiNamingStart', 'aiNamingCancel', 'aiNamingEdit', 'aiNamingApply', 'aiNamingDiscard', 'aiAssistantCheck',
     'dupScan', 'dupRemove', 'linkScan', 'linkStop', 'linkFix', 'linkFixAll',
     'encStatus', 'encEnable', 'encUnlock', 'encLock', 'encDisable', 'encReset',
   ]);

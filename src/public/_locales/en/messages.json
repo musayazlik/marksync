@@ -1986,5 +1986,29 @@
   },
   "namingInvalid": {
     "message": "A title needs at least 2 characters (at most 120)."
+  },
+  "assistantScope": {
+    "message": "Proposals from {1}"
+  },
+  "assistantImported_one": {
+    "message": "An AI assistant proposed 1 change: review it under Tidy up the library."
+  },
+  "assistantImported_other": {
+    "message": "An AI assistant proposed {1} changes: review them under Tidy up the library."
+  },
+  "assistantWaiting_one": {
+    "message": "An AI assistant proposed 1 change; it waits until the open tidy-up review is closed."
+  },
+  "assistantWaiting_other": {
+    "message": "An AI assistant proposed {1} changes; they wait until the open tidy-up review is closed."
+  },
+  "tidyGroupMove": {
+    "message": "Move"
+  },
+  "tidyAriaMove": {
+    "message": "Move {1} to {2}"
+  },
+  "tidyLogMove": {
+    "message": "\"{1}\" moved"
   }
 }

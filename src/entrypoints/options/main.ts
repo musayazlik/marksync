@@ -550,6 +550,13 @@ async function initAi() {
   ]);
   void renderTidyEstimate();
   void renderSemantic();
+  // Proposals an AI assistant (MCP) left in Drive come into the tidy-up review.
+  void send({ type: 'aiAssistantCheck' })
+    .then((r) => {
+      if (r.imported) showToast($('#action-ok'), tn('assistantImported', r.imported));
+      else if (r.waiting) showToast($('#action-ok'), tn('assistantWaiting', r.waiting));
+    })
+    .catch(() => undefined);
 }
 
 aiEnabled.addEventListener('change', () => {
@@ -1288,8 +1295,9 @@ const tidyChosen = new Set<string>();
 const tidySeen = new Set<string>();
 type TidyItem = TidyJob['proposals'][number];
 const tidyOpen = (p: TidyItem) => !p.appliedAt;
-const TIDY_GROUPS: TidyItem['kind'][] = ['merge', 'rename', 'remove', 'retitle'];
+const TIDY_GROUPS: TidyItem['kind'][] = ['move', 'merge', 'rename', 'remove', 'retitle'];
 const tidyGroupKey: Record<TidyItem['kind'], string> = {
+  move: 'tidyGroupMove',
   merge: 'tidyGroupMerge',
   rename: 'tidyGroupRename',
   remove: 'tidyGroupRemove',
@@ -1355,6 +1363,11 @@ function tidyRow(p: TidyItem, job: TidyJob): HTMLLIElement {
     main.append(el('span', 'bulk-title was', p.title || p.url || ''), el('span', 'bulk-sub', shortPath(p.folderPath)));
     arrow(p.newTitle);
     tick.setAttribute('aria-label', t('tidyAriaRetitle', p.title, p.newTitle));
+  } else if (p.kind === 'move') {
+    main.append(el('span', 'bulk-title', p.title || p.url || ''));
+    main.append(el('span', 'bulk-sub', [shortPath(p.folderPath), p.applyError ?? p.reason].filter(Boolean).join(' · ')));
+    arrow(shortPath(p.intoPath), p.intoPath);
+    tick.setAttribute('aria-label', t('tidyAriaMove', p.title, p.intoPath));
   } else {
     main.append(el('span', 'bulk-title', shortPath(p.folderPath)));
     main.lastElementChild!.setAttribute('title', p.folderPath);

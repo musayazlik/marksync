@@ -34,6 +34,36 @@ jobs:
       - run: pnpm test
       - run: pnpm build:all
 
+  # The MCP server (mcp/) is its own npm package.
+  mcp:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mcp
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: mcp/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run build
+      - name: Answer an MCP client over stdio
+        env:
+          MARKSYNC_GOOGLE_CLIENT_ID: ci-placeholder
+        run: |
+          home="$(mktemp -d)"
+          init='{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"ci","version":"1"}}}'
+          ready='{"jsonrpc":"2.0","method":"notifications/initialized"}'
+          list='{"jsonrpc":"2.0","id":2,"method":"tools/list"}'
+          out="$(printf '%s\n' "$init" "$ready" "$list" | MARKSYNC_MCP_HOME="$home" timeout 20 node dist/index.js)"
+          echo "$out" | grep -q '"search_bookmarks"'
+          echo "$out" | grep -q '"propose_changes"'
+
   # Release-please reads commit messages to pick the next version, so pull
   # request titles must be Conventional Commits too (they become the commit
   # message when a PR is squash-merged).

@@ -23,6 +23,7 @@ other file there.
 - No duplicates when you connect a browser that already has the same bookmarks
 - Safety stop when a sync would delete most of your bookmarks
 - Automatic and manual backups in Google Drive, restore with one click
+- AI assistants: the `marksync-mcp` server lets Claude, Cursor and other MCP clients search your bookmarks and propose changes you approve in Marksync ([mcp/](mcp/))
 - Search by meaning: find bookmarks by what they are about, even when no word matches (opt-in, embeddings on OpenRouter or your own server, index shared through Drive)
 - Rediscover: once a day or a week, the popup brings back a few bookmarks you forgot (some related to what you saved lately) to open, keep, archive or delete; off by default, nothing leaves the browser
 - Tags, synced between browsers: AI sorting proposes them, you edit them in the popup, and `#tag` in the popup search filters by them

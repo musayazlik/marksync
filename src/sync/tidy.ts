@@ -35,6 +35,34 @@ export async function applyTidy(api: BookmarksApi, p: TidyProposal, model: strin
     };
   }
 
+  if (p.kind === 'move') {
+    const item = findTreeNode(tree, p.bookmarkId);
+    if (!item) return fail(p.bookmarkId, p.title, 'The bookmark was deleted meanwhile.', 'gone');
+    if (item.parentId !== p.fromId) return fail(p.bookmarkId, p.title, 'The bookmark was moved meanwhile.');
+    const into = findTreeNode(tree, p.intoId);
+    if (!into || into.node.url !== undefined) return fail(p.bookmarkId, p.title, 'The target folder was deleted meanwhile.', 'gone');
+    // A folder cannot go into itself or one of its subfolders.
+    if (item.node.url === undefined && (p.intoId === p.bookmarkId || findTreeNode(item.node.children ?? [], p.intoId))) {
+      return fail(p.bookmarkId, p.title, 'The target folder is inside this folder.');
+    }
+    const siblings = findTreeNode(tree, p.fromId)?.node.children ?? [];
+    const index = siblings.findIndex((c) => c.id === p.bookmarkId);
+    await api.move(p.bookmarkId, { parentId: p.intoId });
+    return {
+      bookmarkId: p.bookmarkId,
+      title: item.node.title,
+      ...(item.node.url ? { url: item.node.url } : {}),
+      status: 'tidied',
+      fromId: p.fromId,
+      fromPath: p.folderPath,
+      toId: p.intoId,
+      toPath: p.intoPath,
+      tidy: { action: 'move', before: item.node.title, parentId: p.fromId, ...(index >= 0 ? { index } : {}), targetId: p.intoId },
+      ...(p.reason ? { reason: p.reason } : {}),
+      model,
+    };
+  }
+
   const hit = findTreeNode(tree, p.folderId);
   const title = hit?.node.title ?? p.title;
   if (!hit || hit.node.url !== undefined) return fail(p.folderId, title, 'The folder was deleted meanwhile.', 'gone');
@@ -109,6 +137,14 @@ export async function undoTidy(api: BookmarksApi, entry: SortLogEntry): Promise<
     return;
   }
   if (!change.parentId || !findTreeNode(tree, change.parentId)) throw new UndoError('no-source');
+  if (change.action === 'move') {
+    const hit = findTreeNode(tree, entry.bookmarkId);
+    if (!hit) throw new UndoError('gone');
+    if (hit.parentId !== change.targetId) throw new UndoError('moved');
+    const count = findTreeNode(tree, change.parentId)!.node.children?.length ?? 0;
+    await api.move(entry.bookmarkId, { parentId: change.parentId, ...(change.index !== undefined ? { index: Math.min(change.index, count) } : {}) });
+    return;
+  }
   const siblings = findTreeNode(tree, change.parentId)!.node.children ?? [];
   const folder = await api.create({
     parentId: change.parentId,

@@ -5,7 +5,7 @@ import type { KeyUsage, ModelInfo } from '../core/openrouter-data';
 import { builtinLanguage } from '../core/ai-provider';
 import { builtinAvailability, type BuiltinState } from '../platform/builtin-ai';
 import { checkKey, fetchEndpointModels, fetchKeyUsage, fetchModels, OpenRouterError } from '../platform/openrouter';
-import { t } from '../shared/i18n';
+import { t, uiLanguage } from '../shared/i18n';
 import {
   aiModelsItem,
   aiSpendItem,
@@ -315,7 +315,7 @@ export async function listEndpointModels(): Promise<string[]> {
 
 /** Whether the browser's built-in model can run here, checked where it runs (the background). */
 export function builtinStatus(): Promise<BuiltinState> {
-  return builtinAvailability(builtinLanguage(browser.i18n.getUILanguage()));
+  return builtinAvailability(builtinLanguage(uiLanguage()));
 }
 
 // ---------- OpenRouter models and usage ----------

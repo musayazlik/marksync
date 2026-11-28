@@ -1,5 +1,5 @@
 import type { DuplicateGroup } from '../../core/dedupe';
-import { localizePage, t, tn } from '../../shared/i18n';
+import { initI18n, locale, localizePage, t, tn } from '../../shared/i18n';
 import { send } from '../../shared/messages';
 import { statusItem } from '../../shared/state';
 import { $, showToast, withBusy } from '../../shared/ui';
@@ -9,6 +9,7 @@ import { $, showToast, withBusy } from '../../shared/ui';
  * the copies the user does not keep. The background script does the scan and
  * the removal (and the backup before it).
  */
+await initI18n(() => location.reload());
 localizePage();
 const actionError = $('#action-error');
 const removeBtn = $<HTMLButtonElement>('#remove');
@@ -77,7 +78,7 @@ function renderGroup(group: DuplicateGroup, i: number): HTMLElement {
     text.append(el('span', 'copy-title', item.title || item.url));
     const meta = el('span', 'copy-meta muted small');
     meta.append(el('span', 'folder', item.folderPath));
-    if (item.dateAdded) meta.append(el('span', undefined, t('dupAdded', new Date(item.dateAdded).toLocaleDateString())));
+    if (item.dateAdded) meta.append(el('span', undefined, t('dupAdded', new Date(item.dateAdded).toLocaleDateString(locale()))));
     text.append(meta);
     if (item.url.replace(/\/$/, '') !== `https://${group.key}`.replace(/\/$/, '')) {
       text.append(el('span', 'copy-url muted small', item.url));

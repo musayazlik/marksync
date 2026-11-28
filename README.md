@@ -49,7 +49,7 @@ In **Settings**, open **History** next to the backup you want to compare. Select
 - Version history: compare any backup with your bookmarks now (removed, moved, renamed, added, grouped by folder), bring back a single bookmark or folder, and find the backup that still had a bookmark
 - Import from another browser (with Marksync, or from any browser's HTML export), merged without duplicates or into a new folder
 - Export to a standard HTML bookmarks file
-- Interface in English and Turkish; a badge on the toolbar icon when sync needs you
+- Interface in English, Turkish and German (follows the browser, or pick one in Settings); a badge on the toolbar icon when sync needs you
 - Duplicate finder: pages bookmarked more than once (even with http/https, a trailing slash or `utm_` parameters as the only difference); keep one copy, with a backup taken first
 - Link checker: finds bookmarks whose pages are gone or have moved; update a moved bookmark to its new address, or point a dead one to its saved copy in the [Wayback Machine](https://web.archive.org)
 - Optional AI sorting with your own [OpenRouter](https://openrouter.ai) key: pick an inbox folder, and the model (Claude Opus by default) researches each bookmark you add to it, moves it to the folder that fits best and explains what the site is and what it is used for; every decision is listed on a log page with Undo

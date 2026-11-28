@@ -1,6 +1,6 @@
 import type { ChangeKind, FolderPath, HistoryChange } from '../../core/history';
 import type { RootKey } from '../../core/types';
-import { localizePage, t, tn } from '../../shared/i18n';
+import { initI18n, locale, localizePage, t, tn } from '../../shared/i18n';
 import { send } from '../../shared/messages';
 import { $, showToast, withBusy } from '../../shared/ui';
 import type { BackupInfo } from '../../services/backup-service';
@@ -11,6 +11,7 @@ import type { BackupDiff } from '../../services/history-service';
  * renamed, added), grouped by the folder it was in, and bring back only the
  * items you tick. The background script does the comparing and restoring.
  */
+await initI18n(() => location.reload());
 localizePage();
 const actionError = $('#action-error');
 const picker = $<HTMLSelectElement>('#backup');
@@ -46,7 +47,7 @@ function el<K extends keyof HTMLElementTagNameMap>(tag: K, className?: string, t
 }
 
 const backupLabel = (b: BackupInfo) =>
-  [new Date(b.createdTime).toLocaleString(), b.source, tn('historyItems', b.count)].filter(Boolean).join(' · ');
+  [new Date(b.createdTime).toLocaleString(locale()), b.source, tn('historyItems', b.count)].filter(Boolean).join(' · ');
 
 function matches(c: HistoryChange): boolean {
   if (filter === 'renamed' && !(c.kind === 'renamed' || c.before)) return false;
@@ -104,7 +105,7 @@ function render() {
   for (const chip of document.querySelectorAll<HTMLButtonElement>('#filters .chip')) {
     const f = chip.dataset.filter as Filter;
     const n = f === 'all' ? (diff?.changes.length ?? 0) : counts[f];
-    chip.textContent = `${t(f === 'all' ? 'historyFilterAll' : kindKey[f])} ${n.toLocaleString()}`;
+    chip.textContent = `${t(f === 'all' ? 'historyFilterAll' : kindKey[f])} ${n.toLocaleString(locale())}`;
     chip.setAttribute('aria-pressed', String(f === filter));
     chip.disabled = f !== 'all' && n === 0;
   }
@@ -181,7 +182,7 @@ async function loadBackups() {
 async function restore() {
   const ids = [...chosen];
   if (!ids.length || !diff) return;
-  const when = new Date(diff.createdAt).toLocaleString();
+  const when = new Date(diff.createdAt).toLocaleString(locale());
   if (!confirm(t('historyConfirm', ids.length, when))) return;
   const r = await send({ type: 'historyRestore', id: picker.value, ids });
   const parts = [tn('historyDone', r.restored)];
@@ -214,7 +215,7 @@ async function find() {
     ...found.map((h) => {
       const li = el('li', 'hit');
       const head = el('div', 'hit-head');
-      head.append(el('strong', undefined, new Date(h.createdTime).toLocaleString()), el('span', 'muted small', h.source));
+      head.append(el('strong', undefined, new Date(h.createdTime).toLocaleString(locale())), el('span', 'muted small', h.source));
       const open = el('button', 'quiet small-button', t('historyFindOpen'));
       open.type = 'button';
       open.addEventListener('click', () => {

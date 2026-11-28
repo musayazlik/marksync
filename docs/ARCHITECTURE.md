@@ -368,7 +368,7 @@ click) and stops at the first key, credit or permission error.
 - Not synced: favicons, separators, Firefox tags and keywords.
 - More storage backends (Git, Dropbox, OneDrive, S3) can implement `FileStore`.
 - Shared folders: Drive only; a member removed in Drive keeps their last copy as a folder with an error.
-- Ideas: more UI languages, Safari build, a per-sync-run change log (which browser changed what), changing the
+- Ideas: Safari build, a per-sync-run change log (which browser changed what), changing the
   encryption passphrase without turning encryption off and on.
 
 ## Encryption (optional, `services/encryption-service.ts`)
@@ -588,7 +588,11 @@ Ctrl+Enter in the background; `/` focuses the field.
 
 ## Interface
 
-- **Languages**: English and Turkish, following the browser's language.
+- **Languages**: English, Turkish and German. The browser's language is used
+  unless one is picked under Settings → Language (`local:uiLanguage`); then
+  `initI18n()` loads that language's `messages.json` and every open page
+  reloads. Pages await it before rendering, the background loads it at start.
+  The extension's name in the browser's list always follows the browser.
   Texts live in `src/public/_locales/<lang>/messages.json`; pages mark
   elements with `data-i18n` and code calls `t()` (`src/shared/i18n.ts`).
   `tests/i18n.test.ts` fails if a key is missing or the languages differ.

@@ -1,0 +1,2219 @@
+{
+  "extName": {
+    "message": "Marksync"
+  },
+  "extDescription": {
+    "message": "Hält Ihre Lesezeichen in Chrome, Brave, Edge und Firefox gleich, mit Sicherungen in Ihrem eigenen Google Drive."
+  },
+  "openOptions": {
+    "message": "Einstellungen"
+  },
+  "openOptionsTitle": {
+    "message": "Sicherungen und Einstellungen"
+  },
+  "popupIntro": {
+    "message": "Verbinden Sie Ihr Google-Konto, damit Ihre Lesezeichen in jedem Browser mit Marksync gleich bleiben."
+  },
+  "privacyNote": {
+    "message": "Lesezeichen werden nur in einem Marksync-Ordner in Ihrem eigenen Google Drive gespeichert. Marksync kann keine anderen Dateien dort sehen."
+  },
+  "connectDrive": {
+    "message": "Google Drive verbinden"
+  },
+  "bringBack": {
+    "message": "Zurückholen"
+  },
+  "keepLocal": {
+    "message": "Meine Lesezeichen behalten"
+  },
+  "deleteEverywhere": {
+    "message": "Überall löschen"
+  },
+  "deleteHereToo": {
+    "message": "Auch hier löschen"
+  },
+  "syncNow": {
+    "message": "Jetzt synchronisieren"
+  },
+  "backupNow": {
+    "message": "Jetzt sichern"
+  },
+  "popupImport": {
+    "message": "Aus anderen Browsern importieren…"
+  },
+  "connectedAs": {
+    "message": "Verbunden als {1}"
+  },
+  "connected": {
+    "message": "Verbunden"
+  },
+  "notConnected": {
+    "message": "Nicht verbunden"
+  },
+  "reconnect": {
+    "message": "Neu verbinden"
+  },
+  "syncOff": {
+    "message": "Die Synchronisierung ist in diesem Browser aus"
+  },
+  "syncOffHint": {
+    "message": "Die Synchronisierung ist für diesen Browser in den Einstellungen ausgeschaltet."
+  },
+  "syncing": {
+    "message": "Wird synchronisiert…"
+  },
+  "lastSync": {
+    "message": "Zuletzt synchronisiert {1}"
+  },
+  "lastBackup": {
+    "message": "Letzte Sicherung {1}"
+  },
+  "items_one": {
+    "message": "{1} Eintrag"
+  },
+  "items_other": {
+    "message": "{1} Einträge"
+  },
+  "skippedItems_one": {
+    "message": "{1} Eintrag wird in diesem Browser nicht unterstützt"
+  },
+  "skippedItems_other": {
+    "message": "{1} Einträge werden in diesem Browser nicht unterstützt"
+  },
+  "authHint": {
+    "message": "{1} Öffnen Sie die Einstellungen und klicken Sie auf „Neu verbinden“."
+  },
+  "massDeleteRemote": {
+    "message": "{1} von {2} Lesezeichen wurden in einem anderen Browser oder direkt in Google Drive gelöscht. Die Synchronisierung pausiert, bis Sie entscheiden. Bevor hier etwas gelöscht wird, wird eine Sicherung erstellt."
+  },
+  "massDeleteLocal": {
+    "message": "{1} von {2} Lesezeichen wurden in diesem Browser entfernt. Die Synchronisierung pausiert, damit sie nicht versehentlich überall gelöscht werden."
+  },
+  "errNetwork": {
+    "message": "Google Drive ist nicht erreichbar. Marksync versucht es erneut."
+  },
+  "badgePaused": {
+    "message": "Synchronisierung pausiert, öffnen Sie Marksync, um zu entscheiden"
+  },
+  "timeNever": {
+    "message": "nie"
+  },
+  "timeJustNow": {
+    "message": "gerade eben"
+  },
+  "timeMinutesAgo": {
+    "message": "vor {1} Min."
+  },
+  "timeHoursAgo": {
+    "message": "vor {1} Std."
+  },
+  "optionsTitle": {
+    "message": "Marksync-Einstellungen"
+  },
+  "version": {
+    "message": "Version {1}"
+  },
+  "versionNotes": {
+    "message": "Neu in dieser Version"
+  },
+  "welcomeHeading": {
+    "message": "Willkommen bei Marksync"
+  },
+  "welcomeConnect": {
+    "message": "Verbinden Sie zum Start unten Ihr Google-Konto. Tun Sie dasselbe in jedem Browser, in dem Sie Marksync installieren, mit demselben Google-Konto."
+  },
+  "welcomeNoDuplicates": {
+    "message": "Lesezeichen, die bereits in mehreren Browsern sind, werden zusammengeführt, nicht verdoppelt."
+  },
+  "disconnect": {
+    "message": "Trennen"
+  },
+  "deviceNameLabel": {
+    "message": "Name dieses Browsers"
+  },
+  "deviceNameHelp": {
+    "message": "Wird in Sicherungen und in der Importliste Ihrer anderen Browser angezeigt. Leer lassen, um den erkannten Namen zu verwenden."
+  },
+  "languageLabel": {
+    "message": "Sprache"
+  },
+  "languageHelp": {
+    "message": "Die Sprache von Marksync in diesem Browser. Der Name der Erweiterung in der Liste des Browsers folgt der Sprache des Browsers."
+  },
+  "languageAuto": {
+    "message": "Sprache des Browsers"
+  },
+  "syncHeading": {
+    "message": "Synchronisierung"
+  },
+  "syncEnabledLabel": {
+    "message": "Lesezeichen in diesem Browser synchronisieren"
+  },
+  "syncIntervalLabel": {
+    "message": "Auf Änderungen aus anderen Browsern prüfen alle"
+  },
+  "interval1Min": {
+    "message": "1 Minute"
+  },
+  "interval5Min": {
+    "message": "5 Minuten"
+  },
+  "interval15Min": {
+    "message": "15 Minuten"
+  },
+  "interval1Hour": {
+    "message": "1 Stunde"
+  },
+  "syncHelp": {
+    "message": "Änderungen in diesem Browser werden innerhalb etwa einer Sekunde gesendet. Änderungen aus Ihren anderen Browsern kommen an, sobald Sie zu diesem Browser wechseln, und sonst im oben gewählten Abstand."
+  },
+  "backupsHeading": {
+    "message": "Sicherungen in Google Drive"
+  },
+  "exportHtml": {
+    "message": "Als HTML exportieren"
+  },
+  "autoBackupLabel": {
+    "message": "Automatisch sichern"
+  },
+  "backupEveryBefore": {
+    "message": "Alle"
+  },
+  "backupEvery6Hours": {
+    "message": "6 Stunden"
+  },
+  "backupEveryDay": {
+    "message": "Tage"
+  },
+  "backupEveryWeek": {
+    "message": "Wochen"
+  },
+  "backupKeepBefore": {
+    "message": "und die letzten"
+  },
+  "backupKeepAfter": {
+    "message": "Sicherungen behalten"
+  },
+  "columnDate": {
+    "message": "Datum"
+  },
+  "columnFrom": {
+    "message": "Von"
+  },
+  "columnItems": {
+    "message": "Einträge"
+  },
+  "columnBrowser": {
+    "message": "Browser"
+  },
+  "columnBookmarks": {
+    "message": "Lesezeichen"
+  },
+  "columnUpdated": {
+    "message": "Aktualisiert"
+  },
+  "noBackups": {
+    "message": "Noch keine Sicherungen."
+  },
+  "restoreHelp": {
+    "message": "Eine Wiederherstellung ersetzt die Lesezeichen in jedem verbundenen Browser. Die aktuellen Lesezeichen werden vorher gesichert, sodass Sie eine Wiederherstellung rückgängig machen können. Um nur einzelne Lesezeichen oder Ordner zurückzuholen, öffnen Sie den Verlauf."
+  },
+  "backupReasonScheduled": {
+    "message": "automatisch"
+  },
+  "backupReasonBeforeRestore": {
+    "message": "vor einer Wiederherstellung"
+  },
+  "backupReasonBeforeRemoteDelete": {
+    "message": "vor einer großen Löschung aus einem anderen Browser"
+  },
+  "restore": {
+    "message": "Wiederherstellen"
+  },
+  "delete": {
+    "message": "Löschen"
+  },
+  "confirmRestore": {
+    "message": "Die Lesezeichen in allen Browsern durch die Sicherung vom {1} ersetzen?"
+  },
+  "confirmDeleteBackup": {
+    "message": "Diese Sicherung aus Google Drive löschen?"
+  },
+  "confirmDisconnect": {
+    "message": "Diesen Browser nicht mehr synchronisieren? Ihre Lesezeichen, Ihre Drive-Dateien und Ihre anderen verbundenen Browser bleiben, wie sie sind.\\n\\nUm den Zugriff von Marksync auf Ihr Google-Konto in allen Browsern zu entfernen, besuchen Sie myaccount.google.com/permissions."
+  },
+  "importHeading": {
+    "message": "Lesezeichen importieren"
+  },
+  "importIntro": {
+    "message": "Holen Sie Lesezeichen aus einem anderen Browser in diesen. Bei eingeschalteter Synchronisierung erscheinen sie dann in allen Ihren Browsern."
+  },
+  "importHow": {
+    "message": "Art des Imports"
+  },
+  "importModeMerge": {
+    "message": "In meine Lesezeichen einfügen und vorhandene überspringen"
+  },
+  "importModeFolder": {
+    "message": "In einen neuen Ordner legen"
+  },
+  "importFromBrowserHeading": {
+    "message": "Aus einem anderen Browser mit Marksync"
+  },
+  "browsersEmpty": {
+    "message": "Noch keine anderen Browser. Installieren Sie Marksync dort und verbinden Sie dasselbe Google-Konto. Das funktioniert auch, wenn die Synchronisierung in diesem Browser aus ist."
+  },
+  "browsersOffline": {
+    "message": "Verbinden Sie Ihr Google-Konto, um Ihre anderen Browser zu sehen."
+  },
+  "importFileHeading": {
+    "message": "Aus einer HTML-Datei"
+  },
+  "importFileHelp": {
+    "message": "Für Browser ohne Marksync. Exportieren Sie die Datei dort zuerst:"
+  },
+  "importFileChromium": {
+    "message": "Chrome, Brave, Edge: Lesezeichen-Manager → ⋮ → Lesezeichen exportieren."
+  },
+  "importFileFirefox": {
+    "message": "Firefox: Lesezeichen → Lesezeichen verwalten → Importieren und Sichern → Lesezeichen nach HTML exportieren."
+  },
+  "importFileSafari": {
+    "message": "Safari: Ablage → Exportieren → Lesezeichen."
+  },
+  "importFileButton": {
+    "message": "Datei importieren"
+  },
+  "importAdded_one": {
+    "message": "1 Lesezeichen hinzugefügt."
+  },
+  "importAdded_other": {
+    "message": "{1} Lesezeichen hinzugefügt."
+  },
+  "importDuplicates_one": {
+    "message": "1 war bereits hier."
+  },
+  "importDuplicates_other": {
+    "message": "{1} waren bereits hier."
+  },
+  "importFailed_one": {
+    "message": "1 konnte in diesem Browser nicht hinzugefügt werden."
+  },
+  "importFailed_other": {
+    "message": "{1} konnten in diesem Browser nicht hinzugefügt werden."
+  },
+  "thisBrowser": {
+    "message": "{1} (dieser Browser)"
+  },
+  "import": {
+    "message": "Importieren"
+  },
+  "remove": {
+    "message": "Entfernen"
+  },
+  "removeBrowserHint": {
+    "message": "Einen Browser, den Sie nicht mehr nutzen, aus dieser Liste entfernen"
+  },
+  "confirmRemoveBrowser": {
+    "message": "{1} aus dieser Liste entfernen? Seine Lesezeichen bleiben unberührt."
+  },
+  "importedFolder": {
+    "message": "Importiert aus {1} ({2})"
+  },
+  "rootToolbar": {
+    "message": "Lesezeichenleiste"
+  },
+  "rootMenu": {
+    "message": "Lesezeichen-Menü"
+  },
+  "rootOther": {
+    "message": "Weitere Lesezeichen"
+  },
+  "rootMobile": {
+    "message": "Mobile Lesezeichen"
+  },
+  "anotherBrowser": {
+    "message": "einem anderen Browser"
+  },
+  "deviceLabel": {
+    "message": "{1} auf {2}"
+  },
+  "errReconnect": {
+    "message": "Verbinden Sie Ihr Google-Konto neu, um weiter zu synchronisieren."
+  },
+  "errNoClientId": {
+    "message": "Diesem Build fehlt eine Google-OAuth-Client-ID (WXT_GOOGLE_CLIENT_ID). Siehe docs/GOOGLE_SETUP.md."
+  },
+  "errSignInFailed": {
+    "message": "Google-Anmeldung fehlgeschlagen: {1}"
+  },
+  "errSignInState": {
+    "message": "Die Google-Anmeldung hat einen unerwarteten Status zurückgegeben."
+  },
+  "errDriveNotGranted": {
+    "message": "Der Zugriff auf Google Drive wurde nicht erlaubt. Verbinden Sie erneut und erlauben Sie den Drive-Zugriff."
+  },
+  "errDisconnectedWhileSigningIn": {
+    "message": "Während der Anmeldung getrennt."
+  },
+  "errConnectFirst": {
+    "message": "Verbinden Sie zuerst Ihr Google-Konto."
+  },
+  "errOtherAccount": {
+    "message": "Google hat ein anderes Konto zurückgegeben ({1}). Verbinden Sie neu, um fortzufahren."
+  },
+  "errNewerSyncFile": {
+    "message": "Die Sync-Datei in Google Drive wurde von einer neueren Marksync-Version geschrieben. Aktualisieren Sie die Erweiterung."
+  },
+  "errNotBackup": {
+    "message": "Diese Datei ist keine Marksync-Sicherung."
+  },
+  "errNotSnapshot": {
+    "message": "Diese Datei ist kein Marksync-Browser-Schnappschuss."
+  },
+  "errNothingToImport": {
+    "message": "Keine Lesezeichen zum Importieren gefunden."
+  },
+  "errNoFileContent": {
+    "message": "Kein Dateiinhalt."
+  },
+  "errUnknownRequest": {
+    "message": "Unbekannte Anfrage."
+  },
+  "errNoAnswer": {
+    "message": "Das Hintergrundskript hat nicht geantwortet."
+  },
+  "aiHeading": {
+    "message": "KI-Sortierung (OpenRouter)"
+  },
+  "aiOpenLog": {
+    "message": "Sortierprotokoll öffnen"
+  },
+  "aiIntro": {
+    "message": "Wählen Sie einen Eingangsordner. Wenn Sie in diesem Browser ein Lesezeichen hinzufügen, wählt ein KI-Modell unter Ihren Ordnern den passendsten aus und verschiebt das Lesezeichen wenige Sekunden später dorthin. Das Modell kann bei OpenRouter, auf einem eigenen Server (Ollama, LM Studio, ...) oder auf diesem Gerät laufen."
+  },
+  "aiPrivacy": {
+    "message": "Nur solange dies eingeschaltet ist: Der Titel des Lesezeichens, seine Adresse ohne den Teil nach „?“ und die Namen Ihrer Ordner werden an OpenRouter und das gewählte Modell gesendet. Mit Web-Recherche öffnet OpenRouter außerdem diese Adresse und sucht eventuell im Web danach. Andere Browser senden nichts, solange Sie es dort nicht ebenfalls einschalten."
+  },
+  "aiEnabledLabel": {
+    "message": "Lesezeichen sortieren, die ich in diesem Browser zum Eingangsordner hinzufüge"
+  },
+  "aiInboxLabel": {
+    "message": "Eingangsordner"
+  },
+  "aiInboxNone": {
+    "message": "Ordner wählen…"
+  },
+  "aiInboxMissingOption": {
+    "message": "(gelöschter Ordner)"
+  },
+  "aiChooseInbox": {
+    "message": "Wählen Sie den Eingangsordner, um zu beginnen."
+  },
+  "aiInboxMissing": {
+    "message": "Der Eingangsordner existiert in diesem Browser nicht mehr. Wählen Sie einen anderen."
+  },
+  "aiReady": {
+    "message": "Bereit. Lesezeichen, die Sie zu „{1}“ hinzufügen, werden wenige Sekunden später sortiert."
+  },
+  "aiKeyLabel": {
+    "message": "OpenRouter-API-Schlüssel"
+  },
+  "aiKeyPlaceholder": {
+    "message": "sk-or-v1-…"
+  },
+  "aiKeySave": {
+    "message": "Schlüssel speichern"
+  },
+  "aiKeyRemove": {
+    "message": "Schlüssel entfernen"
+  },
+  "aiTest": {
+    "message": "Testen"
+  },
+  "aiKeySaved": {
+    "message": "Schlüssel gespeichert: {1}"
+  },
+  "aiKeyNone": {
+    "message": "Kein Schlüssel gespeichert. Sie können einen unter openrouter.ai/keys erstellen."
+  },
+  "aiKeyHelp": {
+    "message": "Der Schlüssel wird nur in diesem Browser gespeichert und nie zu Google Drive hochgeladen."
+  },
+  "aiKeyInvalid": {
+    "message": "Das sieht nicht nach einem OpenRouter-API-Schlüssel aus."
+  },
+  "aiConfirmRemoveKey": {
+    "message": "Den OpenRouter-API-Schlüssel aus diesem Browser entfernen? Die KI-Sortierung stoppt, bis Sie wieder einen Schlüssel hinzufügen."
+  },
+  "aiTestOk": {
+    "message": "OpenRouter hat den Schlüssel akzeptiert."
+  },
+  "aiTestOkLabel": {
+    "message": "OpenRouter hat den Schlüssel akzeptiert ({1})."
+  },
+  "aiModelLabel": {
+    "message": "Modell"
+  },
+  "aiModelHelp": {
+    "message": "Wählen Sie ein Modell aus der Liste von OpenRouter oder geben Sie eine beliebige Modell-ID ein. Der Standard {1} ist am gründlichsten; Sonnet oder Gemini Flash sind schneller und günstiger."
+  },
+  "aiAllowNewLabel": {
+    "message": "Neuen Ordner anlegen, wenn keiner meiner Ordner passt"
+  },
+  "aiSortNow": {
+    "message": "Eingang jetzt sortieren"
+  },
+  "aiSortNowResult": {
+    "message": "Verschoben {1}, im Eingang belassen {2}, fehlgeschlagen {3}. Details stehen im Sortierprotokoll."
+  },
+  "aiNotReady": {
+    "message": "Schalten Sie zuerst die KI-Sortierung ein, wählen Sie einen Eingangsordner und schließen Sie die Einrichtung des KI-Anbieters ab."
+  },
+  "aiPermissionMissing": {
+    "message": "Marksync darf openrouter.ai nicht kontaktieren. Schalten Sie die KI-Sortierung aus und wieder ein, um es zu erlauben."
+  },
+  "aiPermissionDenied": {
+    "message": "Die KI-Sortierung braucht die Berechtigung, openrouter.ai zu kontaktieren."
+  },
+  "aiNoKey": {
+    "message": "Speichern Sie zuerst einen OpenRouter-API-Schlüssel."
+  },
+  "aiKeyRejected": {
+    "message": "OpenRouter hat den Schlüssel abgelehnt."
+  },
+  "aiUndo": {
+    "message": "Rückgängig"
+  },
+  "aiUndoHint": {
+    "message": "Lesezeichen zurück in den Eingangsordner verschieben"
+  },
+  "aiUndoGone": {
+    "message": "Das Lesezeichen existiert nicht mehr."
+  },
+  "aiUndoMoved": {
+    "message": "Das Lesezeichen wurde seitdem erneut verschoben und bleibt daher, wo es ist."
+  },
+  "aiUndoNoSource": {
+    "message": "Der Eingangsordner existiert nicht mehr."
+  },
+  "aiUndoUnavailable": {
+    "message": "Dieser Eintrag kann nicht rückgängig gemacht werden."
+  },
+  "aiLogTitle": {
+    "message": "KI-Sortierprotokoll"
+  },
+  "aiLogBack": {
+    "message": "Einstellungen"
+  },
+  "aiLogIntro": {
+    "message": "Jede Entscheidung der KI in diesem Browser, die neueste zuerst. Die letzten {1} werden behalten."
+  },
+  "aiLogShow": {
+    "message": "Anzeigen"
+  },
+  "aiLogFilterAll": {
+    "message": "Alle"
+  },
+  "aiLogFilterMoved": {
+    "message": "Verschoben"
+  },
+  "aiLogFilterKept": {
+    "message": "Im Eingang"
+  },
+  "aiLogFilterErrors": {
+    "message": "Fehlgeschlagen"
+  },
+  "aiLogSearch": {
+    "message": "Titel, Adresse oder Ordner suchen"
+  },
+  "aiLogClear": {
+    "message": "Protokoll leeren"
+  },
+  "aiLogConfirmClear": {
+    "message": "Das gesamte Sortierprotokoll löschen? Lesezeichen werden nicht verändert."
+  },
+  "aiLogEmpty": {
+    "message": "Noch nichts hier. Lesezeichen, die Sie zum Eingangsordner hinzufügen, erscheinen hier, sobald die KI sie einsortiert hat."
+  },
+  "columnBookmark": {
+    "message": "Lesezeichen"
+  },
+  "columnReason": {
+    "message": "Grund"
+  },
+  "aiStatusMoved": {
+    "message": "Verschoben"
+  },
+  "aiStatusCreated": {
+    "message": "In einen neuen Ordner verschoben"
+  },
+  "aiStatusKept": {
+    "message": "Im Eingang belassen"
+  },
+  "aiStatusError": {
+    "message": "Fehlgeschlagen"
+  },
+  "aiStatusUndone": {
+    "message": "Rückgängig gemacht"
+  },
+  "aiConfidence": {
+    "message": "{1} % sicher"
+  },
+  "aiErrAuth": {
+    "message": "OpenRouter hat den API-Schlüssel abgelehnt."
+  },
+  "aiErrCredits": {
+    "message": "Nicht genug OpenRouter-Guthaben."
+  },
+  "aiErrRateLimit": {
+    "message": "Zu viele Anfragen an OpenRouter. Versuchen Sie es später erneut."
+  },
+  "aiErrModel": {
+    "message": "Das Modell ist nicht verfügbar oder hat die Anfrage abgelehnt. Prüfen Sie die Modell-ID in den Einstellungen."
+  },
+  "aiErrNetwork": {
+    "message": "OpenRouter ist nicht erreichbar."
+  },
+  "aiErrReply": {
+    "message": "Die Antwort der KI war nicht verwendbar, daher blieb das Lesezeichen im Eingang."
+  },
+  "aiResearchLabel": {
+    "message": "Die Website vor dem Sortieren im Web recherchieren"
+  },
+  "aiResearchHelp": {
+    "message": "Das Modell liest die gespeicherte Seite, sucht bei Bedarf im Web und beschreibt dann, was die Website ist und wofür sie genutzt wird. Genauer, aber langsamer (oft 10–60 Sekunden) und etwas teurer."
+  },
+  "aiSiteAbout": {
+    "message": "Über die Website"
+  },
+  "aiSiteWhat": {
+    "message": "Was sie ist"
+  },
+  "aiSitePurpose": {
+    "message": "Wofür"
+  },
+  "aiSiteSources": {
+    "message": "Quellen"
+  },
+  "aiCost": {
+    "message": "Kosten: {1}"
+  },
+  "aiResearched": {
+    "message": "im Web recherchiert"
+  },
+  "dupTitle": {
+    "message": "Doppelte Lesezeichen"
+  },
+  "dupIntro": {
+    "message": "Seiten, die mehrfach gespeichert sind, auch wenn sich die Kopien nur in http oder https, einem abschließenden Schrägstrich oder Tracking-Parametern wie utm_source unterscheiden. Wählen Sie die Kopie, die bleiben soll; die anderen werden in jedem Browser entfernt."
+  },
+  "dupOpen": {
+    "message": "Duplikate finden"
+  },
+  "dupSettingLabel": {
+    "message": "Doppelte Lesezeichen"
+  },
+  "dupSettingHelp": {
+    "message": "Seiten finden, die Sie mehrfach gespeichert haben, und von jeder eine Kopie behalten."
+  },
+  "dupScanAgain": {
+    "message": "Erneut suchen"
+  },
+  "dupScanning": {
+    "message": "Suche nach Duplikaten…"
+  },
+  "dupGroups_one": {
+    "message": "{1} Seite mehrfach gespeichert"
+  },
+  "dupGroups_other": {
+    "message": "{1} Seiten mehrfach gespeichert"
+  },
+  "dupExtra_one": {
+    "message": "{1} überzählige Kopie"
+  },
+  "dupExtra_other": {
+    "message": "{1} überzählige Kopien"
+  },
+  "dupRemove_one": {
+    "message": "1 Kopie entfernen"
+  },
+  "dupRemove_other": {
+    "message": "{1} Kopien entfernen"
+  },
+  "dupCopies_one": {
+    "message": "1 Kopie"
+  },
+  "dupCopies_other": {
+    "message": "{1} Kopien"
+  },
+  "dupKeep": {
+    "message": "Behalten"
+  },
+  "dupWillRemove": {
+    "message": "Entfernen"
+  },
+  "dupIncludeGroup": {
+    "message": "Diese Seite bereinigen"
+  },
+  "dupAdded": {
+    "message": "Hinzugefügt am {1}"
+  },
+  "dupConfirm": {
+    "message": "{1} Lesezeichen entfernen? Sie werden in jedem Browser entfernt, der mit Marksync synchronisiert. Vorher wird eine Sicherung in Google Drive gespeichert."
+  },
+  "dupConfirmNoBackup": {
+    "message": "{1} Lesezeichen aus diesem Browser entfernen? Marksync ist nicht mit Google Drive verbunden, daher kann vorher keine Sicherung gespeichert werden."
+  },
+  "dupDone_one": {
+    "message": "1 Lesezeichen entfernt."
+  },
+  "dupDone_other": {
+    "message": "{1} Lesezeichen entfernt."
+  },
+  "dupDoneBackup": {
+    "message": "Vorher wurde eine Sicherung in Google Drive gespeichert; Sie können sie in den Einstellungen wiederherstellen."
+  },
+  "dupSkipped_one": {
+    "message": "1 wurde nicht angefasst, weil es sich geändert hat oder schon weg war."
+  },
+  "dupSkipped_other": {
+    "message": "{1} wurden nicht angefasst, weil sie sich geändert haben oder schon weg waren."
+  },
+  "dupNone": {
+    "message": "Keine Duplikate: Jede Seite ist einmal gespeichert."
+  },
+  "backupReasonBeforeCleanup": {
+    "message": "vor einer Bereinigung"
+  },
+  "linkTitle": {
+    "message": "Link-Prüfung"
+  },
+  "linkIntro": {
+    "message": "Findet Lesezeichen, deren Seiten verschwunden oder umgezogen sind, und bietet für nicht mehr vorhandene Seiten die gespeicherte Kopie der Wayback Machine an."
+  },
+  "linkSettingLabel": {
+    "message": "Defekte Links"
+  },
+  "linkSettingHelp": {
+    "message": "Jedes Lesezeichen prüfen und die reparieren, die sich nicht mehr öffnen."
+  },
+  "linkOpen": {
+    "message": "Links prüfen"
+  },
+  "linkStartText": {
+    "message": "Marksync öffnet die Adresse jedes Lesezeichens im Hintergrund, immer ein paar gleichzeitig, und listet die auf, die verschwunden oder umgezogen sind oder keine klare Antwort gaben. Nichts ändert sich, bis Sie eine Korrektur wählen."
+  },
+  "linkHintSignIn": {
+    "message": "Seiten werden ohne Ihre Cookies geöffnet, daher kann eine Seite, für die Sie angemeldet sein müssen, als fehlend erscheinen. Öffnen Sie sie, bevor Sie sie entfernen."
+  },
+  "linkHintPrivacy": {
+    "message": "Dafür ist Zugriff auf alle Websites nötig, der beim Start erfragt wird. Adressen auf Ihrem eigenen Computer oder im lokalen Netzwerk werden nie geöffnet. Für verschwundene Seiten wird die Adresse bei archive.org nachgeschlagen."
+  },
+  "linkStart": {
+    "message": "Meine Lesezeichen prüfen"
+  },
+  "linkStop": {
+    "message": "Stoppen"
+  },
+  "linkContinue": {
+    "message": "Fortsetzen"
+  },
+  "linkStartOver": {
+    "message": "Neu beginnen"
+  },
+  "linkCheckAgain": {
+    "message": "Erneut prüfen"
+  },
+  "linkProgress": {
+    "message": "{1} von {2} Lesezeichen geprüft…"
+  },
+  "linkInterrupted": {
+    "message": "Die letzte Prüfung wurde nach {1} von {2} Lesezeichen beendet."
+  },
+  "linkFinished": {
+    "message": "{1} Lesezeichen geprüft am {2}."
+  },
+  "linkFilterDead": {
+    "message": "Verschwunden"
+  },
+  "linkFilterMoved": {
+    "message": "Umgezogen"
+  },
+  "linkFilterUnknown": {
+    "message": "Unklar"
+  },
+  "linkHelpDead": {
+    "message": "Diese Seiten existieren nicht mehr oder ihre Website ist nicht erreichbar. Nutzen Sie die archivierte Kopie oder entfernen Sie das Lesezeichen."
+  },
+  "linkHelpMoved": {
+    "message": "Diese Seiten öffnen sich jetzt unter einer anderen Adresse. Aktualisieren Sie das Lesezeichen auf die neue Adresse."
+  },
+  "linkHelpUnknown": {
+    "message": "Diese gaben keine klare Antwort: Vielleicht müssen Sie angemeldet sein, oder die Website war ausgelastet. Prüfen Sie sie später erneut."
+  },
+  "linkReasonNotFound": {
+    "message": "Nicht gefunden (404)"
+  },
+  "linkReasonGone": {
+    "message": "Von der Website entfernt (410)"
+  },
+  "linkReasonUnreachable": {
+    "message": "Website nicht erreichbar"
+  },
+  "linkReasonMoved": {
+    "message": "Umgezogen"
+  },
+  "linkReasonSignIn": {
+    "message": "Anmeldung nötig oder blockiert"
+  },
+  "linkReasonRateLimited": {
+    "message": "Zu viele Anfragen"
+  },
+  "linkReasonServerError": {
+    "message": "Serverfehler ({1})"
+  },
+  "linkReasonTimeout": {
+    "message": "Keine rechtzeitige Antwort"
+  },
+  "linkReasonOther": {
+    "message": "Unerwartete Antwort ({1})"
+  },
+  "linkArchiveFrom": {
+    "message": "Archivierte Kopie vom {1}"
+  },
+  "linkArchiveOpen": {
+    "message": "Archivierte Kopie"
+  },
+  "linkNoArchive": {
+    "message": "Keine archivierte Kopie"
+  },
+  "linkArchiveLooking": {
+    "message": "Suche nach einer archivierten Kopie…"
+  },
+  "linkUseNew": {
+    "message": "Neue Adresse verwenden"
+  },
+  "linkUseArchive": {
+    "message": "Archivierte Kopie verwenden"
+  },
+  "linkRemove": {
+    "message": "Entfernen"
+  },
+  "linkRecheck": {
+    "message": "Erneut prüfen"
+  },
+  "linkKeep": {
+    "message": "So lassen"
+  },
+  "linkDoneUpdated": {
+    "message": "Aktualisiert"
+  },
+  "linkDoneArchived": {
+    "message": "Zeigt auf das Archiv"
+  },
+  "linkDoneRemoved": {
+    "message": "Entfernt"
+  },
+  "linkDoneKept": {
+    "message": "Behalten"
+  },
+  "linkAllGood_one": {
+    "message": "Das Lesezeichen funktioniert."
+  },
+  "linkAllGood_other": {
+    "message": "Alle {1} Lesezeichen funktionieren."
+  },
+  "linkNothingHere": {
+    "message": "Nichts hier."
+  },
+  "linkRemoveAll_one": {
+    "message": "1 Lesezeichen entfernen"
+  },
+  "linkRemoveAll_other": {
+    "message": "Alle {1} entfernen"
+  },
+  "linkUpdateAll_one": {
+    "message": "1 Lesezeichen aktualisieren"
+  },
+  "linkUpdateAll_other": {
+    "message": "Alle {1} aktualisieren"
+  },
+  "linkConfirmRemoveAll": {
+    "message": "{1} Lesezeichen entfernen, deren Seiten verschwunden sind? Sie werden in jedem Browser entfernt. Ist Marksync verbunden, wird vorher eine Sicherung in Google Drive gespeichert."
+  },
+  "linkConfirmUpdateAll": {
+    "message": "{1} Lesezeichen auf die neuen Adressen ihrer umgezogenen Seiten zeigen lassen?"
+  },
+  "linkRemovedN_one": {
+    "message": "1 Lesezeichen entfernt."
+  },
+  "linkRemovedN_other": {
+    "message": "{1} Lesezeichen entfernt."
+  },
+  "linkUpdatedN_one": {
+    "message": "1 Lesezeichen aktualisiert."
+  },
+  "linkUpdatedN_other": {
+    "message": "{1} Lesezeichen aktualisiert."
+  },
+  "linkPermissionDenied": {
+    "message": "Für die Link-Prüfung ist Zugriff auf alle Websites nötig."
+  },
+  "linkPermissionMissing": {
+    "message": "Marksync darf keine anderen Websites öffnen. Starten Sie die Prüfung auf der Seite der Link-Prüfung, um es zu erlauben."
+  },
+  "linkGone": {
+    "message": "Dieses Lesezeichen existiert nicht mehr."
+  },
+  "linkChanged": {
+    "message": "Dieses Lesezeichen wurde nach der Prüfung geändert und daher so gelassen. Prüfen Sie erneut, um seinen neuen Stand zu sehen."
+  },
+  "aiModelSearchPlaceholder": {
+    "message": "Modelle suchen: claude, gemini, gpt…"
+  },
+  "aiModelFilters": {
+    "message": "Modelle filtern"
+  },
+  "aiModelFilterAll": {
+    "message": "Alle"
+  },
+  "aiModelFilterFree": {
+    "message": "Kostenlos"
+  },
+  "aiModelFilterTools": {
+    "message": "Web-Recherche"
+  },
+  "aiModelsRefresh": {
+    "message": "Liste aktualisieren"
+  },
+  "aiModelFree": {
+    "message": "Kostenlos"
+  },
+  "aiModelPrice": {
+    "message": "{1} Eingabe · {2} Ausgabe / 1 Mio. Tokens"
+  },
+  "aiModelContext": {
+    "message": "{1} Kontext"
+  },
+  "aiModelToolsHint": {
+    "message": "Kann die Seite lesen und im Web suchen (Option Recherche)"
+  },
+  "aiModelUnknown": {
+    "message": "Nicht in der Liste von OpenRouter"
+  },
+  "aiModelNoTools": {
+    "message": "Dieses Modell kann keine Werkzeuge nutzen und entscheidet daher nur anhand von Titel und Adresse, auch mit eingeschalteter Recherche."
+  },
+  "aiModelUseCustom": {
+    "message": "„{1}“ als Modell-ID verwenden"
+  },
+  "aiModelsNone": {
+    "message": "Kein Modell passt zu „{1}“."
+  },
+  "aiModelsNoneFilter": {
+    "message": "Kein Modell passt zu diesem Filter."
+  },
+  "aiModelsLoading": {
+    "message": "Modelle werden von OpenRouter geladen…"
+  },
+  "aiModelsOffline": {
+    "message": "Schalten Sie die KI-Sortierung ein, um die vollständige Modellliste von OpenRouter zu laden. Bis dahin werden empfohlene Modelle angezeigt."
+  },
+  "aiModelsFailed": {
+    "message": "Die Modellliste konnte nicht geladen werden: {1}"
+  },
+  "aiModelsShown": {
+    "message": "{1} von {2} Modellen werden angezeigt. Suchen Sie, um die Liste einzugrenzen."
+  },
+  "aiModelsCount_one": {
+    "message": "{1} Modell"
+  },
+  "aiModelsCount_other": {
+    "message": "{1} Modelle"
+  },
+  "usageRefresh": {
+    "message": "Aktualisieren"
+  },
+  "usageUpdated": {
+    "message": "Aktualisiert {1}. Zum Aktualisieren klicken."
+  },
+  "usageModel": {
+    "message": "Modell: {1}"
+  },
+  "usageFailed": {
+    "message": "Verbrauch konnte nicht gelesen werden: {1}"
+  },
+  "usageFreeTier": {
+    "message": "Kostenlose Stufe: Laden Sie Guthaben auf, um kostenpflichtige Modelle zu nutzen."
+  },
+  "usageLoading": {
+    "message": "Wird geladen…"
+  },
+  "usageKeyLimit": {
+    "message": "Schlüssel-Limit"
+  },
+  "usageAccount": {
+    "message": "Kontoguthaben"
+  },
+  "usagePayg": {
+    "message": "Kein Limit"
+  },
+  "usageToday": {
+    "message": "Heute"
+  },
+  "usageWeek": {
+    "message": "Diese Woche"
+  },
+  "usageMonth": {
+    "message": "Diesen Monat"
+  },
+  "usageLeft": {
+    "message": "übrig"
+  },
+  "usageLeftOf": {
+    "message": "{1} von {2} übrig"
+  },
+  "usageSpentOf": {
+    "message": "{1} von {2} ausgegeben"
+  },
+  "usageSpentTotal": {
+    "message": "insgesamt ausgegeben"
+  },
+  "usageNoLimit": {
+    "message": "Dieser Schlüssel hat kein Ausgabenlimit."
+  },
+  "usageResetDaily": {
+    "message": "wird täglich zurückgesetzt"
+  },
+  "usageResetWeekly": {
+    "message": "wird wöchentlich zurückgesetzt"
+  },
+  "usageResetMonthly": {
+    "message": "wird monatlich zurückgesetzt"
+  },
+  "usageTopUp": {
+    "message": "Guthaben aufladen ↗"
+  },
+  "aiErrBudget": {
+    "message": "Das KI-Budget dieses Monats ist aufgebraucht, daher blieb das Lesezeichen im Eingang."
+  },
+  "aiBudgetLabel": {
+    "message": "Monatliches Budget"
+  },
+  "aiBudgetHelpOff": {
+    "message": "0 = keine Obergrenze. Die KI-Sortierung in diesem Browser hat diesen Monat {1} ausgegeben."
+  },
+  "aiBudgetHelpOn": {
+    "message": "{1} von {2} diesen Monat ausgegeben. Die Sortierung pausiert, wenn das Budget aufgebraucht ist."
+  },
+  "aiBudgetHelpOver": {
+    "message": "{1} von {2} ausgegeben: Die Sortierung pausiert bis {3}. Erhöhen Sie das Budget, um jetzt weiterzumachen."
+  },
+  "aiBudgetStopped": {
+    "message": "Gestoppt: Das monatliche Budget ist aufgebraucht."
+  },
+  "usageBudgetLabel": {
+    "message": "Marksync diesen Monat"
+  },
+  "usageBudgetOf": {
+    "message": "{1} von {2}"
+  },
+  "usageBudgetNone": {
+    "message": "{1} · keine Obergrenze"
+  },
+  "usageBudgetNear": {
+    "message": "{1} % des monatlichen Budgets sind verbraucht."
+  },
+  "usageBudgetOver": {
+    "message": "Budget aufgebraucht: Neue Lesezeichen bleiben bis {1} im Eingang."
+  },
+  "findPlaceholder": {
+    "message": "Lesezeichen suchen"
+  },
+  "findLabel": {
+    "message": "Lesezeichen suchen"
+  },
+  "findNone": {
+    "message": "Kein Lesezeichen passt zu „{1}“."
+  },
+  "findCount_one": {
+    "message": "1 Lesezeichen"
+  },
+  "findCount_other": {
+    "message": "{1} Lesezeichen"
+  },
+  "findMore": {
+    "message": "{1} von {2} werden angezeigt. Fügen Sie ein Wort hinzu, um einzugrenzen."
+  },
+  "findHint": {
+    "message": "Enter öffnet in neuem Tab · Umschalt+Enter hier · Strg+Enter im Hintergrund · #Tag filtert nach Tag"
+  },
+  "aiBulkHeading": {
+    "message": "Einen ganzen Ordner sortieren"
+  },
+  "aiBulkIntro": {
+    "message": "Die KI schlägt für jedes Lesezeichen im gewählten Ordner einen Ordner vor (bis zu 100). Nichts wird verschoben, bevor Sie die Liste prüfen und anwenden; jede Verschiebung lässt sich auf der Protokollseite rückgängig machen."
+  },
+  "aiBulkFolderLabel": {
+    "message": "Ordner zum Sortieren wählen…"
+  },
+  "aiBulkResearch": {
+    "message": "Die Websites recherchieren (langsamer, teurer)"
+  },
+  "aiBulkStart": {
+    "message": "Vorschläge holen"
+  },
+  "aiBulkChooseFolder": {
+    "message": "Wählen Sie zuerst den Ordner, der sortiert werden soll."
+  },
+  "aiBulkBusy": {
+    "message": "Wenden Sie zuerst die aktuellen Vorschläge an oder verwerfen Sie sie."
+  },
+  "aiBulkEmpty": {
+    "message": "Dieser Ordner enthält keine Lesezeichen zum Sortieren (Unterordner zählen nicht)."
+  },
+  "aiBulkNotReady": {
+    "message": "Die Vorschläge sind noch nicht fertig."
+  },
+  "aiBulkPlanningTitle": {
+    "message": "„{1}“ wird angesehen…"
+  },
+  "aiBulkReadyTitle": {
+    "message": "Vorschläge für „{1}“"
+  },
+  "aiBulkDoneTitle": {
+    "message": "„{1}“ sortiert"
+  },
+  "aiBulkProgress": {
+    "message": "{1} von {2} Lesezeichen"
+  },
+  "aiBulkSummary": {
+    "message": "{1} verschieben · {2} bleiben · {3} fehlgeschlagen"
+  },
+  "aiBulkCostHint": {
+    "message": "Was OpenRouter für diesen Durchlauf berechnet hat"
+  },
+  "aiBulkWaiting": {
+    "message": "Die KI wird zu {1} weiteren befragt…"
+  },
+  "aiBulkKeep": {
+    "message": "Bleibt hier"
+  },
+  "aiBulkNewFolder": {
+    "message": "Neuer Ordner"
+  },
+  "aiBulkSelectAll": {
+    "message": "Alle auswählen"
+  },
+  "aiBulkSelected": {
+    "message": "{1} von {2} ausgewählt"
+  },
+  "aiBulkApply_one": {
+    "message": "1 Lesezeichen verschieben"
+  },
+  "aiBulkApply_other": {
+    "message": "{1} Lesezeichen verschieben"
+  },
+  "aiBulkStop": {
+    "message": "Stoppen"
+  },
+  "aiBulkDiscard": {
+    "message": "Verwerfen"
+  },
+  "aiBulkClose": {
+    "message": "Schließen"
+  },
+  "aiBulkConfirmDiscard": {
+    "message": "Diese Vorschläge verwerfen? Es wurde noch nichts verschoben."
+  },
+  "aiBulkStoppedCancel": {
+    "message": "Nach {1} von {2} gestoppt. Sie können die bisherigen Vorschläge anwenden."
+  },
+  "aiBulkStoppedError": {
+    "message": "Gestoppt: {1}"
+  },
+  "aiBulkDone": {
+    "message": "{1} verschoben, {2} konnten nicht verschoben werden. Jede Verschiebung lässt sich auf der Protokollseite rückgängig machen."
+  },
+  "emailShow": {
+    "message": "Klicken, um die vollständige Adresse zu zeigen"
+  },
+  "emailHide": {
+    "message": "Klicken, um die Adresse zu verbergen"
+  },
+  "encHeading": {
+    "message": "Verschlüsselung"
+  },
+  "encIntro": {
+    "message": "Verschlüsseln Sie Ihre Lesezeichen in Google Drive mit einer Passphrase, die nur Sie kennen. Google und jeder, der in Ihr Drive gelangt, sieht dann nur unlesbare Daten. Jeder Browser fragt einmal nach der Passphrase."
+  },
+  "encNeedsConnect": {
+    "message": "Verbinden Sie zuerst Google Drive."
+  },
+  "encPassLabel": {
+    "message": "Passphrase"
+  },
+  "encPassAgain": {
+    "message": "Passphrase wiederholen"
+  },
+  "encStrengthHint": {
+    "message": "Mindestens {1} Zeichen. Ein paar unzusammenhängende Wörter ergeben eine lange Passphrase, die man sich leicht merkt."
+  },
+  "encStrengthShort": {
+    "message": "Zu kurz: mindestens {1} Zeichen."
+  },
+  "encStrengthWeak": {
+    "message": "Schwach: Machen Sie sie länger oder mischen Sie andere Zeichenarten hinein."
+  },
+  "encStrengthFair": {
+    "message": "Ausreichend. Länger ist besser."
+  },
+  "encStrengthStrong": {
+    "message": "Stark."
+  },
+  "encMismatch": {
+    "message": "Die beiden Passphrasen stimmen nicht überein."
+  },
+  "encUnderstand": {
+    "message": "Mir ist klar: Wenn ich die Passphrase vergesse, lassen sich die verschlüsselten Daten in Drive (auch die Sicherungen) nicht wiederherstellen. Meine Lesezeichen bleiben in meinen Browsern."
+  },
+  "encEnable": {
+    "message": "Verschlüsselung einschalten"
+  },
+  "encEnabledToast": {
+    "message": "Die Verschlüsselung ist an. Ihre anderen Browser werden nach der Passphrase fragen."
+  },
+  "encLockedText": {
+    "message": "Für dieses Konto ist die Verschlüsselung an. Geben Sie die Passphrase ein, um diesen Browser zu synchronisieren; bis dahin wird von hier nichts hochgeladen."
+  },
+  "encUnlock": {
+    "message": "Entsperren"
+  },
+  "encForgot": {
+    "message": "Passphrase vergessen…"
+  },
+  "encOnTitle": {
+    "message": "Ende-zu-Ende-Verschlüsselung ist an"
+  },
+  "encSince": {
+    "message": "Seit {1}"
+  },
+  "encSinceBy": {
+    "message": "Seit {1}, eingeschaltet in {2}"
+  },
+  "encOnWhat": {
+    "message": "Verschlüsselt: die Sync-Datei, jede Sicherung und die Lesezeichenlisten Ihrer Browser (AES-256-GCM, Schlüssel aus Ihrer Passphrase mit PBKDF2)."
+  },
+  "encOnNot": {
+    "message": "Nicht verschlüsselt: Dateinamen und Datumsangaben sowie die Browsernamen und Lesezeichenzahlen in den Listen."
+  },
+  "encOnOthers": {
+    "message": "Die Passphrase verlässt nie Ihre Browser; der Schlüssel wird nur in diesem Browser aufbewahrt."
+  },
+  "encLock": {
+    "message": "Passphrase hier vergessen"
+  },
+  "encDisable": {
+    "message": "Verschlüsselung ausschalten"
+  },
+  "encDisableConfirm": {
+    "message": "Die Verschlüsselung für alle Browser ausschalten? Ihre Lesezeichen und Sicherungen werden dann wieder unverschlüsselt in Drive gespeichert."
+  },
+  "encResetWord": {
+    "message": "ZURÜCKSETZEN"
+  },
+  "encResetConfirm": {
+    "message": "Dies löscht die verschlüsselte Sync-Datei, die verschlüsselten Sicherungen und die Browserlisten in Drive. Sie lassen sich nicht wiederherstellen. Die Lesezeichen in Ihren Browsern bleiben unberührt, und die Synchronisierung beginnt neu mit diesem Browser. Geben Sie {1} ein, um fortzufahren."
+  },
+  "encResetDone": {
+    "message": "Die Verschlüsselung wurde zurückgesetzt: {1} verschlüsselte Dateien gelöscht. Die Synchronisierung beginnt neu mit diesem Browser."
+  },
+  "encBadgeOn": {
+    "message": "An"
+  },
+  "encBadgeOff": {
+    "message": "Aus"
+  },
+  "encBadgeLocked": {
+    "message": "Gesperrt"
+  },
+  "encAlreadyOn": {
+    "message": "Für dieses Konto ist die Verschlüsselung bereits an. Geben Sie die Passphrase ein, um sie zu entsperren."
+  },
+  "encPassphraseShort": {
+    "message": "Die Passphrase muss mindestens {1} Zeichen haben."
+  },
+  "encWrongPassphrase": {
+    "message": "Falsche Passphrase."
+  },
+  "errLocked": {
+    "message": "Die Verschlüsselung ist an: Geben Sie die Passphrase in den Einstellungen ein, um diesen Browser zu synchronisieren."
+  },
+  "errDecrypt": {
+    "message": "Eine Datei in Drive konnte nicht entschlüsselt werden. Sie wurde möglicherweise außerhalb von Marksync geändert."
+  },
+  "errEncryptionFile": {
+    "message": "Die Verschlüsselungseinstellungen in Drive (encryption.json) sind beschädigt."
+  },
+  "aiProviderLabel": {
+    "message": "KI-Anbieter"
+  },
+  "aiProviderOpenRouter": {
+    "message": "OpenRouter"
+  },
+  "aiProviderCustom": {
+    "message": "Eigener Server (OpenAI-kompatibel)"
+  },
+  "aiProviderCustomShort": {
+    "message": "eigener Server"
+  },
+  "aiProviderBuiltin": {
+    "message": "Integrierte KI dieses Browsers"
+  },
+  "aiProviderHelpOpenRouter": {
+    "message": "Hunderte Modelle, Web-Recherche, kostet ein wenig pro Lesezeichen. Erfordert einen OpenRouter-API-Schlüssel."
+  },
+  "aiProviderHelpCustom": {
+    "message": "Kostenlos und privat: Ollama, LM Studio, vLLM, llama.cpp oder jede OpenAI-kompatible Adresse. Keine Web-Recherche."
+  },
+  "aiProviderHelpBuiltin": {
+    "message": "Kostenlos, offline, nichts verlässt dieses Gerät. Chrome lädt einmal ein kleines Modell herunter. Keine Web-Recherche, und es werden weniger Ordner angeboten."
+  },
+  "aiPrivacyCustom": {
+    "message": "Nur solange dies eingeschaltet ist: Der Titel des Lesezeichens, seine Adresse ohne den Teil nach „?“ und die Namen Ihrer Ordner werden an {1} gesendet. An OpenRouter wird nichts gesendet. Andere Browser senden nichts, solange Sie es dort nicht ebenfalls einschalten."
+  },
+  "aiPrivacyBuiltin": {
+    "message": "Das Modell läuft auf diesem Gerät: Titel und Adresse des Lesezeichens und Ihre Ordnernamen verlassen diesen Computer nie."
+  },
+  "aiEndpointLabel": {
+    "message": "Serveradresse"
+  },
+  "aiEndpointHelp": {
+    "message": "Die Basisadresse der OpenAI-kompatiblen API, z. B. http://localhost:11434/v1 für Ollama oder http://localhost:1234/v1 für LM Studio. Marksync bittet nur um die Berechtigung, diese Adresse zu kontaktieren."
+  },
+  "aiEndpointNone": {
+    "message": "Keine Adresse gespeichert."
+  },
+  "aiEndpointSaved": {
+    "message": "Gespeichert: {1}"
+  },
+  "aiEndpointInsecure": {
+    "message": "Gespeichert: {1}. Diese Adresse ist nicht verschlüsselt (http) und nicht in Ihrem Netzwerk: Verwenden Sie https für einen Server im Internet."
+  },
+  "aiEndpointSavedToast": {
+    "message": "Adresse gespeichert. Marksync darf jetzt {1} kontaktieren."
+  },
+  "aiEndpointInvalid": {
+    "message": "Geben Sie eine http- oder https-Adresse ohne Benutzernamen, „?“ oder „#“ ein, z. B. http://localhost:11434/v1."
+  },
+  "aiEndpointTestOk_one": {
+    "message": "Verbunden. Der Server bietet {1} Modell an."
+  },
+  "aiEndpointTestOk_other": {
+    "message": "Verbunden. Der Server bietet {1} Modelle an; wählen Sie eines unter „Modell“."
+  },
+  "aiEndpointTestNoModels": {
+    "message": "Verbunden, aber der Server hat keine Modelle aufgelistet. Geben Sie den Modellnamen selbst ein."
+  },
+  "aiEndpointModelLabel": {
+    "message": "Modell"
+  },
+  "aiEndpointModelHelp": {
+    "message": "Der Modellname, wie der Server ihn kennt, z. B. llama3.2:3b oder qwen3:8b. „Testen“ oben listet die Modelle des Servers auf."
+  },
+  "aiEndpointModelInvalid": {
+    "message": "Geben Sie den Modellnamen so ein, wie der Server ihn auflistet (Buchstaben, Ziffern und . : / @ + - _)."
+  },
+  "aiEndpointModelSaved": {
+    "message": "Modell gespeichert: {1}"
+  },
+  "aiEndpointKeyLabel": {
+    "message": "API-Schlüssel (optional)"
+  },
+  "aiEndpointKeyNone": {
+    "message": "Kein Schlüssel gespeichert. Lokale Server brauchen meist keinen."
+  },
+  "aiEndpointKeyHelp": {
+    "message": "Wird nur an die obige Adresse als Bearer-Token gesendet. Nur in diesem Browser gespeichert, nie zu Google Drive hochgeladen."
+  },
+  "aiEndpointKeyRejected": {
+    "message": "Der Server hat den Schlüssel abgelehnt. Prüfen Sie den Schlüssel oder entfernen Sie ihn, falls der Server keinen braucht."
+  },
+  "aiBuiltinLabel": {
+    "message": "Modell auf dem Gerät"
+  },
+  "aiBuiltinHelp": {
+    "message": "Chrome 138 oder neuer unter Windows, macOS, Linux oder auf einem Chromebook Plus, mit einer GPU mit mehr als 4 GB Speicher oder 16 GB RAM und 4 CPU-Kernen sowie etwa 22 GB freiem Speicherplatz für den Download. Gründe und Notizen zu Websites werden auf Englisch, Spanisch, Japanisch, Deutsch oder Französisch geschrieben."
+  },
+  "aiBuiltinPrepare": {
+    "message": "Modell herunterladen"
+  },
+  "aiBuiltinUnsupported": {
+    "message": "Dieser Browser hat kein integriertes KI-Modell. Verwenden Sie Chrome 138 oder neuer oder wählen Sie einen anderen Anbieter."
+  },
+  "aiBuiltinUnavailable": {
+    "message": "Dieses Gerät kann das integrierte Modell nicht ausführen (siehe Anforderungen unten). Wählen Sie einen anderen Anbieter."
+  },
+  "aiBuiltinDownloadable": {
+    "message": "Das Modell ist noch nicht heruntergeladen. Laden Sie es einmal herunter (einige GB), dann funktioniert es offline."
+  },
+  "aiBuiltinDownloading": {
+    "message": "Chrome lädt das Modell herunter. Das kann eine Weile dauern."
+  },
+  "aiBuiltinReady": {
+    "message": "Das Modell ist auf diesem Gerät bereit."
+  },
+  "aiBuiltinNotReady": {
+    "message": "Laden Sie zuerst das integrierte Modell herunter (unten)."
+  },
+  "aiNoEndpoint": {
+    "message": "Speichern Sie zuerst die Adresse Ihres Servers."
+  },
+  "aiNoEndpointModel": {
+    "message": "Wählen Sie zuerst das Modell auf Ihrem Server."
+  },
+  "aiPermissionMissingHost": {
+    "message": "Marksync darf {1} nicht kontaktieren. Speichern Sie die Adresse erneut, um es zu erlauben."
+  },
+  "aiPermissionDeniedHost": {
+    "message": "Die KI-Sortierung braucht die Berechtigung, {1} zu kontaktieren."
+  },
+  "aiErrUnavailable": {
+    "message": "Das Modell kann gerade nicht laufen (nicht heruntergeladen oder auf diesem Gerät nicht unterstützt)."
+  },
+  "aiErrAuthEndpoint": {
+    "message": "Der Server hat den API-Schlüssel abgelehnt."
+  },
+  "aiErrModelEndpoint": {
+    "message": "Das Modell ist fehlgeschlagen oder hat die Anfrage abgelehnt. Prüfen Sie den Modellnamen in den Einstellungen."
+  },
+  "aiErrPermissionEndpoint": {
+    "message": "Marksync darf diesen Server nicht kontaktieren. Speichern Sie seine Adresse erneut in den Einstellungen."
+  },
+  "aiErrNetworkEndpoint": {
+    "message": "Das Modell hat nicht geantwortet: Der Server läuft nicht, ist nicht erreichbar oder zu langsam."
+  },
+  "historyOpen": {
+    "message": "Verlauf"
+  },
+  "historyOpenHint": {
+    "message": "Diese Sicherung mit Ihren aktuellen Lesezeichen vergleichen und einzelne Einträge zurückholen"
+  },
+  "historyTitle": {
+    "message": "Versionsverlauf"
+  },
+  "historyIntro": {
+    "message": "Wählen Sie eine Sicherung, um zu sehen, was sich seitdem geändert hat: entfernte, verschobene, umbenannte und hinzugefügte Lesezeichen, gruppiert nach ihrem damaligen Ordner. Haken Sie an, was Sie zurückhaben möchten; sonst ändert sich nichts."
+  },
+  "historyBackupLabel": {
+    "message": "Ihre aktuellen Lesezeichen vergleichen mit der Sicherung vom"
+  },
+  "historyFilters": {
+    "message": "Änderungen anzeigen"
+  },
+  "historyFilterAll": {
+    "message": "Alle"
+  },
+  "historyFilterPlaceholder": {
+    "message": "Nach Titel, Adresse oder Ordner filtern"
+  },
+  "historyLoading": {
+    "message": "Vergleich mit der Sicherung…"
+  },
+  "historyKindRemoved": {
+    "message": "Entfernt"
+  },
+  "historyKindMoved": {
+    "message": "Verschoben"
+  },
+  "historyKindRenamed": {
+    "message": "Umbenannt"
+  },
+  "historyKindAdded": {
+    "message": "Hinzugefügt"
+  },
+  "historyItems_one": {
+    "message": "{1} Eintrag"
+  },
+  "historyItems_other": {
+    "message": "{1} Einträge"
+  },
+  "historyChanges_one": {
+    "message": "{1} Änderung"
+  },
+  "historyChanges_other": {
+    "message": "{1} Änderungen"
+  },
+  "historyRestoreSelected_one": {
+    "message": "1 Eintrag zurückholen"
+  },
+  "historyRestoreSelected_other": {
+    "message": "{1} Einträge zurückholen"
+  },
+  "historyChoose": {
+    "message": "{1} zurückholen"
+  },
+  "historyUntitled": {
+    "message": "(ohne Titel)"
+  },
+  "historyInside_one": {
+    "message": "mit 1 Eintrag darin"
+  },
+  "historyInside_other": {
+    "message": "mit {1} Einträgen darin"
+  },
+  "historyInsideAdded_one": {
+    "message": "1 Eintrag darin"
+  },
+  "historyInsideAdded_other": {
+    "message": "{1} Einträge darin"
+  },
+  "historyNowIn": {
+    "message": "jetzt in {1}"
+  },
+  "historyWasTitle": {
+    "message": "war „{1}“"
+  },
+  "historyWasUrl": {
+    "message": "war {1}"
+  },
+  "historyAddedHint": {
+    "message": "Nach dieser Sicherung hinzugefügt: Es gibt nichts zurückzuholen."
+  },
+  "historySelectFolder": {
+    "message": "Alle auswählen"
+  },
+  "historyNoMatch": {
+    "message": "Keine Änderung passt zum Filter."
+  },
+  "historyNoChanges": {
+    "message": "Seit dieser Sicherung hat sich nichts geändert."
+  },
+  "historyNoBackups": {
+    "message": "Es gibt noch keine Sicherungen. Erstellen Sie eine in den Einstellungen oder warten Sie auf die geplante Sicherung."
+  },
+  "historyConfirm": {
+    "message": "{1} Eintrag/Einträge so zurückholen, wie sie in der Sicherung vom {2} waren? Ihre aktuellen Lesezeichen werden vorher gesichert; sonst ändert sich nichts."
+  },
+  "historyDone_one": {
+    "message": "1 Eintrag ist zurück und wird mit Ihren anderen Browsern synchronisiert."
+  },
+  "historyDone_other": {
+    "message": "{1} Einträge sind zurück und werden mit Ihren anderen Browsern synchronisiert."
+  },
+  "historyDoneFallback": {
+    "message": "Einträge, deren Ordner nicht mehr existiert, liegen in „{1}“ unter „Weitere Lesezeichen“."
+  },
+  "historyFailed_one": {
+    "message": "1 Eintrag konnte nicht wiederhergestellt werden."
+  },
+  "historyFailed_other": {
+    "message": "{1} Einträge konnten nicht wiederhergestellt werden."
+  },
+  "historyDoneUndo": {
+    "message": "Vorher wurde eine Sicherung der Lesezeichen erstellt."
+  },
+  "historyNoRoot": {
+    "message": "Es wurde kein Ordner zum Wiederherstellen gefunden."
+  },
+  "historyRestoredFolder": {
+    "message": "Wiederhergestellt ({1})"
+  },
+  "historyFindHeading": {
+    "message": "In Sicherungen suchen"
+  },
+  "historyFindIntro": {
+    "message": "Welche Sicherung hatte ein Lesezeichen noch? Durchsuchen Sie alle Sicherungen nach Titel oder Adresse."
+  },
+  "historyFindPlaceholder": {
+    "message": "z. B. example.com/rezepte"
+  },
+  "historyFindButton": {
+    "message": "Suchen"
+  },
+  "historyFindShort": {
+    "message": "Geben Sie mindestens zwei Zeichen ein."
+  },
+  "historyFinding": {
+    "message": "Sicherungen werden durchsucht…"
+  },
+  "historyFound_one": {
+    "message": "In 1 Sicherung gefunden."
+  },
+  "historyFound_other": {
+    "message": "In {1} Sicherungen gefunden."
+  },
+  "historyFoundNone": {
+    "message": "Keine Sicherung enthält ein solches Lesezeichen."
+  },
+  "historyFindOpen": {
+    "message": "Diese Sicherung vergleichen"
+  },
+  "tagsBarLabel": {
+    "message": "Meistgenutzte Tags"
+  },
+  "tagsPlaceholder": {
+    "message": "rezept, italienisch, schnell"
+  },
+  "tagsEditLabel": {
+    "message": "Tags von {1}"
+  },
+  "tagsEdit": {
+    "message": "Tags bearbeiten"
+  },
+  "tagsAdd": {
+    "message": "+ Tag"
+  },
+  "tidyHeading": {
+    "message": "Die Bibliothek aufräumen"
+  },
+  "tidyIntro": {
+    "message": "Die KI betrachtet Ihre gesamte Ordnerstruktur (oder einen Ordner) und schlägt vor, gleichbedeutende Ordner zusammenzuführen, unklare Ordner umzubenennen und kryptische Lesezeichentitel zu bereinigen; leere Ordner werden ebenfalls gefunden. Nichts ändert sich, bevor Sie die Liste prüfen und anwenden. Vorher wird eine Sicherung erstellt, und jede Änderung lässt sich auf der Protokollseite rückgängig machen."
+  },
+  "tidyScopeLabel": {
+    "message": "Was aufgeräumt werden soll"
+  },
+  "tidyScopeAll": {
+    "message": "Die gesamte Bibliothek"
+  },
+  "tidyStart": {
+    "message": "Plan erstellen"
+  },
+  "tidyEstimateSize": {
+    "message": "{1} Ordner und {2} Lesezeichen."
+  },
+  "tidyEstimateFree_one": {
+    "message": "1 Anfrage, bei diesem Anbieter kostenlos."
+  },
+  "tidyEstimateFree_other": {
+    "message": "{1} Anfragen, bei diesem Anbieter kostenlos."
+  },
+  "tidyEstimateUnknown_one": {
+    "message": "1 Anfrage; der Preis dieses Modells ist unbekannt."
+  },
+  "tidyEstimateUnknown_other": {
+    "message": "{1} Anfragen; der Preis dieses Modells ist unbekannt."
+  },
+  "tidyEstimateCost_one": {
+    "message": "1 Anfrage, etwa {2} bei OpenRouter."
+  },
+  "tidyEstimateCost_other": {
+    "message": "{1} Anfragen, etwa {2} bei OpenRouter."
+  },
+  "tidyConfirmStart": {
+    "message": "Die KI um einen Aufräumplan bitten? {1} Nichts ändert sich, bevor Sie ihn anwenden."
+  },
+  "tidyPlanningTitle": {
+    "message": "Planung: {1}"
+  },
+  "tidyReadyTitle": {
+    "message": "Plan für {1}"
+  },
+  "tidyDoneTitle": {
+    "message": "Aufgeräumt: {1}"
+  },
+  "tidyProgress": {
+    "message": "Anfrage {1} von {2}"
+  },
+  "tidyFound_one": {
+    "message": "1 Vorschlag"
+  },
+  "tidyFound_other": {
+    "message": "{1} Vorschläge"
+  },
+  "tidyFree": {
+    "message": "kostenlos"
+  },
+  "tidyWaiting": {
+    "message": "Die KI sieht sich Ihre Ordner und Titel an…"
+  },
+  "tidyGroupMerge": {
+    "message": "Ordner zusammenführen"
+  },
+  "tidyGroupRename": {
+    "message": "Ordner umbenennen"
+  },
+  "tidyGroupRemove": {
+    "message": "Leere Ordner entfernen"
+  },
+  "tidyGroupRetitle": {
+    "message": "Titel bereinigen"
+  },
+  "tidyGroupAll": {
+    "message": "Alle auswählen"
+  },
+  "tidyGroupNone": {
+    "message": "Keine auswählen"
+  },
+  "tidyItems_one": {
+    "message": "1 Eintrag"
+  },
+  "tidyItems_other": {
+    "message": "{1} Einträge"
+  },
+  "tidyEmpty": {
+    "message": "leer"
+  },
+  "tidyAriaRetitle": {
+    "message": "Lesezeichen {1} in {2} umbenennen"
+  },
+  "tidyAriaMerge": {
+    "message": "{1} in {2} zusammenführen"
+  },
+  "tidyAriaRename": {
+    "message": "Ordner {1} in {2} umbenennen"
+  },
+  "tidyAriaRemove": {
+    "message": "Leeren Ordner {1} entfernen"
+  },
+  "tidyApply_one": {
+    "message": "1 Änderung anwenden"
+  },
+  "tidyApply_other": {
+    "message": "{1} Änderungen anwenden"
+  },
+  "tidyConfirmApply": {
+    "message": "{1} Änderung(en) anwenden? Ihre Lesezeichen werden vorher gesichert, und jede Änderung lässt sich auf der Protokollseite rückgängig machen."
+  },
+  "tidyConfirmApplyNoBackup": {
+    "message": "{1} Änderung(en) anwenden? Keine Verbindung zu Google Drive, daher wird vorher keine Sicherung erstellt; jede Änderung lässt sich dennoch auf der Protokollseite rückgängig machen."
+  },
+  "tidyApplied": {
+    "message": "{1} Änderungen angewendet, {2} konnten nicht angewendet werden."
+  },
+  "tidyNothing": {
+    "message": "Die KI hat nichts zum Aufräumen gefunden."
+  },
+  "tidyCancelled": {
+    "message": "Gestoppt. Die bisherigen Vorschläge können noch angewendet werden."
+  },
+  "tidyInterrupted": {
+    "message": "Der Browser hat Marksync während der Planung gestoppt. Die bisherigen Vorschläge können noch angewendet werden."
+  },
+  "tidyFailures_one": {
+    "message": "1 Anfrage ist fehlgeschlagen; ihre Vorschläge fehlen."
+  },
+  "tidyFailures_other": {
+    "message": "{1} Anfragen sind fehlgeschlagen; ihre Vorschläge fehlen."
+  },
+  "tidyScopeGone": {
+    "message": "Der aufzuräumende Ordner existiert nicht mehr."
+  },
+  "tidyNothingChosen": {
+    "message": "Haken Sie zuerst die Änderungen an, die angewendet werden sollen."
+  },
+  "aiStatusTidied": {
+    "message": "Aufgeräumt"
+  },
+  "tidyLogRetitle": {
+    "message": "Titel war „{1}“"
+  },
+  "tidyLogRename": {
+    "message": "Ordner von „{1}“ in „{2}“ umbenannt"
+  },
+  "tidyLogMerge": {
+    "message": "Ordner „{1}“ in einen anderen zusammengeführt"
+  },
+  "tidyLogRemove": {
+    "message": "Leerer Ordner „{1}“ entfernt"
+  },
+  "digestSettingLabel": {
+    "message": "Vergessene Lesezeichen wiederentdecken"
+  },
+  "digestSettingHelp": {
+    "message": "Das Popup zeigt einige Lesezeichen, die Sie lange nicht geöffnet haben, manche passend zu dem, was Sie zuletzt gespeichert haben. Erstellt aus dem, was schon in diesem Browser ist; nichts wird irgendwohin gesendet."
+  },
+  "digestOff": {
+    "message": "Aus"
+  },
+  "digestDaily": {
+    "message": "Jeden Tag"
+  },
+  "digestWeekly": {
+    "message": "Jede Woche"
+  },
+  "digestHeading": {
+    "message": "Wiederentdecken"
+  },
+  "digestRelated": {
+    "message": "Wie „{1}“, das Sie zuletzt gespeichert haben"
+  },
+  "digestSaved": {
+    "message": "gespeichert {1}"
+  },
+  "digestDaysAgo_one": {
+    "message": "gestern"
+  },
+  "digestDaysAgo_other": {
+    "message": "vor {1} Tagen"
+  },
+  "digestMonthsAgo_one": {
+    "message": "vor einem Monat"
+  },
+  "digestMonthsAgo_other": {
+    "message": "vor {1} Monaten"
+  },
+  "digestYearsAgo_one": {
+    "message": "vor einem Jahr"
+  },
+  "digestYearsAgo_other": {
+    "message": "vor {1} Jahren"
+  },
+  "digestKeep": {
+    "message": "Behalten"
+  },
+  "digestArchive": {
+    "message": "Archivieren"
+  },
+  "digestDelete": {
+    "message": "Löschen"
+  },
+  "digestOpened": {
+    "message": "Geöffnet"
+  },
+  "digestKept": {
+    "message": "Behalten; es kommt eine Weile nicht wieder"
+  },
+  "digestArchived": {
+    "message": "In den Ordner „Archiv“ verschoben"
+  },
+  "digestDeleted": {
+    "message": "Gelöscht"
+  },
+  "digestConfirmDelete": {
+    "message": "Das Lesezeichen „{1}“ in jedem Browser löschen?"
+  },
+  "digestArchiveFolder": {
+    "message": "Archiv"
+  },
+  "digestGone": {
+    "message": "Dieses Lesezeichen ist nicht mehr da."
+  },
+  "semHeading": {
+    "message": "Suche nach Bedeutung"
+  },
+  "semIntro": {
+    "message": "Finden Sie Lesezeichen nach ihrem Thema, auch wenn die Wörter abweichen („wie Teig aufgeht“ findet „Grundlagen des Brotbackens“). Jedes Lesezeichen wird einmal in einen Vektor umgewandelt; der Index wird über Google Drive mit Ihren anderen Browsern geteilt, und nur neue oder geänderte Lesezeichen werden erneut gesendet."
+  },
+  "semEnabledLabel": {
+    "message": "Im Popup nach Bedeutung suchen"
+  },
+  "semPrivacy": {
+    "message": "Beim Erstellen des Index werden Titel, Adresse ohne den Teil nach „?“, die Erkenntnisse der KI-Sortierung über die Website und die Tags jedes synchronisierten Lesezeichens an den oben gewählten KI-Anbieter (OpenRouter oder Ihr eigener Server) gesendet. Jede Suche nach Bedeutung sendet die Suchanfrage."
+  },
+  "semModelLabel": {
+    "message": "Embedding-Modell"
+  },
+  "semModelHelpOpenRouter": {
+    "message": "Leer: {1}. Jedes Embedding-Modell bei OpenRouter funktioniert; eine Änderung erstellt einen neuen Index."
+  },
+  "semModelHelpCustom": {
+    "message": "Das Embedding-Modell auf Ihrem Server, z. B. nomic-embed-text oder mxbai-embed-large bei Ollama. Eine Änderung erstellt einen neuen Index."
+  },
+  "semIndexed": {
+    "message": "{1} von {2} Lesezeichen mit {3} indexiert."
+  },
+  "semPendingTokens_one": {
+    "message": "1 Lesezeichen zu indexieren (etwa {2} Tokens)."
+  },
+  "semPendingTokens_other": {
+    "message": "{1} Lesezeichen zu indexieren (etwa {2} Tokens)."
+  },
+  "semPendingFree_one": {
+    "message": "1 Lesezeichen zu indexieren, kostenlos mit Ihrem Server."
+  },
+  "semPendingFree_other": {
+    "message": "{1} Lesezeichen zu indexieren, kostenlos mit Ihrem Server."
+  },
+  "semPendingCost_one": {
+    "message": "1 Lesezeichen zu indexieren, etwa {2} bei OpenRouter."
+  },
+  "semPendingCost_other": {
+    "message": "{1} Lesezeichen zu indexieren, etwa {2} bei OpenRouter."
+  },
+  "semProgress": {
+    "message": "Indexiere {1} von {2}…"
+  },
+  "semBuild": {
+    "message": "Index erstellen"
+  },
+  "semUpdate_one": {
+    "message": "1 neues Lesezeichen indexieren"
+  },
+  "semUpdate_other": {
+    "message": "{1} neue Lesezeichen indexieren"
+  },
+  "semDelete": {
+    "message": "Index löschen"
+  },
+  "semConfirmBuild": {
+    "message": "Den Index erstellen? {1}"
+  },
+  "semConfirmDelete": {
+    "message": "Den Index hier und in Google Drive löschen? Für die Suche nach Bedeutung muss er dann neu erstellt werden."
+  },
+  "semNoBuiltin": {
+    "message": "Das integrierte Modell des Browsers kann keine Embeddings erstellen. Wählen Sie oben OpenRouter oder Ihren eigenen Server."
+  },
+  "semNoModel": {
+    "message": "Geben Sie zuerst das Embedding-Modell Ihres Servers ein."
+  },
+  "semOff": {
+    "message": "Schalten Sie zuerst die Suche nach Bedeutung ein."
+  },
+  "semDimsChanged": {
+    "message": "Das Modell hat mit einer anderen Vektorgröße geantwortet. Löschen Sie den Index und erstellen Sie ihn neu."
+  },
+  "semInterrupted": {
+    "message": "Der Browser hat Marksync während der Indexierung gestoppt. Aktualisieren Sie den Index, um fortzufahren."
+  },
+  "semNoIndex": {
+    "message": "Es gibt noch keinen Index. Erstellen Sie ihn unter Einstellungen → KI-Sortierung → Suche nach Bedeutung."
+  },
+  "semSearchButton": {
+    "message": "✨ Nach Bedeutung"
+  },
+  "semSearchHint": {
+    "message": "Lesezeichen zu diesem Thema finden, auch mit anderen Wörtern (Alt+Enter)"
+  },
+  "semSearching": {
+    "message": "Suche nach Bedeutung…"
+  },
+  "semScore": {
+    "message": "Wie nah in der Bedeutung"
+  },
+  "semNone": {
+    "message": "Nichts ist „{1}“ in der Bedeutung nah."
+  },
+  "semCount_one": {
+    "message": "1 Lesezeichen mit ähnlicher Bedeutung"
+  },
+  "semCount_other": {
+    "message": "{1} Lesezeichen mit ähnlicher Bedeutung"
+  },
+  "namingHeading": {
+    "message": "Lesezeichen mit KI benennen"
+  },
+  "namingIntro": {
+    "message": "Wählen Sie einen oder mehrere Ordner: Die KI betrachtet jedes Lesezeichen darin (mit Web-Recherche bei OpenRouter liest sie jede Seite) und schlägt einen klaren Titel vor, der sagt, was die Website ist und wofür sie dient. Sie können jeden Vorschlag vor dem Speichern bearbeiten; nichts ändert sich, bevor Sie anwenden. Vorher wird eine Sicherung erstellt, und jede Umbenennung lässt sich auf der Protokollseite rückgängig machen."
+  },
+  "namingFilterPlaceholder": {
+    "message": "Ordner filtern"
+  },
+  "namingFoldersLabel": {
+    "message": "Zu benennende Ordner"
+  },
+  "namingSubfolders": {
+    "message": "Unterordner einbeziehen"
+  },
+  "namingResearch": {
+    "message": "Jede Seite lesen (langsamer, genauer, teurer)"
+  },
+  "namingUiLanguage": {
+    "message": "Titel in meiner Sprache schreiben"
+  },
+  "namingStart": {
+    "message": "Titel vorschlagen"
+  },
+  "namingChooseFolder": {
+    "message": "Haken Sie zuerst mindestens einen Ordner an."
+  },
+  "namingEmpty": {
+    "message": "Die gewählten Ordner enthalten keine Lesezeichen zum Benennen."
+  },
+  "namingEstimateSize_one": {
+    "message": "1 Lesezeichen."
+  },
+  "namingEstimateSize_other": {
+    "message": "{1} Lesezeichen."
+  },
+  "namingEstimateResearch": {
+    "message": "Die KI liest jede Seite."
+  },
+  "namingConfirmStart": {
+    "message": "Die KI um neue Titel bitten? {1} Nichts ändert sich, bevor Sie sie anwenden."
+  },
+  "namingPlanningTitle": {
+    "message": "Benennung: {1}"
+  },
+  "namingReadyTitle": {
+    "message": "Neue Titel für {1}"
+  },
+  "namingDoneTitle": {
+    "message": "Umbenannt: {1}"
+  },
+  "namingFound_one": {
+    "message": "1 neuer Titel"
+  },
+  "namingFound_other": {
+    "message": "{1} neue Titel"
+  },
+  "namingNothing": {
+    "message": "Die KI fand alle Titel bereits klar."
+  },
+  "namingWaiting": {
+    "message": "Die KI benennt die Lesezeichen…"
+  },
+  "namingWaitingResearch": {
+    "message": "Die KI liest die Seiten und benennt sie…"
+  },
+  "namingEditHint": {
+    "message": "Klicken Sie auf einen Titel, um ihn zu ändern; er wird gespeichert, wenn Sie das Feld verlassen."
+  },
+  "namingEditLabel": {
+    "message": "Neuer Titel für {1}"
+  },
+  "namingApply_one": {
+    "message": "1 Lesezeichen umbenennen"
+  },
+  "namingApply_other": {
+    "message": "{1} Lesezeichen umbenennen"
+  },
+  "namingConfirmApply": {
+    "message": "{1} Lesezeichen umbenennen? Ihre Lesezeichen werden vorher gesichert, und jede Umbenennung lässt sich auf der Protokollseite rückgängig machen."
+  },
+  "namingConfirmApplyNoBackup": {
+    "message": "{1} Lesezeichen umbenennen? Keine Verbindung zu Google Drive, daher wird vorher keine Sicherung erstellt; jede Umbenennung lässt sich dennoch auf der Protokollseite rückgängig machen."
+  },
+  "namingInvalid": {
+    "message": "Ein Titel braucht mindestens 2 Zeichen (höchstens 120)."
+  },
+  "assistantScope": {
+    "message": "Vorschläge von {1}"
+  },
+  "assistantImported_one": {
+    "message": "Ein KI-Assistent hat 1 Änderung vorgeschlagen: Prüfen Sie sie unter „Die Bibliothek aufräumen“."
+  },
+  "assistantImported_other": {
+    "message": "Ein KI-Assistent hat {1} Änderungen vorgeschlagen: Prüfen Sie sie unter „Die Bibliothek aufräumen“."
+  },
+  "assistantWaiting_one": {
+    "message": "Ein KI-Assistent hat 1 Änderung vorgeschlagen; sie wartet, bis die offene Aufräum-Prüfung geschlossen ist."
+  },
+  "assistantWaiting_other": {
+    "message": "Ein KI-Assistent hat {1} Änderungen vorgeschlagen; sie warten, bis die offene Aufräum-Prüfung geschlossen ist."
+  },
+  "tidyGroupMove": {
+    "message": "Verschieben"
+  },
+  "tidyAriaMove": {
+    "message": "{1} nach {2} verschieben"
+  },
+  "tidyLogMove": {
+    "message": "„{1}“ verschoben"
+  },
+  "storageLabel": {
+    "message": "Speicher"
+  },
+  "storageDrive": {
+    "message": "Google Drive (Ihr eigenes Drive, der Marksync-Ordner)."
+  },
+  "storageWebdav": {
+    "message": "WebDAV: {1}"
+  },
+  "webdavSummary": {
+    "message": "Stattdessen einen WebDAV-Server nutzen (Nextcloud, ownCloud, ein NAS…)"
+  },
+  "webdavHelp": {
+    "message": "Marksync legt dort dieselben Dateien ab wie in Drive (einen Marksync-Ordner mit der Sync-Datei, den Sicherungen und den Browserlisten), mit Ende-zu-Ende-Verschlüsselung, wenn Sie sie einschalten. Verwenden Sie die WebDAV-Adresse eines eigenen Ordners, z. B. https://cloud.example.org/remote.php/dav/files/USER/ bei Nextcloud. Jeder Browser, der synchronisieren soll, braucht dieselbe Adresse."
+  },
+  "webdavUrl": {
+    "message": "WebDAV-Adresse"
+  },
+  "webdavUser": {
+    "message": "Benutzername"
+  },
+  "webdavPassword": {
+    "message": "App-Passwort"
+  },
+  "webdavPrivacy": {
+    "message": "Verwenden Sie ein App-Passwort (Nextcloud: Einstellungen → Sicherheit → Geräte & Sitzungen). Es wird nur in diesem Browser gespeichert und nur an diesen Server gesendet."
+  },
+  "webdavConnect": {
+    "message": "Mit WebDAV verbinden"
+  },
+  "webdavConfirmSwitch": {
+    "message": "Diesen Browser von seinem aktuellen Speicher auf diesen WebDAV-Server umstellen? Seine Lesezeichen bleiben, wie sie sind, und werden mit dem Inhalt des Servers synchronisiert."
+  },
+  "webdavConnected": {
+    "message": "Mit {1} verbunden. Synchronisierung läuft."
+  },
+  "webdavInvalidUrl": {
+    "message": "Geben Sie eine http- oder https-Adresse ohne Benutzernamen, „?“ oder „#“ ein."
+  },
+  "webdavMissingLogin": {
+    "message": "Geben Sie den Benutzernamen und das App-Passwort ein."
+  },
+  "webdavAuthFailed": {
+    "message": "Der Server hat Benutzername oder Passwort abgelehnt."
+  },
+  "webdavNotFound": {
+    "message": "Unter dieser Adresse gibt es auf dem Server keinen Ordner."
+  },
+  "webdavNotDav": {
+    "message": "Diese Adresse spricht kein WebDAV. Prüfen Sie die Adresse (bei Nextcloud endet sie auf /remote.php/dav/files/USER/)."
+  },
+  "webdavUnreachable": {
+    "message": "{1} ist nicht erreichbar."
+  },
+  "sharedHeading": {
+    "message": "Geteilte Ordner"
+  },
+  "sharedIntro": {
+    "message": "Teilen Sie einen Lesezeichenordner mit Familie oder Team. Er bekommt eine eigene Sync-Datei in Ihrem Google Drive, die mit deren Google-Konten geteilt wird; ihre Änderungen erreichen Sie und Ihre erreichen sie. Es gibt keinen Marksync-Server."
+  },
+  "sharedPrivacy": {
+    "message": "Geteilte Ordner sind nicht Ende-zu-Ende-verschlüsselt (die anderen könnten sie sonst nicht lesen), auch wenn Ihre eigenen Lesezeichen es sind. Bearbeiter können den Ordner ändern; Betrachter sehen ihn nur."
+  },
+  "sharedNone": {
+    "message": "Noch keine geteilten Ordner."
+  },
+  "sharedContainer": {
+    "message": "Marksync Shared"
+  },
+  "sharedFolderDefault": {
+    "message": "Geteilter Ordner"
+  },
+  "sharedCreateHeading": {
+    "message": "Einen Ordner teilen"
+  },
+  "sharedCreateHelp": {
+    "message": "Der Ordner wandert nach „Marksync Shared“ und verlässt Ihre persönliche Synchronisierung: Treten Sie ihm in Ihren anderen Browsern bei, wie es die anderen tun."
+  },
+  "sharedFolderLabel": {
+    "message": "Ordner zum Teilen wählen"
+  },
+  "sharedEmailsPlaceholder": {
+    "message": "Einzuladende Google-Konten, z. B. ana@example.org, deniz@example.org"
+  },
+  "sharedRoleLabel": {
+    "message": "Was sie dürfen"
+  },
+  "sharedRoleOwner": {
+    "message": "Eigentümer"
+  },
+  "sharedRoleWriter": {
+    "message": "Darf bearbeiten"
+  },
+  "sharedRoleReader": {
+    "message": "Darf ansehen"
+  },
+  "sharedCreate": {
+    "message": "Teilen"
+  },
+  "sharedConfirmCreate": {
+    "message": "„{1}“ teilen? Der Ordner wandert nach „Marksync Shared“ und wird nicht mehr über Ihre persönliche Sync-Datei synchronisiert."
+  },
+  "sharedCreated": {
+    "message": "„{1}“ ist geteilt."
+  },
+  "sharedJoinHeading": {
+    "message": "Einem geteilten Ordner beitreten"
+  },
+  "sharedJoinHelp": {
+    "message": "Öffnen Sie zuerst den Link aus der Einladungs-E-Mail (damit darf Marksync den Ordner lesen) und fügen Sie dann den dort angezeigten Code hier ein."
+  },
+  "sharedCodePlaceholder": {
+    "message": "Code oder Einladungslink"
+  },
+  "sharedJoin": {
+    "message": "Beitreten"
+  },
+  "sharedJoined": {
+    "message": "„{1}“ beigetreten: Er liegt in „Marksync Shared“."
+  },
+  "sharedOwner": {
+    "message": "Geteilt von {1}"
+  },
+  "sharedCopyLink": {
+    "message": "Einladungslink kopieren"
+  },
+  "sharedCopyCode": {
+    "message": "Code kopieren"
+  },
+  "sharedCopied": {
+    "message": "Kopiert."
+  },
+  "sharedInvite": {
+    "message": "Einladen"
+  },
+  "sharedInviteLabel": {
+    "message": "Zu {1} einladen"
+  },
+  "sharedInvited_one": {
+    "message": "1 Einladung gesendet."
+  },
+  "sharedInvited_other": {
+    "message": "{1} Einladungen gesendet."
+  },
+  "sharedLeave": {
+    "message": "Verlassen"
+  },
+  "sharedConfirmLeave": {
+    "message": "„{1}“ in diesem Browser nicht mehr synchronisieren? Die Lesezeichen bleiben hier als normaler Ordner; für die anderen ändert sich nichts."
+  },
+  "shareNeedsDrive": {
+    "message": "Geteilte Ordner funktionieren nur mit Google Drive, nicht mit WebDAV."
+  },
+  "shareChooseFolder": {
+    "message": "Wählen Sie einen Ordner zum Teilen (keinen der obersten Ebene)."
+  },
+  "shareAlready": {
+    "message": "Dieser Ordner ist bereits geteilt."
+  },
+  "shareAlreadyJoined": {
+    "message": "Sie sind diesem Ordner bereits beigetreten."
+  },
+  "shareBadEmail": {
+    "message": "„{1}“ ist keine E-Mail-Adresse."
+  },
+  "shareBadCode": {
+    "message": "Das ist kein Freigabecode und kein Einladungslink."
+  },
+  "shareNoAccess": {
+    "message": "Marksync darf diesen geteilten Ordner noch nicht öffnen. Öffnen Sie zuerst den Einladungslink, wählen Sie dort die Datei aus und versuchen Sie es erneut."
+  },
+  "shareNotMarksync": {
+    "message": "Diese Datei ist kein geteilter Marksync-Ordner."
+  },
+  "shareUnknown": {
+    "message": "Dieser geteilte Ordner ist nicht in diesem Browser."
+  },
+  "shareFolderGone": {
+    "message": "Der geteilte Ordner wurde in diesem Browser gelöscht. Verlassen Sie ihn und treten Sie erneut bei, um ihn zurückzubekommen."
+  },
+  "shareLostAccess": {
+    "message": "Sie haben keinen Zugriff mehr auf diesen geteilten Ordner."
+  },
+  "shareEmailMessage": {
+    "message": "Ich habe den Lesezeichenordner „{1}“ über Marksync mit dir geteilt. Öffne diesen Link, um beizutreten: {2}"
+  },
+  "shareEmailMessageCode": {
+    "message": "Ich habe den Lesezeichenordner „{1}“ über Marksync mit dir geteilt. Gib in Marksync unter Einstellungen → Geteilte Ordner → Beitreten den Code {2} ein."
+  },
+  "sharedNeedsViewer": {
+    "message": "Zum Teilen ist der Web-Viewer nötig (über seine Beitrittsseite öffnen Eingeladene den geteilten Ordner). In diesem Build ist keine Viewer-Adresse gesetzt."
+  },
+  "errInvalidRequest": {
+    "message": "Ungültige Anfrage."
+  },
+  "openFailed": {
+    "message": "Der Browser lässt Erweiterungen {1} nicht öffnen."
+  },
+  "importFileLabel": {
+    "message": "HTML-Datei mit Lesezeichen"
+  },
+  "shareMassDeleteLocal": {
+    "message": "{1} von {2} Lesezeichen wurden hier entfernt. Die Löschung für alle übernehmen oder sie behalten?"
+  },
+  "shareMassDeleteRemote": {
+    "message": "{1} von {2} Lesezeichen wurden von einem anderen Mitglied entfernt. Die Löschung auch hier übernehmen oder Ihre Kopien behalten?"
+  },
+  "shareApplyDeletion": {
+    "message": "Löschung übernehmen"
+  },
+  "shareKeepMine": {
+    "message": "Meine Kopien behalten"
+  }
+}

@@ -137,6 +137,15 @@
   "deviceNameHelp": {
     "message": "Shown in backups and in the import list of your other browsers. Leave it empty to use the detected name."
   },
+  "languageLabel": {
+    "message": "Language"
+  },
+  "languageHelp": {
+    "message": "Marksync's language in this browser. The extension's name in the browser's list follows the browser's language."
+  },
+  "languageAuto": {
+    "message": "Browser language"
+  },
   "syncHeading": {
     "message": "Sync"
   },

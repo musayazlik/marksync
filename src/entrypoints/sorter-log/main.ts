@@ -1,4 +1,4 @@
-import { localizePage, t } from '../../shared/i18n';
+import { initI18n, locale, localizePage, t } from '../../shared/i18n';
 import { send } from '../../shared/messages';
 import { SORT_LOG_MAX, sortLogItem, type SortLogEntry } from '../../shared/state';
 import { $, withBusy } from '../../shared/ui';
@@ -9,6 +9,7 @@ import { $, withBusy } from '../../shared/ui';
  * page reads and watches it. Entries that arrive while the page is open slide
  * in, and their route draws from the inbox to the new folder.
  */
+await initI18n(() => location.reload());
 localizePage();
 const actionError = $('#action-error');
 $('#intro').textContent = t('aiLogIntro', SORT_LOG_MAX);
@@ -161,9 +162,9 @@ function entry(e: SortLogEntry, isNew: boolean): HTMLLIElement {
   const href = safeHref(e.url);
   title.append(href ? link(href, e.title || href) : el('span', undefined, e.title || e.url || ''));
   if (e.site?.category) title.append(el('span', 'pill category', e.site.category));
-  const time = el('time', 'muted small', new Date(e.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+  const time = el('time', 'muted small', new Date(e.at).toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit' }));
   time.dateTime = new Date(e.at).toISOString();
-  time.title = new Date(e.at).toLocaleString();
+  time.title = new Date(e.at).toLocaleString(locale());
   head.append(title, time);
   body.append(head);
   if (href) body.append(el('p', 'host muted small', new URL(href).host));
@@ -214,7 +215,7 @@ function entry(e: SortLogEntry, isNew: boolean): HTMLLIElement {
 
 const dayKey = (ms: number) => new Date(ms).toDateString();
 const dayLabel = (ms: number) =>
-  new Date(ms).toLocaleDateString([], { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  new Date(ms).toLocaleDateString(locale(), { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
 function moveThumb() {
   const active = segments.find((b) => b.dataset.filter === filter)!;

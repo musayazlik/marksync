@@ -1,4 +1,4 @@
-import { t } from './i18n';
+import { locale, t } from './i18n';
 import type { Status } from './state';
 
 /** Release notes of every version (GitHub Releases, written by release-please). */
@@ -26,7 +26,7 @@ export function timeAgo(ms: number | undefined): string {
   if (m < 60) return t('timeMinutesAgo', m);
   const h = Math.round(m / 60);
   if (h < 24) return t('timeHoursAgo', h);
-  return new Date(ms).toLocaleString();
+  return new Date(ms).toLocaleString(locale());
 }
 
 export function statusTone(s: Status): 'ok' | 'warn' | 'error' | '' {

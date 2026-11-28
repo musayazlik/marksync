@@ -84,9 +84,11 @@ with `Release-As: 1.0.0`.
   If you find a new quirk, add it to the fake in `tests/fakes.ts` first, then fix it.
 - Google sign-in and Drive calls live in `src/platform`.
 - Every text shown to users lives in `src/public/_locales/<lang>/messages.json`
-  (English and Turkish). Add a new key to every language; `pnpm test` checks
+  (English, Turkish and German). Add a new key to every language; `pnpm test` checks
   that none is missing. Use `{1}`, `{2}` for values and never a `$` sign.
-  New languages are welcome: copy `en/messages.json` to a new folder.
+  New languages are welcome: copy `en/messages.json` to a new folder and add
+  the language to `LANGUAGES` in `src/shared/i18n.ts` and to the Language
+  menu in Settings (the web viewer has its own texts in `viewer/text.ts`).
 
 ## Changing the sync file format
 

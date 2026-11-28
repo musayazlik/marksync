@@ -124,6 +124,19 @@
               </div>
               <input id="deviceName" type="text" maxlength="60" />
             </div>
+            <div class="setting">
+              <div class="setting-text">
+                <label for="uiLanguage" data-i18n="languageLabel"></label>
+                <p class="muted small" data-i18n="languageHelp"></p>
+              </div>
+              <!-- Language names stay in their own language. -->
+              <select id="uiLanguage">
+                <option value="auto" data-i18n="languageAuto"></option>
+                <option value="en" lang="en">English</option>
+                <option value="tr" lang="tr">Türkçe</option>
+                <option value="de" lang="de">Deutsch</option>
+              </select>
+            </div>
           </div>
         </section>
 

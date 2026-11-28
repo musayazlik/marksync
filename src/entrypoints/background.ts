@@ -56,7 +56,7 @@ import {
 } from '../services/sorter-service';
 import { isApplying, keepLocalBookmarks, resyncFromDrive, runSync, syncIfRemoteChanged } from '../services/sync-service';
 import type { Envelope, Request } from '../shared/messages';
-import { t } from '../shared/i18n';
+import { initI18n, t } from '../shared/i18n';
 import { getSettings, patchStatus, settingsItem, statusItem } from '../shared/state';
 
 const SYNC_ALARM = 'marksync-sync';
@@ -137,6 +137,9 @@ export default defineBackground(() => {
   }
   statusItem.watch(() => void refreshBadge());
   settingsItem.watch(() => void refreshBadge());
+  // The language picked in Settings: texts the background writes (badge tooltip,
+  // folder names, notifications) follow it once it is loaded.
+  void initI18n(() => void refreshBadge()).then(() => refreshBadge());
   // Every start of the service worker: a bulk sorting run that was cut off carries on.
   void resumeBulk().catch((err) => console.warn('[marksync] bulk sorting could not resume', err));
   void resumeTidy().catch((err) => console.warn('[marksync] tidy-up could not resume', err));

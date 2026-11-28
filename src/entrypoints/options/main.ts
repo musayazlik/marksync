@@ -1,5 +1,5 @@
 import { browser } from 'wxt/browser';
-import { errorText, localizePage, t, tn } from '../../shared/i18n';
+import { errorText, initI18n, isLanguage, languageItem, locale, localizePage, t, tn, uiLanguage } from '../../shared/i18n';
 import { send } from '../../shared/messages';
 import {
   encryptionStatusItem,
@@ -41,6 +41,7 @@ import type { NamingEstimate } from '../../services/naming-service';
 import { parseWebDavUrl } from '../../platform/webdav';
 import type { ImportMode, ImportResult } from '../../sync/importer';
 
+await initI18n(() => location.reload());
 localizePage();
 
 // The version comes from package.json (set by release-please) and links to
@@ -139,6 +140,12 @@ const fields = {
 async function loadSettings() {
   const s = await getSettings();
   $<HTMLInputElement>('#deviceName').placeholder = detectBrowser();
+  // Saving the language reloads every open Marksync page (see initI18n).
+  const language = $<HTMLSelectElement>('#uiLanguage');
+  language.value = await languageItem.getValue();
+  language.addEventListener('change', () => {
+    void languageItem.setValue(isLanguage(language.value) ? language.value : 'auto');
+  });
   for (const [key, kind] of Object.entries(fields) as [keyof typeof fields, string][]) {
     const el = $<HTMLInputElement>(`#${key}`);
     if (kind === 'checkbox') el.checked = s[key] as boolean;
@@ -162,7 +169,7 @@ const reasonKey: Record<BackupInfo['reason'], string | undefined> = {
 };
 
 function backupDate(b: BackupInfo): string {
-  const date = new Date(b.createdTime).toLocaleString();
+  const date = new Date(b.createdTime).toLocaleString(locale());
   const key = reasonKey[b.reason];
   return key ? `${date} (${t(key)})` : date;
 }
@@ -180,7 +187,7 @@ async function loadBackups() {
     const cells = [
       backupDate(b),
       b.source,
-      b.count.toLocaleString(),
+      b.count.toLocaleString(locale()),
     ];
     for (const text of cells) {
       const td = document.createElement('td');
@@ -480,7 +487,7 @@ $('#ai-builtin-prepare').addEventListener('click', () => {
   progress.hidden = false;
   progress.removeAttribute('value');
   // Started straight from the click: the download needs the user action.
-  const download = prepareBuiltin(builtinLanguage(browser.i18n.getUILanguage()), (loaded) => {
+  const download = prepareBuiltin(builtinLanguage(uiLanguage()), (loaded) => {
     // After the download the model is unpacked: show an open-ended bar.
     if (loaded >= 1) progress.removeAttribute('value');
     else progress.value = loaded;
@@ -651,7 +658,7 @@ async function renderBudget() {
     b.state === 'off'
       ? t('aiBudgetHelpOff', formatUsd(b.spent))
       : b.state === 'over'
-        ? t('aiBudgetHelpOver', formatUsd(b.spent), formatUsd(b.budget), nextMonthStart().toLocaleDateString())
+        ? t('aiBudgetHelpOver', formatUsd(b.spent), formatUsd(b.budget), nextMonthStart().toLocaleDateString(locale()))
         : t('aiBudgetHelpOn', formatUsd(b.spent), formatUsd(b.budget));
 }
 aiSpendItem.watch(() => void renderBudget());
@@ -945,7 +952,7 @@ async function loadBrowsers() {
     const tr = document.createElement('tr');
     const cells = [
       b.self ? t('thisBrowser', b.label) : b.label,
-      b.count.toLocaleString(),
+      b.count.toLocaleString(locale()),
       timeAgo(Date.parse(b.updatedAt)),
     ];
     for (const text of cells) {
@@ -1458,7 +1465,7 @@ function renderTidy(job: TidyJob | undefined) {
     const list = job.proposals.filter((p) => p.kind === kind);
     if (!list.length) continue;
     const head = el('li', 'tidy-group');
-    head.append(el('span', '', `${t(tidyGroupKey[kind])} · ${list.length.toLocaleString()}`));
+    head.append(el('span', '', `${t(tidyGroupKey[kind])} · ${list.length.toLocaleString(locale())}`));
     const open = list.filter(tidyOpen);
     if (open.length > 1 && job.state === 'ready') {
       const all = open.every((p) => tidyChosen.has(p.id));
@@ -2033,7 +2040,7 @@ async function renderSemantic() {
   else if (status.pending && !indexing) {
     parts.push(
       status.usd === undefined
-        ? tn('semPendingTokens', status.pending, status.tokens.toLocaleString())
+        ? tn('semPendingTokens', status.pending, status.tokens.toLocaleString(locale()))
         : status.usd === 0
           ? tn('semPendingFree', status.pending)
           : tn('semPendingCost', status.pending, formatUsd(status.usd)),
@@ -2073,7 +2080,7 @@ $('#sem-build').addEventListener('click', () =>
     async () => {
       const status = await send({ type: 'semStatus' });
       const cost =
-        status.usd === undefined ? tn('semPendingTokens', status.pending, status.tokens.toLocaleString()) : status.usd === 0 ? tn('semPendingFree', status.pending) : tn('semPendingCost', status.pending, formatUsd(status.usd));
+        status.usd === undefined ? tn('semPendingTokens', status.pending, status.tokens.toLocaleString(locale())) : status.usd === 0 ? tn('semPendingFree', status.pending) : tn('semPendingCost', status.pending, formatUsd(status.usd));
       if (!confirm(t('semConfirmBuild', cost))) return;
       await send({ type: 'semBuild' });
     },
@@ -2109,7 +2116,7 @@ function renderEncryption(e: EncryptionStatus, connected: boolean) {
   badge.hidden = !connected;
   badge.className = `pill enc-${e.state}`;
   badge.textContent = t(e.state === 'on' ? 'encBadgeOn' : e.state === 'locked' ? 'encBadgeLocked' : 'encBadgeOff');
-  const since = e.createdAt ? new Date(e.createdAt).toLocaleDateString() : '';
+  const since = e.createdAt ? new Date(e.createdAt).toLocaleDateString(locale()) : '';
   const meta = e.createdBy ? t('encSinceBy', since, e.createdBy) : since ? t('encSince', since) : '';
   $('#enc-on-meta').textContent = meta;
   $('#enc-locked-meta').textContent = meta;

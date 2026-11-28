@@ -2059,5 +2059,140 @@
   },
   "webdavUnreachable": {
     "message": "{1} adresine ulaşılamadı."
+  },
+  "sharedHeading": {
+    "message": "Paylaşılan klasörler"
+  },
+  "sharedIntro": {
+    "message": "Bir yer imi klasörünü ailenizle ya da ekibinizle paylaşın. Klasörün Google Drive'ınızda kendi eşitleme dosyası olur ve onların Google hesaplarıyla paylaşılır; onların değişiklikleri size, sizinkiler onlara ulaşır. Marksync'in sunucusu yok."
+  },
+  "sharedPrivacy": {
+    "message": "Kendi yer imleriniz şifreli olsa bile paylaşılan klasörler uçtan uca şifrelenmez (diğerleri okuyamazdı). Düzenleyebilenler klasörü değiştirebilir; görüntüleyebilenler yalnızca görür."
+  },
+  "sharedNone": {
+    "message": "Henüz paylaşılan klasör yok."
+  },
+  "sharedContainer": {
+    "message": "Marksync Shared"
+  },
+  "sharedFolderDefault": {
+    "message": "Paylaşılan klasör"
+  },
+  "sharedCreateHeading": {
+    "message": "Bir klasörü paylaş"
+  },
+  "sharedCreateHelp": {
+    "message": "Klasör “Marksync Shared” içine taşınır ve kişisel eşitlemenizden çıkar: diğer tarayıcılarınızda da diğerleri gibi katılın."
+  },
+  "sharedFolderLabel": {
+    "message": "Paylaşılacak klasörü seçin"
+  },
+  "sharedEmailsPlaceholder": {
+    "message": "Davet edilecek Google hesapları; ör. ana@example.org, deniz@example.org"
+  },
+  "sharedRoleLabel": {
+    "message": "Neler yapabilecekleri"
+  },
+  "sharedRoleOwner": {
+    "message": "Sahibi"
+  },
+  "sharedRoleWriter": {
+    "message": "Düzenleyebilir"
+  },
+  "sharedRoleReader": {
+    "message": "Görüntüleyebilir"
+  },
+  "sharedCreate": {
+    "message": "Paylaş"
+  },
+  "sharedConfirmCreate": {
+    "message": "“{1}” paylaşılsın mı? “Marksync Shared” içine taşınır ve kişisel eşitleme dosyanız üzerinden eşitlenmez."
+  },
+  "sharedCreated": {
+    "message": "“{1}” paylaşıldı."
+  },
+  "sharedJoinHeading": {
+    "message": "Paylaşılan bir klasöre katıl"
+  },
+  "sharedJoinHelp": {
+    "message": "Önce davet e-postasındaki bağlantıyı açın (Marksync'in klasörü okumasını sağlar), sonra orada gösterilen kodu buraya yapıştırın."
+  },
+  "sharedCodePlaceholder": {
+    "message": "Kod ya da davet bağlantısı"
+  },
+  "sharedJoin": {
+    "message": "Katıl"
+  },
+  "sharedJoined": {
+    "message": "“{1}” klasörüne katıldınız: “Marksync Shared” içinde."
+  },
+  "sharedOwner": {
+    "message": "Paylaşan: {1}"
+  },
+  "sharedCopyLink": {
+    "message": "Davet bağlantısını kopyala"
+  },
+  "sharedCopyCode": {
+    "message": "Kodu kopyala"
+  },
+  "sharedCopied": {
+    "message": "Kopyalandı."
+  },
+  "sharedInvite": {
+    "message": "Davet et"
+  },
+  "sharedInviteLabel": {
+    "message": "{1} için davet"
+  },
+  "sharedInvited_one": {
+    "message": "1 davet gönderildi."
+  },
+  "sharedInvited_other": {
+    "message": "{1} davet gönderildi."
+  },
+  "sharedLeave": {
+    "message": "Ayrıl"
+  },
+  "sharedConfirmLeave": {
+    "message": "“{1}” bu tarayıcıda eşitlenmesin mi? Yer imleri burada sıradan bir klasör olarak kalır; diğerleri için hiçbir şey değişmez."
+  },
+  "shareNeedsDrive": {
+    "message": "Paylaşılan klasörler yalnızca Google Drive ile çalışır, WebDAV ile değil."
+  },
+  "shareChooseFolder": {
+    "message": "Paylaşılacak bir klasör seçin (en üst düzeydekilerden biri değil)."
+  },
+  "shareAlready": {
+    "message": "Bu klasör zaten paylaşılıyor."
+  },
+  "shareAlreadyJoined": {
+    "message": "Bu klasöre zaten katıldınız."
+  },
+  "shareBadEmail": {
+    "message": "“{1}” bir e-posta adresi değil."
+  },
+  "shareBadCode": {
+    "message": "Bu bir paylaşım kodu ya da davet bağlantısı değil."
+  },
+  "shareNoAccess": {
+    "message": "Marksync bu paylaşılan klasörü henüz açamıyor. Önce davet bağlantısını açıp dosyayı orada seçin, sonra yeniden deneyin."
+  },
+  "shareNotMarksync": {
+    "message": "Bu dosya bir Marksync paylaşılan klasörü değil."
+  },
+  "shareUnknown": {
+    "message": "Bu paylaşılan klasör bu tarayıcıda yok."
+  },
+  "shareFolderGone": {
+    "message": "Paylaşılan klasör bu tarayıcıda silindi. Geri almak için ayrılıp yeniden katılın."
+  },
+  "shareLostAccess": {
+    "message": "Bu paylaşılan klasöre artık erişiminiz yok."
+  },
+  "shareEmailMessage": {
+    "message": "“{1}” yer imi klasörünü Marksync üzerinden sizinle paylaştım. Katılmak için bu bağlantıyı açın: {2}"
+  },
+  "shareEmailMessageCode": {
+    "message": "“{1}” yer imi klasörünü Marksync üzerinden sizinle paylaştım. Marksync Ayarlar → Paylaşılan klasörler → Katıl bölümünde {2} kodunu kullanın."
   }
 }

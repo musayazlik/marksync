@@ -167,8 +167,10 @@ export function readSnapshot(
 }
 
 /** Reads the local tree, including browser-specific folders. */
-export async function readLocal(api: BookmarksApi, menuFolderId?: string) {
-  const special = await detectSpecialRoots(api);
+export async function readLocal(api: BookmarksApi, menuFolderId?: string, exclude: readonly string[] = []) {
+  const found = await detectSpecialRoots(api);
+  // Folders synced elsewhere (shared folders) are left out like Opera's Trash.
+  const special = exclude.length ? { ...found, exclude: [...found.exclude, ...exclude] } : found;
   const result = readSnapshot(await api.getTree(), { ...(menuFolderId ? { menuFolderId } : {}), special });
   return { ...result, special };
 }

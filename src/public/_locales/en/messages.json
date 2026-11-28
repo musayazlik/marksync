@@ -2064,5 +2064,140 @@
   },
   "webdavUnreachable": {
     "message": "{1} could not be reached."
+  },
+  "sharedHeading": {
+    "message": "Shared folders"
+  },
+  "sharedIntro": {
+    "message": "Share a bookmark folder with family or a team. It gets its own sync file in your Google Drive, shared with their Google accounts; their changes reach you and yours reach them. There is no Marksync server."
+  },
+  "sharedPrivacy": {
+    "message": "Shared folders are not end-to-end encrypted (the others could not read them), even when your own bookmarks are. Editors can change the folder; viewers only see it."
+  },
+  "sharedNone": {
+    "message": "No shared folders yet."
+  },
+  "sharedContainer": {
+    "message": "Marksync Shared"
+  },
+  "sharedFolderDefault": {
+    "message": "Shared folder"
+  },
+  "sharedCreateHeading": {
+    "message": "Share a folder"
+  },
+  "sharedCreateHelp": {
+    "message": "The folder moves into “Marksync Shared” and leaves your personal sync: in your other browsers, join it like the others do."
+  },
+  "sharedFolderLabel": {
+    "message": "Choose a folder to share"
+  },
+  "sharedEmailsPlaceholder": {
+    "message": "Google accounts to invite, e.g. ana@example.org, deniz@example.org"
+  },
+  "sharedRoleLabel": {
+    "message": "What they may do"
+  },
+  "sharedRoleOwner": {
+    "message": "Owner"
+  },
+  "sharedRoleWriter": {
+    "message": "Can edit"
+  },
+  "sharedRoleReader": {
+    "message": "Can view"
+  },
+  "sharedCreate": {
+    "message": "Share"
+  },
+  "sharedConfirmCreate": {
+    "message": "Share “{1}”? It moves into “Marksync Shared” and stops syncing through your personal sync file."
+  },
+  "sharedCreated": {
+    "message": "“{1}” is shared."
+  },
+  "sharedJoinHeading": {
+    "message": "Join a shared folder"
+  },
+  "sharedJoinHelp": {
+    "message": "Open the link from the invitation e-mail first (it lets Marksync read the folder), then paste the code it shows here."
+  },
+  "sharedCodePlaceholder": {
+    "message": "Code or invitation link"
+  },
+  "sharedJoin": {
+    "message": "Join"
+  },
+  "sharedJoined": {
+    "message": "Joined “{1}”: it is in “Marksync Shared”."
+  },
+  "sharedOwner": {
+    "message": "Shared by {1}"
+  },
+  "sharedCopyLink": {
+    "message": "Copy invitation link"
+  },
+  "sharedCopyCode": {
+    "message": "Copy code"
+  },
+  "sharedCopied": {
+    "message": "Copied."
+  },
+  "sharedInvite": {
+    "message": "Invite"
+  },
+  "sharedInviteLabel": {
+    "message": "Invite to {1}"
+  },
+  "sharedInvited_one": {
+    "message": "1 invitation sent."
+  },
+  "sharedInvited_other": {
+    "message": "{1} invitations sent."
+  },
+  "sharedLeave": {
+    "message": "Leave"
+  },
+  "sharedConfirmLeave": {
+    "message": "Stop syncing “{1}” in this browser? The bookmarks stay here as an ordinary folder; nothing changes for the others."
+  },
+  "shareNeedsDrive": {
+    "message": "Shared folders work with Google Drive only, not with WebDAV."
+  },
+  "shareChooseFolder": {
+    "message": "Choose a folder to share (not a top-level one)."
+  },
+  "shareAlready": {
+    "message": "This folder is already shared."
+  },
+  "shareAlreadyJoined": {
+    "message": "You have already joined this folder."
+  },
+  "shareBadEmail": {
+    "message": "“{1}” is not an e-mail address."
+  },
+  "shareBadCode": {
+    "message": "That is not a share code or invitation link."
+  },
+  "shareNoAccess": {
+    "message": "Marksync may not open this shared folder yet. Open the invitation link first and pick the file there, then try again."
+  },
+  "shareNotMarksync": {
+    "message": "This file is not a Marksync shared folder."
+  },
+  "shareUnknown": {
+    "message": "This shared folder is not in this browser."
+  },
+  "shareFolderGone": {
+    "message": "The shared folder was deleted in this browser. Leave it, then join it again to get it back."
+  },
+  "shareLostAccess": {
+    "message": "You no longer have access to this shared folder."
+  },
+  "shareEmailMessage": {
+    "message": "I shared the bookmark folder “{1}” with you through Marksync. Open this link to join: {2}"
+  },
+  "shareEmailMessageCode": {
+    "message": "I shared the bookmark folder “{1}” with you through Marksync. In Marksync's Settings → Shared folders → Join, use the code {2}."
   }
 }

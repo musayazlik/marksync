@@ -367,6 +367,7 @@ click) and stops at the first key, credit or permission error.
 - Changes from other browsers arrive on the next alarm (no push).
 - Not synced: favicons, separators, Firefox tags and keywords.
 - More storage backends (Git, Dropbox, OneDrive, S3) can implement `FileStore`.
+- Shared folders: Drive only; a member removed in Drive keeps their last copy as a folder with an error.
 - Ideas: more UI languages, Safari build, a per-sync-run change log (which browser changed what), changing the
   encryption passphrase without turning encryption off and on.
 
@@ -482,6 +483,38 @@ show the old title and an editable new one; an edit is saved with the run
 as soon as the box is left, so Settings can be closed meanwhile. *Rename*
 takes a backup, re-checks that each title is unchanged since the proposal,
 and logs each rename as a "Tidied" entry with Undo.
+
+## Shared folders (`services/share-service.ts`)
+
+A shared folder has its own sync file in the owner's Drive,
+`Marksync/shared/shared-<uuid>.json` (a normal `SyncState`; its name and
+`kind: marksync-shared` are Drive appProperties), shared with Drive
+permissions (`writer` or `reader`, Google sends the invitation e-mail).
+There is no Marksync server and no new scope.
+
+- **Locally** shared folders live in a "Marksync Shared" folder under Other
+  bookmarks. The personal sync leaves that folder out (`SyncDeps.exclude`,
+  like Opera's Trash); each shared folder is synced by the ordinary engine
+  through `sync/scoped-bookmarks.ts`, a view in which the folder is the
+  whole tree (its "Bookmarks bar") and writes outside it are refused. Its
+  sync history is kept per folder in `local:shares`. The engine's merge
+  rules and mass-delete guard therefore apply per shared folder.
+- **Sharing** moves the folder into "Marksync Shared", creates the file,
+  invites people, and runs the personal sync with the deletion confirmed:
+  the folder leaves the personal file (the owner's other browsers join it
+  like everyone else).
+- **Joining**: `drive.file` only opens files the user opened with the app,
+  so the invitation link goes to the web viewer's `join.html`, where the
+  invited person confirms the file once in Google's file picker (which
+  grants the project access); the page shows the code to paste into
+  Settings → Shared folders → Join.
+- **Roles** follow Drive: `capabilities.canEdit` decides editor or viewer. A
+  viewer never writes the file, and every sync restores the folder from it,
+  so local changes are put back.
+- **Leaving** keeps the bookmarks as an ordinary folder under Other
+  bookmarks (it joins the personal sync again).
+- Shared files are not end-to-end encrypted, since the other members do not
+  have the owner's passphrase; Settings says so. WebDAV has no sharing.
 
 ## Web viewer (`viewer/`)
 

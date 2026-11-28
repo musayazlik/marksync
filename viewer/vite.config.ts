@@ -17,5 +17,9 @@ export default defineConfig({
     outDir: '../.output/viewer',
     emptyOutDir: true,
     target: 'es2022',
+    rollupOptions: {
+      // The viewer, and the invitation page of shared folders.
+      input: { main: 'viewer/index.html', join: 'viewer/join.html' },
+    },
   },
 });

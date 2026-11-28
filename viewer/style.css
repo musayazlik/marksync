@@ -186,3 +186,21 @@ button.wide {
   padding: 32px 8px;
   text-align: center;
 }
+
+/* The invitation page. */
+.code-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.code-row code {
+  flex: 1 1 200px;
+  min-width: 0;
+  padding: 8px 10px;
+  border-radius: var(--r-md);
+  background: var(--sunken);
+  overflow-wrap: anywhere;
+  font-size: 13px;
+}

@@ -19,6 +19,10 @@ let nextId = 1;
 
 export class FakeDrive {
   files = new Map<string, FakeFile>();
+  /** What the signed-in account may do with a file (default: owner). */
+  access = new Map<string, { canEdit: boolean; ownedByMe: boolean }>();
+  /** Permissions given with share(): file ID → e-mail → role. */
+  permissions = new Map<string, Map<string, string>>();
   private clock = Date.parse('2026-11-24T10:00:00Z');
 
   private add(f: Omit<FakeFile, 'id' | 'version' | 'createdTime'>): FakeFile {
@@ -84,6 +88,19 @@ export class FakeDrive {
       const meta = JSON.parse(String(init.body)) as { name: string; parents: string[]; mimeType: string };
       return ok(this.meta(this.add({ ...meta, content: '' })));
     }
+    const perm = /^([^/]+)\/permissions$/.exec(path);
+    if (perm) {
+      const id = perm[1]!;
+      if (!this.files.has(id)) return notFound();
+      const list = this.permissions.get(id) ?? new Map<string, string>();
+      if (method === 'POST') {
+        const body = JSON.parse(String(init.body)) as { emailAddress: string; role: string };
+        list.set(body.emailAddress, body.role);
+        this.permissions.set(id, list);
+        return ok({ id: `perm-${body.emailAddress}` });
+      }
+      return ok({ permissions: [...list].map(([emailAddress, role]) => ({ type: 'user', emailAddress, role })) });
+    }
     const file = this.files.get(path);
     if (!file) return notFound();
     if (method === 'DELETE') {
@@ -96,6 +113,10 @@ export class FakeDrive {
       return ok(this.meta(file));
     }
     if (url.searchParams.get('alt') === 'media') return new Response(file.content, { status: 200 });
+    if ((url.searchParams.get('fields') ?? '').includes('capabilities')) {
+      const a = this.access.get(file.id) ?? { canEdit: true, ownedByMe: true };
+      return ok({ ...this.meta(file), ownedByMe: a.ownedByMe, capabilities: { canEdit: a.canEdit, canShare: a.canEdit }, owners: [{ displayName: 'Ana' }] });
+    }
     return ok(this.meta(file));
   };
 }

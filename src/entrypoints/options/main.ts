@@ -7,6 +7,7 @@ import {
   aiBulkItem,
   aiTidyItem,
   aiNamingItem,
+  sharesItem,
   type TidyJob,
   semanticJobItem,
   DEFAULT_EMBEDDING_MODEL,
@@ -524,6 +525,7 @@ async function loadAiFolders() {
   bulkFolder.value = aiFolders.some((f) => f.id === keep) ? keep : '';
   fillTidyScopes();
   fillNamingFolders();
+  void renderShares();
   await renderAiStatus();
 }
 
@@ -1544,6 +1546,120 @@ $('#tidy-discard').addEventListener('click', () =>
     actionError,
   ),
 );
+
+// ---------- shared folders ----------
+
+const roleKey = { owner: 'sharedRoleOwner', writer: 'sharedRoleWriter', reader: 'sharedRoleReader' } as const;
+
+async function renderShares() {
+  const list = $('#shares');
+  const shares = await send({ type: 'shareList' }).catch(() => []);
+  $('#shares-empty').hidden = shares.length > 0;
+  list.replaceChildren(
+    ...shares.map((s) => {
+      const li = document.createElement('li');
+      const head = el('div', 'share-head');
+      head.append(el('strong', '', s.name), el('span', 'pill', t(roleKey[s.role])));
+      const meta = el('p', `small ${s.error ? 'warn-text' : 'muted'}`, s.error ?? [s.owner ? t('sharedOwner', s.owner) : '', s.lastSyncAt ? t('lastSync', timeAgo(s.lastSyncAt)) : '', s.path].filter(Boolean).join(' · '));
+      const actions = el('div', 'row wrap');
+      const copy = el('button', 'quiet small-button', t(s.link ? 'sharedCopyLink' : 'sharedCopyCode'));
+      copy.type = 'button';
+      copy.addEventListener('click', () => {
+        void navigator.clipboard.writeText(s.link ?? s.fileId).then(() => showToast($('#action-ok'), t('sharedCopied')));
+      });
+      actions.append(copy);
+      if (s.role !== 'reader') {
+        const form = el('div', 'share-invite');
+        const emails = document.createElement('input');
+        emails.placeholder = t('sharedEmailsPlaceholder');
+        emails.setAttribute('aria-label', t('sharedInviteLabel', s.name));
+        const role = document.createElement('select');
+        role.append(
+          Object.assign(document.createElement('option'), { value: 'writer', textContent: t('sharedRoleWriter') }),
+          Object.assign(document.createElement('option'), { value: 'reader', textContent: t('sharedRoleReader') }),
+        );
+        const send_ = el('button', 'small-button', t('sharedInvite'));
+        send_.type = 'button';
+        send_.addEventListener('click', () =>
+          withBusy(
+            send_,
+            async () => {
+              const n = await send({ type: 'shareInvite', fileId: s.fileId, emails: emails.value, role: role.value as 'writer' | 'reader' });
+              emails.value = '';
+              showToast($('#action-ok'), tn('sharedInvited', n));
+            },
+            actionError,
+          ),
+        );
+        form.append(emails, role, send_);
+        li.append(head, meta, form);
+      } else li.append(head, meta);
+      const leave = el('button', 'quiet danger small-button', t('sharedLeave'));
+      leave.type = 'button';
+      leave.addEventListener('click', () =>
+        withBusy(
+          leave,
+          async () => {
+            if (!confirm(t('sharedConfirmLeave', s.name))) return;
+            await send({ type: 'shareLeave', fileId: s.fileId });
+            await renderShares();
+          },
+          actionError,
+        ),
+      );
+      actions.append(leave);
+      li.append(actions);
+      return li;
+    }),
+  );
+  // Folders that can be shared: not the shared ones (they are under "Marksync Shared").
+  const pick = $<HTMLSelectElement>('#share-folder');
+  const keep = pick.value;
+  const container = t('sharedContainer');
+  const choices = aiFolders.filter((f) => !f.path.split(' / ').includes(container) && f.path.includes(' / '));
+  pick.replaceChildren(
+    Object.assign(document.createElement('option'), { value: '', textContent: t('sharedFolderLabel') }),
+    ...choices.map((f) => Object.assign(document.createElement('option'), { value: f.id, textContent: f.path })),
+  );
+  pick.value = choices.some((f) => f.id === keep) ? keep : '';
+}
+
+$('#share-create').addEventListener('click', () =>
+  withBusy(
+    $<HTMLButtonElement>('#share-create'),
+    async () => {
+      const folderId = $<HTMLSelectElement>('#share-folder').value;
+      if (!folderId) throw new Error(t('shareChooseFolder'));
+      const name = aiFolders.find((f) => f.id === folderId)?.path ?? '';
+      if (!confirm(t('sharedConfirmCreate', name))) return;
+      const view = await send({
+        type: 'shareCreate',
+        folderId,
+        emails: $<HTMLTextAreaElement>('#share-emails').value,
+        role: $<HTMLSelectElement>('#share-role').value as 'writer' | 'reader',
+      });
+      $<HTMLTextAreaElement>('#share-emails').value = '';
+      await loadAiFolders();
+      await renderShares();
+      showToast($('#action-ok'), t('sharedCreated', view.name));
+    },
+    actionError,
+  ),
+);
+$('#share-join').addEventListener('click', () =>
+  withBusy(
+    $<HTMLButtonElement>('#share-join'),
+    async () => {
+      const view = await send({ type: 'shareJoin', code: $<HTMLInputElement>('#share-code').value });
+      $<HTMLInputElement>('#share-code').value = '';
+      await loadAiFolders();
+      await renderShares();
+      showToast($('#action-ok'), t('sharedJoined', view.name));
+    },
+    actionError,
+  ),
+);
+sharesItem.watch(() => void renderShares());
 
 // ---------- storage: Google Drive or WebDAV ----------
 

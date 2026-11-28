@@ -37,6 +37,7 @@ import { detectBrowser } from '../../platform/browser-info';
 import type { BackupInfo } from '../../services/backup-service';
 import type { TidyEstimate } from '../../services/tidy-service';
 import type { NamingEstimate } from '../../services/naming-service';
+import { parseWebDavUrl } from '../../platform/webdav';
 import type { ImportMode, ImportResult } from '../../sync/importer';
 
 localizePage();
@@ -1033,11 +1034,13 @@ statusItem.watch((s) => {
   // Connected or disconnected elsewhere (e.g. from the popup): the backup
   // and browser lists belong to the account, so load them again.
   if (wasConnected !== undefined && s.connected !== wasConnected) {
+    void renderStorage();
     void Promise.all([loadBackups(), loadBrowsers(), loadEncryption()]).catch(showError);
   }
   wasConnected = s.connected;
 });
 void loadSettings();
+void renderStorage();
 void initAi().catch((err: unknown) => showError(err));
 void loadEncryption().catch((err: unknown) => showError(err));
 // Development builds only: the OAuth redirect URI to register in Google Cloud.
@@ -1541,6 +1544,46 @@ $('#tidy-discard').addEventListener('click', () =>
     actionError,
   ),
 );
+
+// ---------- storage: Google Drive or WebDAV ----------
+
+async function renderStorage() {
+  const info = await send({ type: 'storageInfo' }).catch(() => ({ kind: 'drive' as const }));
+  $('#storage-state').textContent = info.kind === 'webdav' ? t('storageWebdav', info.url) : t('storageDrive');
+  if (info.kind === 'webdav') {
+    const url = $<HTMLInputElement>('#webdav-url');
+    const user = $<HTMLInputElement>('#webdav-user');
+    if (!url.value) url.value = info.url;
+    if (!user.value) user.value = info.username;
+  }
+}
+
+$('#webdav-connect').addEventListener('click', () => {
+  actionError.hidden = true;
+  const url = $<HTMLInputElement>('#webdav-url').value.trim();
+  const origin = parseWebDavUrl(url);
+  if (!origin) {
+    showError(new Error(t('webdavInvalidUrl')));
+    return;
+  }
+  // Asked straight from the click: the prompt needs the user action.
+  const asked = browser.permissions.request({ origins: [`${origin.protocol}//${origin.hostname}/*`] });
+  void withBusy(
+    $<HTMLButtonElement>('#webdav-connect'),
+    async () => {
+      if (!(await asked)) throw new Error(t('aiPermissionDeniedHost', origin.host));
+      const s = await statusItem.getValue();
+      if (s.connected && !confirm(t('webdavConfirmSwitch'))) return;
+      const pass = $<HTMLInputElement>('#webdav-pass');
+      await send({ type: 'connectWebdav', url, username: $<HTMLInputElement>('#webdav-user').value, password: pass.value });
+      pass.value = '';
+      $<HTMLDetailsElement>('#webdav-box').open = false;
+      await renderStorage();
+      showToast($('#action-ok'), t('webdavConnected', origin.host));
+    },
+    actionError,
+  );
+});
 
 // ---------- name bookmarks with AI ----------
 

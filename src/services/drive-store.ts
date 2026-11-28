@@ -1,8 +1,10 @@
 import { SYNC_SCHEMA, type SyncState } from '../core/types';
 import { DriveClient, DriveError, quote, type DriveCodec } from '../platform/drive';
+import { PRECONDITION_FAILED, type FileStore } from '../platform/store';
+import { WebDavClient } from '../platform/webdav';
 import { getAccessToken, invalidateToken } from '../platform/identity';
 import { t } from '../shared/i18n';
-import { driveIdsItem } from '../shared/state';
+import { backendItem, driveIdsItem, type Backend } from '../shared/state';
 import { ConflictError, type RemoteStore } from '../sync/engine';
 
 /**
@@ -37,14 +39,60 @@ export function setDriveCodec(c: DriveCodec): void {
   codec = c;
 }
 
-/** Drive access for Marksync's files; encrypts and decrypts them when encryption is on. */
-export function driveClient(): DriveClient {
-  return new DriveClient(getAccessToken, invalidateToken, codec);
+/** The storage this browser uses (read when the service worker starts and whenever it changes). */
+let backend: Backend = { kind: 'drive' };
+export const backendReady = backendItem.getValue().then((b) => {
+  backend = b;
+});
+backendItem.watch((b) => {
+  backend = b ?? { kind: 'drive' };
+});
+/** For tests and the connect flow: use this backend from now on. */
+export function useBackend(b: Backend): void {
+  backend = b;
+}
+
+function concrete(withCodec: boolean): FileStore {
+  const c = withCodec ? codec : undefined;
+  if (backend.kind === 'webdav') return new WebDavClient(backend, c);
+  return new DriveClient(getAccessToken, invalidateToken, c);
+}
+
+/**
+ * A store that picks Drive or WebDAV when it is used, after the saved choice
+ * has been read: a sync right after the service worker starts never goes to
+ * the wrong place.
+ */
+function client(withCodec: boolean): FileStore {
+  const run = async <T>(task: (s: FileStore) => Promise<T>): Promise<T> => {
+    await backendReady;
+    return task(concrete(withCodec));
+  };
+  return {
+    list: (q, orderBy, pageSize) => run((s) => s.list(q, orderBy, pageSize)),
+    findByName: (name, parentId, folder) => run((s) => s.findByName(name, parentId, folder)),
+    ensureFolder: (name, parentId) => run((s) => s.ensureFolder(name, parentId)),
+    getMeta: (id) => run((s) => s.getMeta(id)),
+    downloadJson: <T>(id: string) => run((s) => s.downloadJson<T>(id)),
+    createJson: (name, parentId, data, appProperties) => run((s) => s.createJson(name, parentId, data, appProperties)),
+    updateJson: (id, data, expectedVersion) => run((s) => s.updateJson(id, data, expectedVersion)),
+    delete: (id) => run((s) => s.delete(id)),
+  };
+}
+
+/** Access to Marksync's files (Google Drive or WebDAV); encrypts and decrypts them when encryption is on. */
+export function driveClient(): FileStore {
+  return client(true);
+}
+
+/** The same storage without encryption, for encryption.json and for rewriting files in another format. */
+export function rawClient(): FileStore {
+  return client(false);
 }
 
 const isNotFound = (err: unknown) => err instanceof DriveError && err.status === 404;
 
-export async function appFolders(drive: DriveClient): Promise<AppFolders> {
+export async function appFolders(drive: FileStore): Promise<AppFolders> {
   const ids = await driveIdsItem.getValue();
   if (ids.folderId && ids.backupsFolderId && ids.browsersFolderId) {
     return { folderId: ids.folderId, backupsFolderId: ids.backupsFolderId, browsersFolderId: ids.browsersFolderId };
@@ -58,7 +106,7 @@ export async function appFolders(drive: DriveClient): Promise<AppFolders> {
 }
 
 /** Runs `task` with the app folders; if a cached folder is gone, looks them up again once. */
-export async function withFolders<T>(drive: DriveClient, task: (f: AppFolders) => Promise<T>): Promise<T> {
+export async function withFolders<T>(drive: FileStore, task: (f: AppFolders) => Promise<T>): Promise<T> {
   try {
     return await task(await appFolders(drive));
   } catch (err) {
@@ -73,7 +121,7 @@ export async function withFolders<T>(drive: DriveClient, task: (f: AppFolders) =
  * it really is in the expected Marksync folder, so a stray or crafted ID can
  * never delete or restore an unrelated file (such as sync-state.json).
  */
-export async function assertInFolder(drive: DriveClient, fileId: string, folder: 'backups' | 'browsers'): Promise<void> {
+export async function assertInFolder(drive: FileStore, fileId: string, folder: 'backups' | 'browsers'): Promise<void> {
   const folders = await appFolders(drive);
   const expected = folder === 'backups' ? folders.backupsFolderId : folders.browsersFolderId;
   const meta = await drive.getMeta(fileId);
@@ -83,7 +131,7 @@ export async function assertInFolder(drive: DriveClient, fileId: string, folder:
 }
 
 export class DriveRemoteStore implements RemoteStore {
-  constructor(private readonly drive: DriveClient) {}
+  constructor(private readonly drive: FileStore) {}
 
   /** ID of sync-state.json, or undefined if no browser has created it yet. */
   private async stateFileId(): Promise<string | undefined> {
@@ -137,7 +185,14 @@ export class DriveRemoteStore implements RemoteStore {
     if (!id) {
       if (expectedVersion !== null) throw new ConflictError();
       const { created, oldest } = await withFolders(this.drive, async (f) => {
-        const file = await this.drive.createJson(STATE_FILE, f.folderId, state);
+        let file;
+        try {
+          file = await this.drive.createJson(STATE_FILE, f.folderId, state);
+        } catch (err) {
+          // WebDAV: another browser created it a moment ago.
+          if (err instanceof DriveError && err.status === PRECONDITION_FAILED) throw new ConflictError();
+          throw err;
+        }
         // Two browsers connecting for the first time at once can each create
         // the file. The oldest one wins; the other browser drops its copy and
         // merges into the winner on the retry.
@@ -154,6 +209,12 @@ export class DriveRemoteStore implements RemoteStore {
     if (expectedVersion === null) throw new ConflictError();
     const meta = await this.drive.getMeta(id);
     if (meta.version !== expectedVersion) throw new ConflictError();
-    return (await this.drive.updateJson(id, state)).version ?? '';
+    try {
+      // WebDAV checks the version again atomically (If-Match).
+      return (await this.drive.updateJson(id, state, expectedVersion)).version ?? '';
+    } catch (err) {
+      if (err instanceof DriveError && err.status === PRECONDITION_FAILED) throw new ConflictError();
+      throw err;
+    }
   }
 }

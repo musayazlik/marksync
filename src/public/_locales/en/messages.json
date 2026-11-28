@@ -2010,5 +2010,59 @@
   },
   "tidyLogMove": {
     "message": "\"{1}\" moved"
+  },
+  "storageLabel": {
+    "message": "Storage"
+  },
+  "storageDrive": {
+    "message": "Google Drive (your own Drive, the Marksync folder)."
+  },
+  "storageWebdav": {
+    "message": "WebDAV: {1}"
+  },
+  "webdavSummary": {
+    "message": "Use a WebDAV server instead (Nextcloud, ownCloud, a NAS…)"
+  },
+  "webdavHelp": {
+    "message": "Marksync keeps the same files there as in Drive (a Marksync folder with the sync file, backups and browser lists), with end-to-end encryption if you turn it on. Use the WebDAV address of a folder you own, e.g. https://cloud.example.org/remote.php/dav/files/USER/ on Nextcloud. Every browser that should sync needs the same address."
+  },
+  "webdavUrl": {
+    "message": "WebDAV address"
+  },
+  "webdavUser": {
+    "message": "User name"
+  },
+  "webdavPassword": {
+    "message": "App password"
+  },
+  "webdavPrivacy": {
+    "message": "Use an app password (Nextcloud: Settings → Security → Devices & sessions). It is stored in this browser only and sent only to this server."
+  },
+  "webdavConnect": {
+    "message": "Connect to WebDAV"
+  },
+  "webdavConfirmSwitch": {
+    "message": "Switch this browser from its current storage to this WebDAV server? Its bookmarks stay as they are and are synced with what is on the server."
+  },
+  "webdavConnected": {
+    "message": "Connected to {1}. Syncing now."
+  },
+  "webdavInvalidUrl": {
+    "message": "Enter an http or https address without a user name, \"?\" or \"#\"."
+  },
+  "webdavMissingLogin": {
+    "message": "Enter the user name and the app password."
+  },
+  "webdavAuthFailed": {
+    "message": "The server refused the user name or password."
+  },
+  "webdavNotFound": {
+    "message": "There is no folder at this address on the server."
+  },
+  "webdavNotDav": {
+    "message": "This address does not speak WebDAV. Check the address (on Nextcloud it ends in /remote.php/dav/files/USER/)."
+  },
+  "webdavUnreachable": {
+    "message": "{1} could not be reached."
   }
 }

@@ -2005,5 +2005,59 @@
   },
   "tidyLogMove": {
     "message": "\"{1}\" taşındı"
+  },
+  "storageLabel": {
+    "message": "Depolama"
+  },
+  "storageDrive": {
+    "message": "Google Drive (kendi Drive'ınız, Marksync klasörü)."
+  },
+  "storageWebdav": {
+    "message": "WebDAV: {1}"
+  },
+  "webdavSummary": {
+    "message": "Bunun yerine bir WebDAV sunucusu kullan (Nextcloud, ownCloud, NAS…)"
+  },
+  "webdavHelp": {
+    "message": "Marksync orada da Drive'dakiyle aynı dosyaları tutar (eşitleme dosyası, yedekler ve tarayıcı listeleriyle bir Marksync klasörü); açarsanız uçtan uca şifrelemeyle. Size ait bir klasörün WebDAV adresini kullanın; ör. Nextcloud'da https://cloud.example.org/remote.php/dav/files/KULLANICI/. Eşitlenecek her tarayıcıda aynı adres gerekir."
+  },
+  "webdavUrl": {
+    "message": "WebDAV adresi"
+  },
+  "webdavUser": {
+    "message": "Kullanıcı adı"
+  },
+  "webdavPassword": {
+    "message": "Uygulama parolası"
+  },
+  "webdavPrivacy": {
+    "message": "Bir uygulama parolası kullanın (Nextcloud: Ayarlar → Güvenlik → Cihazlar ve oturumlar). Yalnızca bu tarayıcıda saklanır ve yalnızca bu sunucuya gönderilir."
+  },
+  "webdavConnect": {
+    "message": "WebDAV'a bağlan"
+  },
+  "webdavConfirmSwitch": {
+    "message": "Bu tarayıcı şu anki depolamasından bu WebDAV sunucusuna geçsin mi? Yer imleri olduğu gibi kalır ve sunucudakilerle eşitlenir."
+  },
+  "webdavConnected": {
+    "message": "{1} adresine bağlanıldı. Şimdi eşitleniyor."
+  },
+  "webdavInvalidUrl": {
+    "message": "Kullanıcı adı, \"?\" ya da \"#\" içermeyen bir http veya https adresi girin."
+  },
+  "webdavMissingLogin": {
+    "message": "Kullanıcı adını ve uygulama parolasını girin."
+  },
+  "webdavAuthFailed": {
+    "message": "Sunucu kullanıcı adını ya da parolayı reddetti."
+  },
+  "webdavNotFound": {
+    "message": "Sunucuda bu adreste bir klasör yok."
+  },
+  "webdavNotDav": {
+    "message": "Bu adres WebDAV konuşmuyor. Adresi kontrol edin (Nextcloud'da /remote.php/dav/files/KULLANICI/ ile biter)."
+  },
+  "webdavUnreachable": {
+    "message": "{1} adresine ulaşılamadı."
   }
 }

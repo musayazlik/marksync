@@ -26,6 +26,7 @@ import { applyNaming, cancelNaming, discardNaming, editNaming, estimateNaming, r
 import { compareBackup, restoreFromBackup, searchBackups } from '../services/history-service';
 import { allTags, setTags, tagsByLocalId } from '../services/tags-service';
 import { actOnDigest, getDigest } from '../services/digest-service';
+import { connectWebDav, storageInfo, useDrive } from '../services/webdav-service';
 import { checkAssistantProposals } from '../services/assistant-service';
 import { buildIndex, deleteIndex, resumeIndex, searchByMeaning, semanticReady, semanticStatus, stopIndex } from '../services/semantic-service';
 // Also installs the encryption codec for every Drive client (see drive-store.ts).
@@ -191,12 +192,25 @@ export default defineBackground(() => {
     switch (req.type) {
       case 'connect': {
         const email = await connect();
+        // A Google sign-in means Drive, even if WebDAV was used before.
+        await useDrive();
         await scheduleAlarms();
         void syncAndPublish();
         return email;
       }
       case 'disconnect':
-        return disconnect();
+        await disconnect();
+        await useDrive();
+        return;
+      case 'connectWebdav': {
+        if (typeof req.url !== 'string' || typeof req.username !== 'string' || typeof req.password !== 'string') throw new Error(t('webdavMissingLogin'));
+        const label = await connectWebDav({ url: req.url, username: req.username, password: req.password });
+        await scheduleAlarms();
+        void syncAndPublish();
+        return label;
+      }
+      case 'storageInfo':
+        return storageInfo();
       case 'syncNow':
         if (!(await getSettings()).syncEnabled) throw new Error(t('syncOffHint'));
         await runSync(req.allowMassDelete ? { allowMassDelete: true } : {});
@@ -364,7 +378,7 @@ export default defineBackground(() => {
   // sendResponse + `return true` works the same in Chrome and Firefox.
   const pageOrigin = browser.runtime.getURL('');
   const knownTypes = new Set<Request['type']>([
-    'connect', 'disconnect', 'syncNow', 'checkNow', 'resyncFromDrive', 'keepLocal', 'backupNow', 'listBackups',
+    'connect', 'disconnect', 'connectWebdav', 'storageInfo', 'syncNow', 'checkNow', 'resyncFromDrive', 'keepLocal', 'backupNow', 'listBackups',
     'restoreBackup', 'deleteBackup', 'historyCompare', 'historyRestore', 'historySearch', 'listBrowsers', 'removeBrowser', 'importFromBrowser', 'importHtml',
     'exportHtml', 'getRedirectUrl', 'settingsChanged', 'aiListFolders', 'aiTestKey', 'aiSortNow', 'aiUndo',
     'aiClearLog', 'aiListModels', 'aiUsage', 'aiEndpointModels', 'aiBuiltinStatus', 'tagsGet', 'tagsSet', 'digestGet', 'digestAct', 'semStatus', 'semBuild', 'semStop', 'semDelete', 'semSearch', 'semReady', 'aiBulkStart', 'aiBulkCancel', 'aiBulkApply', 'aiBulkDiscard',

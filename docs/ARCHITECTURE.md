@@ -38,13 +38,32 @@ src/
     dedupe.ts      Remove the chosen duplicate copies (re-checked first)
   platform/    Browser and Google specifics
     identity.ts    Google sign-in with launchWebAuthFlow
-    drive.ts       Google Drive v3 REST client
+    store.ts       FileStore: the storage interface every backend implements
+    drive.ts       Google Drive v3 REST client (a FileStore)
+    webdav.ts      WebDAV client (a FileStore): Nextcloud, ownCloud, NAS
     openrouter.ts  OpenAI-compatible client (OpenRouter or the user's server): chat completions, model lists, key usage
     builtin-ai.ts  The browser's on-device model (Prompt API): availability, download, prompt
   services/    Wires the engine to Drive and extension storage
   entrypoints/ background (events, alarms, messages), popup, options, sorter-log, duplicates, links
 tests/         In-memory Chromium and Firefox fakes, end-to-end sync tests
 ```
+
+## Storage backends (`platform/store.ts`)
+
+The services talk to a `FileStore`: Google Drive (`platform/drive.ts`) or a
+WebDAV server (`platform/webdav.ts`), chosen in Settings → Sync → Storage
+and kept in `local:backend` (the WebDAV app password stays in that browser).
+The interface has the shape of the Drive client; `list` takes the small
+subset of Drive queries the services build (`'ID' in parents`, `name =`,
+`mimeType` folder or not), and WebDAV answers them with `PROPFIND` (parsed
+without DOMParser, which service workers lack). On WebDAV, file IDs are
+paths below the configured folder (".." refused), the ETag is the version,
+`createJson` sends `If-None-Match: *` and `updateJson` `If-Match`, so a
+concurrent write is a 412 that `DriveRemoteStore` turns into a sync retry.
+Drive's appProperties (backup count, source, reason; snapshot label) become
+WebDAV dead properties (`PROPPATCH`). The same layout, encryption and
+version checks apply to both; `tests/store-contract.test.ts` runs the same
+contract against a fake Drive and a fake WebDAV server.
 
 ## Files in Google Drive
 
@@ -347,6 +366,7 @@ click) and stops at the first key, credit or permission error.
   (moves of different items in one folder both survive, see "Order").
 - Changes from other browsers arrive on the next alarm (no push).
 - Not synced: favicons, separators, Firefox tags and keywords.
+- More storage backends (Git, Dropbox, OneDrive, S3) can implement `FileStore`.
 - Ideas: more UI languages, Safari build, a per-sync-run change log (which browser changed what), changing the
   encryption passphrase without turning encryption off and on.
 

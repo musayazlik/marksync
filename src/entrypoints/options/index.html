@@ -37,6 +37,7 @@
         <span class="rail-ribbon" aria-hidden="true"></span>
         <a href="#sec-sync" data-i18n="syncHeading"></a>
         <a href="#sec-backups" data-i18n="backupsHeading"></a>
+        <a href="#sec-shared" data-i18n="sharedHeading"></a>
         <a href="#sec-encryption" data-i18n="encHeading"></a>
         <a href="#import" data-i18n="importHeading"></a>
         <a href="#ai" data-i18n="aiHeading"></a>
@@ -165,6 +166,39 @@
             </div>
           </div>
           <p class="muted small" data-i18n="restoreHelp"></p>
+        </section>
+
+        <section id="sec-shared" class="section" aria-labelledby="shared-h">
+          <h2 id="shared-h" data-i18n="sharedHeading"></h2>
+          <p class="muted" data-i18n="sharedIntro"></p>
+          <p class="notice small" data-i18n="sharedPrivacy"></p>
+          <div class="panel">
+            <ul id="shares" class="share-list"></ul>
+            <p id="shares-empty" class="muted small panel-block" data-i18n="sharedNone"></p>
+          </div>
+          <div class="panel">
+            <div class="panel-block stack">
+              <h3 data-i18n="sharedCreateHeading"></h3>
+              <p class="muted small" data-i18n="sharedCreateHelp"></p>
+              <select id="share-folder" data-i18n-aria-label="sharedFolderLabel"></select>
+              <textarea id="share-emails" rows="2" spellcheck="false" data-i18n-placeholder="sharedEmailsPlaceholder" data-i18n-aria-label="sharedEmailsPlaceholder"></textarea>
+              <div class="row wrap">
+                <select id="share-role" data-i18n-aria-label="sharedRoleLabel">
+                  <option value="writer" data-i18n="sharedRoleWriter"></option>
+                  <option value="reader" data-i18n="sharedRoleReader"></option>
+                </select>
+                <button id="share-create" class="primary" data-i18n="sharedCreate"></button>
+              </div>
+            </div>
+            <div class="panel-block stack">
+              <h3 data-i18n="sharedJoinHeading"></h3>
+              <p class="muted small" data-i18n="sharedJoinHelp"></p>
+              <div class="key-row">
+                <input id="share-code" autocomplete="off" spellcheck="false" maxlength="500" data-i18n-placeholder="sharedCodePlaceholder" data-i18n-aria-label="sharedCodePlaceholder" />
+                <button id="share-join" data-i18n="sharedJoin"></button>
+              </div>
+            </div>
+          </div>
         </section>
 
         <section id="sec-encryption" class="section" aria-labelledby="enc-h">

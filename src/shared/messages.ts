@@ -13,6 +13,7 @@ import type { BulkJob, EncryptionStatus, TidyJob } from './state';
 import type { TidyApplyResult, TidyEstimate } from '../services/tidy-service';
 import type { NamingEstimate, NamingOptions } from '../services/naming-service';
 import type { AssistantCheck } from '../services/assistant-service';
+import type { ShareView } from '../services/share-service';
 import type { DigestAction, DigestEntry } from '../services/digest-service';
 import type { SemanticStatus } from '../services/semantic-service';
 import type { BuiltinState } from '../platform/builtin-ai';
@@ -23,6 +24,13 @@ export type Request =
   | { type: 'connect' }
   | { type: 'connectWebdav'; url: string; username: string; password: string }
   | { type: 'storageInfo' }
+  | { type: 'shareList' }
+  | { type: 'shareCreate'; folderId: string; emails: string; role: 'writer' | 'reader' }
+  | { type: 'shareInvite'; fileId: string; emails: string; role: 'writer' | 'reader' }
+  | { type: 'shareJoin'; code: string }
+  | { type: 'shareLeave'; fileId: string }
+  | { type: 'sharePeople'; fileId: string }
+  | { type: 'shareSyncNow' }
   | { type: 'disconnect' }
   | { type: 'syncNow'; allowMassDelete?: boolean }
   | { type: 'checkNow' }
@@ -94,6 +102,13 @@ export interface ResponseData {
   connect: string;
   connectWebdav: string;
   storageInfo: { kind: 'drive' } | { kind: 'webdav'; url: string; username: string };
+  shareList: ShareView[];
+  shareCreate: ShareView;
+  shareInvite: number;
+  shareJoin: ShareView;
+  shareLeave: void;
+  sharePeople: { email: string; name: string; role: string }[];
+  shareSyncNow: void;
   disconnect: void;
   syncNow: void;
   checkNow: void;

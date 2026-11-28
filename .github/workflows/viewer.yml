@@ -41,6 +41,9 @@ jobs:
       - run: pnpm build:viewer
         env:
           VITE_GOOGLE_CLIENT_ID: ${{ vars.VIEWER_GOOGLE_CLIENT_ID }}
+          # For the shared-folder invitation page (Google Picker); optional.
+          VITE_GOOGLE_API_KEY: ${{ vars.VIEWER_GOOGLE_API_KEY }}
+          VITE_GOOGLE_APP_ID: ${{ vars.GOOGLE_PROJECT_NUMBER }}
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
           path: .output/viewer

@@ -26,6 +26,18 @@ export interface DriveFile {
   mimeType?: string;
 }
 
+/** What the signed-in account may do with a file. */
+export interface DriveAccess {
+  id: string;
+  name: string;
+  appProperties: Record<string, string>;
+  ownedByMe: boolean;
+  canEdit: boolean;
+  canShare: boolean;
+  /** Display name or e-mail of the owner. */
+  owner: string;
+}
+
 export class DriveError extends Error {
   constructor(
     readonly status: number,
@@ -148,6 +160,45 @@ export class DriveClient implements FileStore {
       body: JSON.stringify(content),
     });
     return (await res.json()) as DriveFile;
+  }
+
+  /** What this account may do with a file (for shared folders). */
+  async access(id: string): Promise<DriveAccess> {
+    const res = await this.request(`${API}/files/${fileIdPath(id)}?fields=id,name,appProperties,ownedByMe,capabilities(canEdit,canShare),owners(displayName,emailAddress)`);
+    const f = (await res.json()) as {
+      id: string;
+      name: string;
+      appProperties?: Record<string, string>;
+      ownedByMe?: boolean;
+      capabilities?: { canEdit?: boolean; canShare?: boolean };
+      owners?: { displayName?: string; emailAddress?: string }[];
+    };
+    return {
+      id: f.id,
+      name: f.name,
+      appProperties: f.appProperties ?? {},
+      ownedByMe: !!f.ownedByMe,
+      canEdit: !!f.capabilities?.canEdit,
+      canShare: !!f.capabilities?.canShare,
+      owner: f.owners?.[0]?.displayName ?? f.owners?.[0]?.emailAddress ?? '',
+    };
+  }
+
+  /** Gives `emailAddress` access to a file; Google sends them an e-mail with `message`. */
+  async share(id: string, emailAddress: string, role: 'writer' | 'reader', message?: string): Promise<void> {
+    const params = new URLSearchParams({ sendNotificationEmail: 'true', ...(message ? { emailMessage: message.slice(0, 1000) } : {}) });
+    await this.request(`${API}/files/${fileIdPath(id)}/permissions?${params}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'user', role, emailAddress }),
+    });
+  }
+
+  /** People with access to a file. */
+  async people(id: string): Promise<{ email: string; name: string; role: string }[]> {
+    const res = await this.request(`${API}/files/${fileIdPath(id)}/permissions?fields=permissions(role,emailAddress,displayName,type)`);
+    const body = (await res.json()) as { permissions?: { role?: string; emailAddress?: string; displayName?: string; type?: string }[] };
+    return (body.permissions ?? []).filter((p) => p.type === 'user').map((p) => ({ email: p.emailAddress ?? '', name: p.displayName ?? '', role: p.role ?? '' }));
   }
 
   async delete(id: string): Promise<void> {

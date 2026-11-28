@@ -64,6 +64,8 @@ jobs:
       # Repository variables (Settings → Secrets and variables → Actions → Variables).
       # Both values end up inside the published extension, so they are not secrets.
       WXT_GOOGLE_CLIENT_ID: ${{ vars.WXT_GOOGLE_CLIENT_ID }}
+      # The web viewer's address, for shared-folder invitation links (optional).
+      WXT_VIEWER_URL: ${{ vars.VIEWER_URL }}
       WXT_GECKO_ID: ${{ vars.WXT_GECKO_ID }}
     steps:
       - name: Release tag

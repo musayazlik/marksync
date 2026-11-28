@@ -20,6 +20,7 @@ oradadır. Üçüncü taraf bir sunucu yoktur; her şey Google Drive'ınızdaki
 - Aynı yer imleri zaten olan bir tarayıcı bağlandığında kopya oluşmaz
 - Bir eşitleme yer imlerinin çoğunu silecekse durur ve onay ister
 - Google Drive'a otomatik ve elle yedekleme, tek tıkla geri yükleme
+- Ailenizle ya da ekibinizle paylaşılan klasörler: tek bir klasör, kendi Drive dosyası üzerinden diğer Google hesaplarıyla eşitlenir; düzenleyiciler ve görüntüleyiciler Drive izinlerine göre çalışır
 - Google Drive yerine kendi sunucunuz: herhangi bir WebDAV sunucusu (Nextcloud, ownCloud, NAS) aynı şifreleme ve çakışmaya karşı güvenli yazmayla aynı dosyaları tutar
 - Yer imleriniz her telefonda: Drive'ınızı doğrudan okuyan salt okunur bir web uygulaması (ana ekrana eklenebilir, iOS Safari ve Android'de çalışır); arama, etiketler ve şifreleme desteğiyle ([viewer/](viewer/))
 - Yapay zekâ asistanları: `marksync-mcp` sunucusu Claude, Cursor ve diğer MCP istemcilerinin yer imlerinizde arama yapmasını ve Marksync'te onayladığınız değişiklikler önermesini sağlar ([mcp/](mcp/))

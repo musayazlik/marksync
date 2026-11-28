@@ -4,7 +4,7 @@ import { InvalidRemoteDataError } from '../core/validate';
 import { deviceLabel } from '../platform/browser-info';
 import { DriveError } from '../platform/drive';
 import { AuthRequiredError, ConfigError } from '../platform/identity';
-import { patchStatus, remoteVersionItem, statusItem, syncStateItem, type ErrorCode, type Status } from '../shared/state';
+import { patchStatus, remoteVersionItem, sharesItem, statusItem, syncStateItem, type ErrorCode, type Status } from '../shared/state';
 import type { BookmarkNode, BookmarksApi } from '../sync/bookmarks-api';
 import { MassDeleteError, syncOnce, type SyncOptions, type SyncResult } from '../sync/engine';
 import { createBackup } from './backup-service';
@@ -17,6 +17,14 @@ let queuedSync: Promise<SyncResult> | null = null;
 let ignoreEventsUntil = 0;
 
 /** True while (or just after) Marksync writes bookmarks, so its own events are ignored. */
+/** Run after every successful sync (shared folders register here, to avoid an import cycle). */
+export const afterSyncHooks: (() => Promise<unknown> | void)[] = [];
+
+async function sharedContainer(): Promise<string[]> {
+  const { containerId } = await sharesItem.getValue();
+  return containerId ? [containerId] : [];
+}
+
 export function isApplying(): boolean {
   return Date.now() < ignoreEventsUntil;
 }
@@ -95,6 +103,8 @@ async function doSync(opts: SyncOptions): Promise<SyncResult> {
           save: (s) => syncStateItem.setValue(s),
         },
         deviceLabel: await deviceLabel(),
+        // Shared folders sync through their own files (services/share-service.ts).
+        exclude: await sharedContainer(),
         onApplying: (on) => {
           ignoreEventsUntil = on ? Number.POSITIVE_INFINITY : Date.now() + 2000;
         },
@@ -116,6 +126,7 @@ async function doSync(opts: SyncOptions): Promise<SyncResult> {
     });
     // Tags are a separate file: merged after the bookmarks, never blocking them.
     void syncTags().catch((err) => console.warn('[marksync] tags sync failed', err));
+    for (const hook of afterSyncHooks) void Promise.resolve().then(hook).catch((err) => console.warn('[marksync] after-sync task failed', err));
     return result;
   } catch (err) {
     await patchStatus({ syncing: false, error: describeError(err) });

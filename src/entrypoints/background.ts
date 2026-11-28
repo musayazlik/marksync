@@ -27,6 +27,7 @@ import { compareBackup, restoreFromBackup, searchBackups } from '../services/his
 import { allTags, setTags, tagsByLocalId } from '../services/tags-service';
 import { actOnDigest, getDigest } from '../services/digest-service';
 import { connectWebDav, storageInfo, useDrive } from '../services/webdav-service';
+import { createShare, invite, joinShare, leaveShare, listShares, parseEmails, sharePeople, syncShares } from '../services/share-service';
 import { checkAssistantProposals } from '../services/assistant-service';
 import { buildIndex, deleteIndex, resumeIndex, searchByMeaning, semanticReady, semanticStatus, stopIndex } from '../services/semantic-service';
 // Also installs the encryption codec for every Drive client (see drive-store.ts).
@@ -211,6 +212,24 @@ export default defineBackground(() => {
       }
       case 'storageInfo':
         return storageInfo();
+      case 'shareList':
+        return listShares();
+      case 'shareCreate':
+        if (typeof req.folderId !== 'string' || typeof req.emails !== 'string') throw new Error(t('shareChooseFolder'));
+        return createShare(req.folderId, parseEmails(req.emails), req.role === 'reader' ? 'reader' : 'writer');
+      case 'shareInvite':
+        if (typeof req.fileId !== 'string' || typeof req.emails !== 'string') throw new Error(t('shareUnknown'));
+        return invite(req.fileId, parseEmails(req.emails), req.role === 'reader' ? 'reader' : 'writer');
+      case 'shareJoin':
+        return joinShare(typeof req.code === 'string' ? req.code : '');
+      case 'shareLeave':
+        if (typeof req.fileId !== 'string') throw new Error(t('shareUnknown'));
+        return leaveShare(req.fileId);
+      case 'sharePeople':
+        if (typeof req.fileId !== 'string') throw new Error(t('shareUnknown'));
+        return sharePeople(req.fileId);
+      case 'shareSyncNow':
+        return syncShares();
       case 'syncNow':
         if (!(await getSettings()).syncEnabled) throw new Error(t('syncOffHint'));
         await runSync(req.allowMassDelete ? { allowMassDelete: true } : {});
@@ -378,7 +397,8 @@ export default defineBackground(() => {
   // sendResponse + `return true` works the same in Chrome and Firefox.
   const pageOrigin = browser.runtime.getURL('');
   const knownTypes = new Set<Request['type']>([
-    'connect', 'disconnect', 'connectWebdav', 'storageInfo', 'syncNow', 'checkNow', 'resyncFromDrive', 'keepLocal', 'backupNow', 'listBackups',
+    'connect', 'disconnect', 'connectWebdav', 'storageInfo',
+    'shareList', 'shareCreate', 'shareInvite', 'shareJoin', 'shareLeave', 'sharePeople', 'shareSyncNow', 'syncNow', 'checkNow', 'resyncFromDrive', 'keepLocal', 'backupNow', 'listBackups',
     'restoreBackup', 'deleteBackup', 'historyCompare', 'historyRestore', 'historySearch', 'listBrowsers', 'removeBrowser', 'importFromBrowser', 'importHtml',
     'exportHtml', 'getRedirectUrl', 'settingsChanged', 'aiListFolders', 'aiTestKey', 'aiSortNow', 'aiUndo',
     'aiClearLog', 'aiListModels', 'aiUsage', 'aiEndpointModels', 'aiBuiltinStatus', 'tagsGet', 'tagsSet', 'digestGet', 'digestAct', 'semStatus', 'semBuild', 'semStop', 'semDelete', 'semSearch', 'semReady', 'aiBulkStart', 'aiBulkCancel', 'aiBulkApply', 'aiBulkDiscard',

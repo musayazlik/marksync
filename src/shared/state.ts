@@ -302,6 +302,27 @@ export interface TidyJob {
   applied?: { done: number; failed: number; backedUp: boolean };
 }
 export const aiTidyItem = storage.defineItem<TidyJob>('local:aiTidy');
+/** A folder shared with other Google accounts (services/share-service.ts). */
+export interface ShareEntry {
+  /** The shared folder's own sync file in the owner's Drive. */
+  fileId: string;
+  name: string;
+  /** The local folder, inside the "Marksync Shared" folder. */
+  localFolderId: string;
+  role: 'owner' | 'writer' | 'reader';
+  owner?: string;
+  /** Sync history of this folder in this browser (like the personal one). */
+  state: LocalState;
+  lastSyncAt?: number;
+  error?: string;
+}
+export interface SharesStore {
+  /** Local "Marksync Shared" folder: left out of the personal sync. */
+  containerId?: string;
+  shares: ShareEntry[];
+}
+export const sharesItem = storage.defineItem<SharesStore>('local:shares', { fallback: { shares: [] } });
+
 /** The current or last "Name bookmarks with AI" run. */
 export const aiNamingItem = storage.defineItem<TidyJob>('local:aiNaming');
 
@@ -435,6 +456,9 @@ export async function resetAccountState(): Promise<void> {
   await snapshotMetaItem.setValue({});
   // Tags belong to the account's bookmarks.
   await tagsItem.setValue({ items: {}, pending: {} });
+  // Shared folders belong to the account too; their local folders stay as they are.
+  const shares = await sharesItem.getValue();
+  await sharesItem.setValue({ ...(shares.containerId ? { containerId: shares.containerId } : {}), shares: [] });
 }
 
 let statusWrites: Promise<unknown> = Promise.resolve();

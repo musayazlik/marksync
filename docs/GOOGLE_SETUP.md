@@ -112,6 +112,13 @@ The web viewer's client ID goes into the repository variable
 `VIEWER_GOOGLE_CLIENT_ID` (Settings → Secrets and variables → Actions →
 Variables); the "Web viewer" workflow builds and publishes the viewer to
 GitHub Pages only when it is set (Settings → Pages → Source: GitHub Actions).
+Shared-folder invitations open the viewer's `join.html`, which uses
+Google's file picker: also create an **API key** restricted to the *Google
+Picker API* and the viewer's origin, enable the Picker API, and set the
+variables `VIEWER_GOOGLE_API_KEY` and `GOOGLE_PROJECT_NUMBER` (the
+project number from the Cloud console's dashboard). Set `VIEWER_URL` (e.g.
+`https://<user>.github.io/marksync`) so store builds of the extension put
+the invitation link into the e-mails; without it, people join with the code.
 For a local build put it in `.env` as `VITE_GOOGLE_CLIENT_ID` and run
 `pnpm build:viewer` (output in `.output/viewer`).
 

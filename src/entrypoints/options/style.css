@@ -1091,3 +1091,53 @@ input[type='checkbox'].tick:indeterminate::after {
   flex: 1 1 200px;
   min-width: 0;
 }
+
+/* Shared folders. */
+.share-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.share-list li {
+  display: grid;
+  gap: 6px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.share-list li:last-child {
+  border-bottom: 0;
+}
+
+.share-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.share-head strong {
+  margin-right: auto;
+}
+
+#share-emails,
+#share-code {
+  width: 100%;
+  min-width: 0;
+}
+
+#share-code {
+  flex: 1 1 240px;
+}
+
+.share-invite {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.share-invite input {
+  flex: 1 1 220px;
+  min-width: 0;
+}

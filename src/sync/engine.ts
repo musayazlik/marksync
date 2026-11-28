@@ -58,6 +58,8 @@ export interface SyncDeps {
    * file (MASS_DELETE_MIN or more items), so a backup can be taken first.
    */
   beforeRemoteMassDelete?: (count: number) => Promise<void>;
+  /** Local folders this sync leaves alone (shared folders have their own sync). */
+  exclude?: readonly string[];
 }
 
 export interface SyncOptions {
@@ -151,7 +153,7 @@ async function attemptSync(deps: SyncDeps, opts: SyncOptions): Promise<SyncResul
     : stored;
   // A new file gets a new generation; an existing one keeps its own (older files have none).
   const epoch = remote ? remoteEpoch : newId();
-  const { snapshot, special } = await readLocal(deps.bookmarks, state.menuFolderId);
+  const { snapshot, special } = await readLocal(deps.bookmarks, state.menuFolderId, deps.exclude);
   const wallClock = (deps.now ?? Date.now)();
 
   // Nothing from Drive is trusted as-is: malformed records are dropped and

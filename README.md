@@ -23,6 +23,7 @@ other file there.
 - No duplicates when you connect a browser that already has the same bookmarks
 - Safety stop when a sync would delete most of your bookmarks
 - Automatic and manual backups in Google Drive, restore with one click
+- Shared folders with family or a team: one folder synced with other Google accounts through its own Drive file; editors and viewers follow Drive's permissions
 - Your own server instead of Google Drive: any WebDAV server (Nextcloud, ownCloud, a NAS) holds the same files, with the same encryption and conflict-safe writes
 - Your bookmarks on any phone: a read-only web app (installable, works on iOS Safari and Android) that reads your Drive directly, with search, tags and encryption support ([viewer/](viewer/))
 - AI assistants: the `marksync-mcp` server lets Claude, Cursor and other MCP clients search your bookmarks and propose changes you approve in Marksync ([mcp/](mcp/))

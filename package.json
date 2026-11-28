@@ -28,10 +28,13 @@
     "test:watch": "vitest",
     "postinstall": "wxt prepare",
     "build:opera": "wxt build -b opera",
-    "zip:all": "wxt zip && wxt zip -b firefox && wxt zip -b edge && wxt zip -b opera"
+    "zip:all": "wxt zip && wxt zip -b firefox && wxt zip -b edge && wxt zip -b opera",
+    "build:viewer": "vite build --config viewer/vite.config.ts",
+    "dev:viewer": "vite --config viewer/vite.config.ts"
   },
   "devDependencies": {
     "typescript": "^7.0.2",
+    "vite": "8.3.8",
     "vitest": "^5.1.1",
     "wxt": "^0.21.5"
   },

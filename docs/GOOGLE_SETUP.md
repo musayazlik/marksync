@@ -96,3 +96,26 @@ Put the printed value in `.env` as `WXT_EXTENSION_KEY=...`, run
 `chrome://extensions`. Do not commit `key.pem`. The key is added only to
 development builds; store builds get their ID from the store. Register this
 ID's redirect URI in the development client only.
+
+## 6. More clients in the same project (optional)
+
+`drive.file` gives a project's apps access to the files any of them created,
+so these clients must be in the **same project** as the extension's: then
+they see the Marksync folder the extension created.
+
+| For | Client type | Settings |
+|---|---|---|
+| The web viewer (`viewer/`, the PWA for phones) | Web application | **Authorized JavaScript origins**: the viewer's origin, e.g. `https://<user>.github.io` |
+| The MCP server (`mcp/`, `marksync-mcp`) | Desktop app | none (it signs in through `http://127.0.0.1`) |
+
+The web viewer's client ID goes into the repository variable
+`VIEWER_GOOGLE_CLIENT_ID` (Settings → Secrets and variables → Actions →
+Variables); the "Web viewer" workflow builds and publishes the viewer to
+GitHub Pages only when it is set (Settings → Pages → Source: GitHub Actions).
+For a local build put it in `.env` as `VITE_GOOGLE_CLIENT_ID` and run
+`pnpm build:viewer` (output in `.output/viewer`).
+
+The MCP server's client ID and secret are set by each user in their MCP
+client configuration (see [mcp/README.md](../mcp/README.md)). A Desktop
+client's secret is not confidential (Google treats installed apps as public
+clients), but it still belongs in local configuration, not in the repository.

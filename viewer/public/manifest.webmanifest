@@ -1,0 +1,14 @@
+{
+  "name": "Marksync",
+  "short_name": "Marksync",
+  "description": "Your Marksync bookmarks on any device, read straight from your own Google Drive.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f5f4fc",
+  "theme_color": "#4051ea",
+  "icons": [
+    { "src": "logo.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icon-128.png", "sizes": "128x128", "type": "image/png" }
+  ]
+}

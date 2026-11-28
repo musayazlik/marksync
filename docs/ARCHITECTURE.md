@@ -483,6 +483,22 @@ as soon as the box is left, so Settings can be closed meanwhile. *Rename*
 takes a backup, re-checks that each title is unchanged since the proposal,
 and logs each rename as a "Tidied" entry with Undo.
 
+## Web viewer (`viewer/`)
+
+A static, read-only PWA for phones (Firefox for Android and Safari have no
+bookmarks API for extensions). It signs in with Google Identity Services
+(`drive.file`, a "Web application" client in the same Google Cloud project,
+so it sees the folder the extension created), reads `sync-state.json` and
+`tags.json` from the Marksync folder, and shows the tree with breadcrumbs,
+search and `#tag` filters (`core/library.ts`, shared with the MCP server).
+With end-to-end encryption on it asks for the passphrase and decrypts on the
+device; the key lives only in the page's memory. Nothing is written. The
+service worker caches only the app itself, never bookmarks. A strict
+Content-Security-Policy allows scripts from the site and Google sign-in
+only. The "Web viewer" workflow publishes it to GitHub Pages when
+`VIEWER_GOOGLE_CLIENT_ID` is set. AI site descriptions are kept per browser
+(not in Drive), so the viewer does not show them.
+
 ## AI assistants (MCP, `mcp/`)
 
 `marksync-mcp` is a separate npm package: an MCP server that reads

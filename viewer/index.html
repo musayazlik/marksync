@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#4051ea" />
+    <meta name="description" content="Your Marksync bookmarks on any phone or computer, read straight from your own Google Drive." />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://accounts.google.com; connect-src 'self' https://www.googleapis.com https://accounts.google.com; frame-src https://accounts.google.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'" />
+    <title>Marksync</title>
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" type="image/svg+xml" href="./logo.svg" />
+    <link rel="apple-touch-icon" href="./icon-128.png" />
+  </head>
+  <body>
+    <header class="bar">
+      <img src="./logo.svg" alt="" width="28" height="28" />
+      <h1>Marksync</h1>
+      <button id="sign-out" class="quiet" hidden></button>
+    </header>
+
+    <main id="app">
+      <section id="welcome" class="card stack" hidden>
+        <h2 id="welcome-title"></h2>
+        <p id="welcome-text" class="muted"></p>
+        <button id="sign-in" class="primary wide"></button>
+        <p id="welcome-privacy" class="muted small"></p>
+      </section>
+
+      <form id="unlock" class="card stack" hidden>
+        <h2 id="unlock-title"></h2>
+        <p id="unlock-text" class="muted small"></p>
+        <input id="passphrase" type="password" autocomplete="current-password" required />
+        <button class="primary wide" id="unlock-button" type="submit"></button>
+      </form>
+
+      <p id="message" class="notice small" role="status" hidden></p>
+
+      <section id="library" hidden>
+        <div class="search">
+          <input id="find" type="search" autocomplete="off" spellcheck="false" />
+        </div>
+        <nav id="crumbs" class="crumbs"></nav>
+        <ul id="list" class="list"></ul>
+        <p id="count" class="muted small"></p>
+      </section>
+    </main>
+
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

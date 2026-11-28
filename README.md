@@ -24,6 +24,7 @@ other file there.
 - Safety stop when a sync would delete most of your bookmarks
 - Automatic and manual backups in Google Drive, restore with one click
 - Your own server instead of Google Drive: any WebDAV server (Nextcloud, ownCloud, a NAS) holds the same files, with the same encryption and conflict-safe writes
+- Your bookmarks on any phone: a read-only web app (installable, works on iOS Safari and Android) that reads your Drive directly, with search, tags and encryption support ([viewer/](viewer/))
 - AI assistants: the `marksync-mcp` server lets Claude, Cursor and other MCP clients search your bookmarks and propose changes you approve in Marksync ([mcp/](mcp/))
 - Search by meaning: find bookmarks by what they are about, even when no word matches (opt-in, embeddings on OpenRouter or your own server, index shared through Drive)
 - Rediscover: once a day or a week, the popup brings back a few bookmarks you forgot (some related to what you saved lately) to open, keep, archive or delete; off by default, nothing leaves the browser

@@ -8,7 +8,7 @@ import { checkAssistantProposals, toTidyProposals } from '../src/services/assist
 import { aiTidyItem, statusItem, syncStateItem, tokenItem } from '../src/shared/state';
 import { applyTidy, undoTidy } from '../src/sync/tidy';
 import { MarksyncDrive } from '../mcp/src/drive';
-import { Library } from '../mcp/src/library';
+import { Library } from '../src/core/library';
 import { FakeDrive } from './fake-drive';
 import { FakeBookmarks } from './fakes';
 

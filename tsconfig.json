@@ -5,5 +5,5 @@
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true
   },
-  "include": ["src", "tests", ".wxt/wxt.d.ts", "wxt.config.ts", "vitest.config.ts"]
+  "include": ["src", "tests", "viewer", ".wxt/wxt.d.ts", "wxt.config.ts", "vitest.config.ts"]
 }

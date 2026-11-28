@@ -1,11 +1,11 @@
-import { childrenByParent, isLive, liveRecords } from '../../src/core/records';
-import { addProposals, readProposal, type AssistantProposal, type ProposalsFile } from '../../src/core/proposals';
-import { flattenBookmarks, isOpenable, searchBookmarks, type SearchNode } from '../../src/core/search';
-import { isRootKey, ROOT_KEYS, type RecordMap, type RootKey, type SyncRecord } from '../../src/core/types';
-import type { TagMap } from '../../src/core/tags';
+import { childrenByParent, isLive, liveRecords } from './records';
+import { addProposals, readProposal, type AssistantProposal, type ProposalsFile } from './proposals';
+import { flattenBookmarks, isOpenable, searchBookmarks, type SearchNode } from './search';
+import { isRootKey, ROOT_KEYS, type RecordMap, type RootKey, type SyncRecord } from './types';
+import type { TagMap } from './tags';
 
 /**
- * The bookmark library as the MCP tools see it: the records of
+ * The bookmark library as the MCP tools and the web viewer see it: the records of
  * sync-state.json and the tags of tags.json, both from the user's Drive.
  * Read-only; changes are only ever proposals. Pure logic, unit tested.
  */

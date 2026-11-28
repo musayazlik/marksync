@@ -4,7 +4,7 @@ import { sanitizeTagsFile } from '../../src/core/tags';
 import type { SyncState } from '../../src/core/types';
 import { sanitizeRemoteRecords } from '../../src/core/validate';
 import { DriveClient, quote, type DriveCodec } from '../../src/platform/drive';
-import { Library } from './library';
+import { Library } from '../../src/core/library';
 
 /**
  * Reads the Marksync folder in the user's Drive (the same files and the same

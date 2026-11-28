@@ -8,7 +8,7 @@ import {
   type RestoreParent,
 } from '../core/history';
 import type { RecordMap, RootKey } from '../core/types';
-import { t } from '../shared/i18n';
+import { locale, t } from '../shared/i18n';
 import { syncStateItem } from '../shared/state';
 import type { BookmarksApi } from '../sync/bookmarks-api';
 import { readLocal } from '../sync/local-tree';
@@ -122,7 +122,7 @@ export async function restoreFromBackup(id: string, ids: string[]): Promise<Part
     return runRestorePlan(localBookmarks(), ops, {
       local,
       roots: snapshot.roots,
-      fallbackTitle: t('historyRestoredFolder', new Date(createdAt || Date.now()).toLocaleDateString()),
+      fallbackTitle: t('historyRestoredFolder', new Date(createdAt || Date.now()).toLocaleDateString(locale())),
     });
   });
   // The restored items are local changes now: send them to Drive.

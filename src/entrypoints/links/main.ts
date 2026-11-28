@@ -1,5 +1,5 @@
 import { browser } from 'wxt/browser';
-import { localizePage, t, tn } from '../../shared/i18n';
+import { initI18n, locale, localizePage, t, tn } from '../../shared/i18n';
 import { send } from '../../shared/messages';
 import { linkScanItem, type LinkResult, type LinkScan } from '../../shared/state';
 import { $, setEmblem, showToast, withBusy } from '../../shared/ui';
@@ -9,6 +9,7 @@ import type { LinkReason } from '../../core/links';
  * Link checker: start or continue a check, watch its progress, and fix what it
  * found. The background script does the checking and every change.
  */
+await initI18n(() => location.reload());
 localizePage();
 const actionError = $('#action-error');
 const LINK_ORIGINS = ['*://*/*'];
@@ -100,7 +101,7 @@ function row(r: LinkResult, isNew: boolean): HTMLLIElement {
     const archive = el('p', 'archive small');
     if (r.archive) {
       archive.append(
-        link(r.archive.url, r.archive.at ? t('linkArchiveFrom', new Date(r.archive.at).toLocaleDateString()) : t('linkArchiveOpen')),
+        link(r.archive.url, r.archive.at ? t('linkArchiveFrom', new Date(r.archive.at).toLocaleDateString(locale())) : t('linkArchiveOpen')),
       );
     } else if (r.archive === null) archive.append(el('span', 'muted', t('linkNoArchive')));
     else archive.append(el('span', 'muted', t('linkArchiveLooking')));
@@ -145,7 +146,7 @@ function render() {
   }
   if (s.interrupted) $('#interrupted-text').textContent = t('linkInterrupted', s.checked, s.total);
   if (s.finishedAt) {
-    $('#finished-text').textContent = t('linkFinished', s.total, new Date(s.finishedAt).toLocaleString());
+    $('#finished-text').textContent = t('linkFinished', s.total, new Date(s.finishedAt).toLocaleString(locale()));
   }
 
   const counts: Record<Filter, number> = { dead: 0, redirected: 0, unknown: 0 };

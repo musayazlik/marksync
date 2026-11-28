@@ -46,7 +46,7 @@ Marksync'i tarayıcının araç çubuğundan açın ve bu etikete sahip yer imle
 - Sürüm geçmişi: herhangi bir yedeği şimdiki yer imlerinizle karşılaştırın (kaldırılan, taşınan, adı değişen, eklenen; klasöre göre), tek bir yer imini ya da klasörü geri getirin, bir yer imini hâlâ içeren yedeği bulun
 - Başka tarayıcıdan içe aktarma (Marksync kurulu tarayıcıdan ya da herhangi bir tarayıcının HTML dosyasından), kopyasız birleştirme veya yeni klasöre koyma
 - Standart HTML yer imi dosyasına dışa aktarma
-- Türkçe ve İngilizce arayüz; eşitleme müdahale gerektirdiğinde araç çubuğu simgesinde uyarı rozeti
+- Türkçe, İngilizce ve Almanca arayüz (tarayıcının dilini izler ya da Ayarlar'dan seçilir); eşitleme müdahale gerektirdiğinde araç çubuğu simgesinde uyarı rozeti
 - Yinelenen yer imi bulucu: birden fazla kez kaydedilmiş sayfalar (fark yalnızca http/https, sondaki eğik çizgi ya da `utm_` parametreleri olsa bile); her birinden bir kopya tutulur, önce yedek alınır
 - Bağlantı denetimi: sayfası kaybolmuş ya da taşınmış yer imlerini bulur; taşınanı yeni adresiyle güncelleyin, kaybolanı [Wayback Machine](https://web.archive.org)'deki kayıtlı kopyasına yönlendirin
 - Kendi [OpenRouter](https://openrouter.ai) anahtarınızla isteğe bağlı yapay zekâ düzenlemesi: bir gelen kutusu klasörü seçin, model (varsayılan Claude Opus) oraya eklediğiniz her yer imini araştırır, en uygun klasöre taşır ve sitenin ne olduğunu, ne için kullanıldığını açıklar; her karar Geri al seçeneğiyle bir kayıt sayfasında listelenir

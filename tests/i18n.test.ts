@@ -1,4 +1,6 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { fakeBrowser } from 'wxt/testing/fake-browser';
+import { initI18n, LANGUAGES, languageItem, t, tn, uiLanguage } from '../src/shared/i18n';
 
 type Messages = Record<string, { message: string; description?: string }>;
 
@@ -38,8 +40,9 @@ function usedKeys(): Set<string> {
 const placeholders = (s: string) => [...s.matchAll(/\{\d\}/g)].map((m) => m[0]).sort();
 
 describe('translations', () => {
-  it('ships English and Turkish', () => {
-    expect([...languages].sort()).toEqual(['en', 'tr']);
+  it('ships English, Turkish and German, and offers each of them in Settings', () => {
+    expect([...languages].sort()).toEqual(['de', 'en', 'tr']);
+    expect(Object.keys(LANGUAGES).sort()).toEqual([...languages].sort());
     expect(Object.keys(sources).length).toBeGreaterThan(20);
   });
 
@@ -63,5 +66,44 @@ describe('translations', () => {
 
   it('keeps the store description within the Chrome Web Store limit', () => {
     for (const lang of languages) expect(load(lang).extDescription!.message.length).toBeLessThanOrEqual(132);
+  });
+});
+
+describe('language setting', () => {
+  beforeEach(() => {
+    fakeBrowser.reset();
+    fakeBrowser.i18n.getUILanguage = (() => 'en-US') as typeof fakeBrowser.i18n.getUILanguage;
+    fakeBrowser.i18n.getMessage = ((key: string) => en[key]?.message ?? '') as typeof fakeBrowser.i18n.getMessage;
+    // The extension's own messages.json, as fetch() would return it.
+    vi.stubGlobal('fetch', async (url: string) => {
+      const lang = /_locales\/(\w+)\/messages\.json$/.exec(url)?.[1] ?? '';
+      const messages = byLang.get(lang);
+      return messages ? new Response(JSON.stringify(messages)) : new Response('', { status: 404 });
+    });
+  });
+  afterEach(() => vi.unstubAllGlobals());
+
+  it('follows the browser until a language is picked', async () => {
+    await initI18n();
+    expect(uiLanguage()).toBe('en-US');
+    expect(t('syncNow')).toBe('Sync now');
+
+    await languageItem.setValue('de');
+    await initI18n();
+    expect(uiLanguage()).toBe('de');
+    expect(t('syncNow')).toBe('Jetzt synchronisieren');
+    expect(tn('findCount', 3)).toBe('3 Lesezeichen');
+  });
+
+  it('switches when the setting changes, and back to the browser language', async () => {
+    const changed = vi.fn();
+    await initI18n(changed);
+    await languageItem.setValue('tr');
+    await vi.waitFor(() => expect(changed).toHaveBeenCalled());
+    expect(t('syncNow')).toBe(load('tr').syncNow!.message);
+
+    await languageItem.setValue('auto');
+    await vi.waitFor(() => expect(uiLanguage()).toBe('en-US'));
+    expect(t('syncNow')).toBe('Sync now');
   });
 });

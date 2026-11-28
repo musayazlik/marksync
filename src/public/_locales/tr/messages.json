@@ -134,6 +134,15 @@
   "deviceNameHelp": {
     "message": "Yedeklerde ve diğer tarayıcılarınızın içe aktarma listesinde görünür. Algılanan adı kullanmak için boş bırakın."
   },
+  "languageLabel": {
+    "message": "Dil"
+  },
+  "languageHelp": {
+    "message": "Marksync'in bu tarayıcıdaki dili. Eklentinin tarayıcı listesindeki adı tarayıcının dilini izler."
+  },
+  "languageAuto": {
+    "message": "Tarayıcı dili"
+  },
   "syncHeading": {
     "message": "Eşitleme"
   },

@@ -1,4 +1,5 @@
 import './style.css';
+import { viewerLanguage } from './text';
 
 /**
  * The invitation page of a shared folder (join.html#<file id>). Marksync may
@@ -14,34 +15,48 @@ const API_KEY = (import.meta.env.VITE_GOOGLE_API_KEY ?? '').trim();
 const APP_ID = (import.meta.env.VITE_GOOGLE_APP_ID ?? '').trim();
 const SCOPE = 'https://www.googleapis.com/auth/drive.file';
 
-const tr = navigator.language.toLowerCase().startsWith('tr');
-const T = tr
-  ? {
-      title: 'Paylaşılan bir klasöre katılın',
-      text: 'Biri sizinle Marksync üzerinden bir yer imi klasörü paylaştı. Google ile giriş yapın ve açılan pencerede paylaşılan dosyayı seçin; böylece Marksync onu okuyabilir.',
-      accept: 'Google ile giriş yap ve dosyayı seç',
-      noCode: 'Bu bağlantıda paylaşım kodu yok. Davet e-postasındaki bağlantının tamamını açın.',
-      noSetup: 'Bu görüntüleyici kopyasında Google ayarları eksik (istemci kimliği, API anahtarı, proje numarası).',
-      failed: 'Olmadı: {1}',
-      doneTitle: 'Neredeyse tamam',
-      doneText: 'Marksync artık paylaşılan klasörü okuyabilir.',
-      steps: 'Marksync uzantısında Ayarlar → Paylaşılan klasörler → Katıl bölümüne bu kodu yapıştırın. Klasör “Marksync Shared” altında görünür.',
-      copy: 'Kopyala',
-      copied: 'Kopyalandı',
-    }
-  : {
-      title: 'Join a shared folder',
-      text: 'Someone shared a bookmark folder with you through Marksync. Sign in with Google and pick the shared file in the window that opens, so Marksync may read it.',
-      accept: 'Sign in with Google and pick the file',
-      noCode: 'This link has no share code. Open the full link from the invitation e-mail.',
-      noSetup: 'This copy of the viewer is missing its Google settings (client ID, API key, project number).',
-      failed: 'That did not work: {1}',
-      doneTitle: 'Almost done',
-      doneText: 'Marksync may now read the shared folder.',
-      steps: 'In the Marksync extension, open Settings → Shared folders → Join and paste this code. The folder appears under “Marksync Shared”.',
-      copy: 'Copy',
-      copied: 'Copied',
-    };
+const TEXTS = {
+  tr: {
+    title: 'Paylaşılan bir klasöre katılın',
+    text: 'Biri sizinle Marksync üzerinden bir yer imi klasörü paylaştı. Google ile giriş yapın ve açılan pencerede paylaşılan dosyayı seçin; böylece Marksync onu okuyabilir.',
+    accept: 'Google ile giriş yap ve dosyayı seç',
+    noCode: 'Bu bağlantıda paylaşım kodu yok. Davet e-postasındaki bağlantının tamamını açın.',
+    noSetup: 'Bu görüntüleyici kopyasında Google ayarları eksik (istemci kimliği, API anahtarı, proje numarası).',
+    failed: 'Olmadı: {1}',
+    doneTitle: 'Neredeyse tamam',
+    doneText: 'Marksync artık paylaşılan klasörü okuyabilir.',
+    steps: 'Marksync uzantısında Ayarlar → Paylaşılan klasörler → Katıl bölümüne bu kodu yapıştırın. Klasör “Marksync Shared” altında görünür.',
+    copy: 'Kopyala',
+    copied: 'Kopyalandı',
+  },
+  en: {
+    title: 'Join a shared folder',
+    text: 'Someone shared a bookmark folder with you through Marksync. Sign in with Google and pick the shared file in the window that opens, so Marksync may read it.',
+    accept: 'Sign in with Google and pick the file',
+    noCode: 'This link has no share code. Open the full link from the invitation e-mail.',
+    noSetup: 'This copy of the viewer is missing its Google settings (client ID, API key, project number).',
+    failed: 'That did not work: {1}',
+    doneTitle: 'Almost done',
+    doneText: 'Marksync may now read the shared folder.',
+    steps: 'In the Marksync extension, open Settings → Shared folders → Join and paste this code. The folder appears under “Marksync Shared”.',
+    copy: 'Copy',
+    copied: 'Copied',
+  },
+  de: {
+    title: 'Einem geteilten Ordner beitreten',
+    text: 'Jemand hat über Marksync einen Lesezeichenordner mit Ihnen geteilt. Melden Sie sich mit Google an und wählen Sie im sich öffnenden Fenster die geteilte Datei, damit Marksync sie lesen darf.',
+    accept: 'Mit Google anmelden und Datei wählen',
+    noCode: 'Dieser Link enthält keinen Freigabecode. Öffnen Sie den vollständigen Link aus der Einladungs-E-Mail.',
+    noSetup: 'In dieser Kopie des Viewers fehlen die Google-Einstellungen (Client-ID, API-Schlüssel, Projektnummer).',
+    failed: 'Das hat nicht geklappt: {1}',
+    doneTitle: 'Fast geschafft',
+    doneText: 'Marksync darf den geteilten Ordner jetzt lesen.',
+    steps: 'Öffnen Sie in der Marksync-Erweiterung Einstellungen → Geteilte Ordner → Beitreten und fügen Sie diesen Code ein. Der Ordner erscheint unter „Marksync Shared“.',
+    copy: 'Kopieren',
+    copied: 'Kopiert',
+  },
+};
+const T = TEXTS[viewerLanguage];
 
 const $ = <T extends HTMLElement = HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
 const fileId = (() => {
@@ -51,7 +66,6 @@ const fileId = (() => {
     return '';
   }
 })();
-document.documentElement.lang = tr ? 'tr' : 'en';
 
 $('#title').textContent = T.title;
 $('#text').textContent = T.text;

@@ -12,7 +12,7 @@ import {
 } from '../core/ai-provider';
 import { builtinComplete } from '../platform/builtin-ai';
 import { chatCompletion } from '../platform/openrouter';
-import { t } from '../shared/i18n';
+import { t, uiLanguage as currentUiLanguage } from '../shared/i18n';
 import { aiModelsItem, endpointKeyItem, openRouterKeyItem, type Settings } from '../shared/state';
 import type { ModelReply } from '../sync/sorter';
 
@@ -64,7 +64,7 @@ export async function assertPermission(runner: AiRunner, s: Settings): Promise<v
  */
 export async function aiRunner(s: Settings, pin?: { provider?: AiProvider; model?: string }): Promise<AiRunner> {
   const provider = pin?.provider ?? s.aiProvider;
-  const uiLanguage = browser.i18n.getUILanguage();
+  const uiLanguage = currentUiLanguage();
 
   if (provider === 'builtin') {
     const language = builtinLanguage(uiLanguage);

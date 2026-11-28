@@ -1,6 +1,6 @@
 import { browser } from 'wxt/browser';
 import { send } from '../../shared/messages';
-import { errorText, localizePage, t, tn } from '../../shared/i18n';
+import { errorText, initI18n, locale, localizePage, t, tn } from '../../shared/i18n';
 import { aiModelsItem, aiSpendItem, aiUsageItem, sortLogItem, getSettings, settingsItem, statusItem, type Settings, type Status } from '../../shared/state';
 import { maskEmail } from '../../core/mask';
 import { flattenBookmarks, fold, matchRanges, searchBookmarks, splitQuery, type SearchItem } from '../../core/search';
@@ -9,6 +9,7 @@ import { formatUsd, usageGauge, type KeyUsage } from '../../core/openrouter-data
 import { OPENROUTER_ORIGIN } from '../../platform/openrouter';
 import { $, emblemState, revealOnClick, setEmblem, showToast, timeAgo, withBusy } from '../../shared/ui';
 
+await initI18n(() => location.reload());
 localizePage();
 const actionError = $('#action-error');
 
@@ -223,7 +224,7 @@ async function renderBudget() {
   note.className = `notice small ${b.state === 'over' ? 'error' : 'warn'}`;
   note.textContent =
     b.state === 'over'
-      ? t('usageBudgetOver', nextMonthStart().toLocaleDateString(undefined, { day: 'numeric', month: 'long' }))
+      ? t('usageBudgetOver', nextMonthStart().toLocaleDateString(locale(), { day: 'numeric', month: 'long' }))
       : t('usageBudgetNear', Math.round(pct));
 }
 aiSpendItem.watch(() => void renderBudget());

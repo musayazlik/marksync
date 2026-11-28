@@ -15,6 +15,22 @@ other file there.
 
 [Türkçe](README.tr.md)
 
+![Two browser windows showing matching bookmarks connected through cloud storage](docs/images/marksync-cover.jpg)
+
+## Screenshots
+
+### Search bookmarks by tag
+
+Open Marksync from the browser toolbar and type `#css` to find bookmarks with that tag.
+
+<img src="docs/images/bookmark-search-en.png" alt="Marksync popup showing four bookmarks tagged css, with their folder paths and tags" width="340">
+
+### Review changes and restore a bookmark
+
+In **Settings**, open **History** next to the backup you want to compare. Select the bookmarks you want to restore, then click **Bring back**.
+
+![Version history showing four changes and one removed bookmark selected for restore](docs/images/version-history-en.png)
+
 ## Features
 
 - Two-way sync between Chromium browsers and Firefox, on any number of computers

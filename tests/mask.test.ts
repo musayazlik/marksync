@@ -3,7 +3,7 @@ import { maskEmail } from '../src/core/mask';
 
 describe('maskEmail', () => {
   it('keeps the start, the last letter and the domain', () => {
-    expect(maskEmail('musayazlik1997@gmail.com')).toBe('mu*****7@gmail.com');
+    expect(maskEmail('jane.doe42@example.com')).toBe('ja*****2@example.com');
     expect(maskEmail('anna@example.org')).toBe('a*****a@example.org');
     expect(maskEmail('jo@example.org')).toBe('j*****@example.org');
     expect(maskEmail('x@y.z')).toBe('x*****@y.z');

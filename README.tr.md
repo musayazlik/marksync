@@ -12,6 +12,22 @@ Brave'de bir yer imi ekleyin, Firefox'u açın: aynı klasörde, aynı sırada
 oradadır. Üçüncü taraf bir sunucu yoktur; her şey Google Drive'ınızdaki
 `Marksync` klasöründe durur ve eklenti Drive'daki başka hiçbir dosyayı göremez.
 
+![Bulut depolama üzerinden birbirine bağlanan iki tarayıcı penceresinde aynı yer imi](docs/images/marksync-cover.jpg)
+
+## Ekran görüntüleri
+
+### Etikete göre yer imi arama
+
+Marksync'i tarayıcının araç çubuğundan açın ve bu etikete sahip yer imlerini bulmak için `#css` yazın.
+
+<img src="docs/images/bookmark-search-tr.png" alt="Marksync açılır penceresinde css etiketli dört yer imi, klasör yolları ve etiketleriyle görünüyor" width="340">
+
+### Değişiklikleri inceleme ve yer imi geri getirme
+
+**Ayarlar** bölümünde, karşılaştırmak istediğiniz yedeğin yanındaki **Geçmiş** düğmesine tıklayın. Geri getirmek istediğiniz yer imlerini işaretleyin ve **Geri getir** düğmesini kullanın.
+
+![Sürüm geçmişinde dört değişiklik listeleniyor ve kaldırılan bir yer imi geri getirmek üzere seçili](docs/images/version-history-tr.png)
+
 ## Özellikler
 
 - Chromium tarayıcılar ve Firefox arasında çift yönlü eşitleme, istediğiniz kadar bilgisayarda

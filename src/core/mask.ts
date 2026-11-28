@@ -1,7 +1,7 @@
 /**
  * Hides most of an e-mail address on screen, so the popup and Settings can be
  * shown or recorded without giving the address away:
- * "musayazlik1997@gmail.com" → "mu*****7@gmail.com".
+ * "jane.doe42@example.com" → "ja*****2@example.com".
  *
  * The number of stars is fixed, so the length of the name is not revealed
  * either. The domain stays readable to tell accounts apart.

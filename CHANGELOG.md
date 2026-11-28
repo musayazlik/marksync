@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.0.0](https://github.com/musayazlik/marksync/compare/v0.8.0...v1.0.0) (2026-11-28)
+
+
+### Features
+
+* **sync:** shared folders with family or a team ([f3798b4](https://github.com/musayazlik/marksync/commit/f3798b410deb959c81e769e2766ca999315fddd6)), closes [#19](https://github.com/musayazlik/marksync/issues/19)
+* **viewer:** read-only web viewer for phones (PWA) on top of the Drive data ([c27d084](https://github.com/musayazlik/marksync/commit/c27d084b78c83e1916248fc1e0d2c8c48068c778)), closes [#18](https://github.com/musayazlik/marksync/issues/18)
+
+
+### Bug Fixes
+
+* issues found in the 1.0.0 review ([bc4fe73](https://github.com/musayazlik/marksync/commit/bc4fe737cfb33dfbfadffd32c8a9fd9d24a28740))
+
+
+### Documentation
+
+* Marksync 1.0 is stable, versions follow semantic versioning ([d22947f](https://github.com/musayazlik/marksync/commit/d22947f657837c24e0762fd67e10a1e824447528))
+
 ## [0.8.0](https://github.com/musayazlik/marksync/compare/v0.7.0...v0.8.0) (2026-11-28)
 
 

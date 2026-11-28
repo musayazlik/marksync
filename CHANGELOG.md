@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/musayazlik/marksync/compare/v1.0.0...v1.1.0) (2026-11-28)
+
+
+### Features
+
+* **i18n:** German translation and a language setting (English, Türkçe, Deutsch) ([#51](https://github.com/musayazlik/marksync/issues/51)) ([af5900b](https://github.com/musayazlik/marksync/commit/af5900b05a108577fa8bc99c728613a04a362302)), closes [#50](https://github.com/musayazlik/marksync/issues/50)
+
 ## [1.0.0](https://github.com/musayazlik/marksync/compare/v0.8.0...v1.0.0) (2026-11-28)
 
 

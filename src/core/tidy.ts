@@ -30,7 +30,9 @@ export type TidyProposal =
   | { id: string; kind: 'merge'; folderId: string; title: string; folderPath: string; intoId: string; intoPath: string; count: number; reason?: string }
   | { id: string; kind: 'rename'; folderId: string; title: string; folderPath: string; name: string; reason?: string }
   | { id: string; kind: 'remove'; folderId: string; title: string; folderPath: string }
-  | { id: string; kind: 'retitle'; bookmarkId: string; title: string; newTitle: string; url?: string; folderPath: string };
+  | { id: string; kind: 'retitle'; bookmarkId: string; title: string; newTitle: string; url?: string; folderPath: string }
+  /** From an AI assistant (MCP): move a bookmark or folder into another folder. */
+  | { id: string; kind: 'move'; bookmarkId: string; title: string; url?: string; fromId: string; folderPath: string; intoId: string; intoPath: string; reason?: string };
 
 export type TidyKind = TidyProposal['kind'];
 

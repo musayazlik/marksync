@@ -1981,5 +1981,29 @@
   },
   "namingInvalid": {
     "message": "Bir başlık en az 2 karakter olmalı (en fazla 120)."
+  },
+  "assistantScope": {
+    "message": "{1} önerileri"
+  },
+  "assistantImported_one": {
+    "message": "Bir yapay zekâ asistanı 1 değişiklik önerdi: Kütüphaneyi toparla bölümünden inceleyin."
+  },
+  "assistantImported_other": {
+    "message": "Bir yapay zekâ asistanı {1} değişiklik önerdi: Kütüphaneyi toparla bölümünden inceleyin."
+  },
+  "assistantWaiting_one": {
+    "message": "Bir yapay zekâ asistanı 1 değişiklik önerdi; açık toparlama incelemesi kapanana kadar bekliyor."
+  },
+  "assistantWaiting_other": {
+    "message": "Bir yapay zekâ asistanı {1} değişiklik önerdi; açık toparlama incelemesi kapanana kadar bekliyorlar."
+  },
+  "tidyGroupMove": {
+    "message": "Taşı"
+  },
+  "tidyAriaMove": {
+    "message": "{1} öğesini {2} içine taşı"
+  },
+  "tidyLogMove": {
+    "message": "\"{1}\" taşındı"
   }
 }

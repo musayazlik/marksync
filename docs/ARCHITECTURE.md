@@ -463,6 +463,25 @@ as soon as the box is left, so Settings can be closed meanwhile. *Rename*
 takes a backup, re-checks that each title is unchanged since the proposal,
 and logs each rename as a "Tidied" entry with Undo.
 
+## AI assistants (MCP, `mcp/`)
+
+`marksync-mcp` is a separate npm package: an MCP server that reads
+`sync-state.json` and `tags.json` from the Marksync folder in Drive (with a
+"Desktop app" OAuth client in the same Google Cloud project, scope
+`drive.file`; decrypting with `MARKSYNC_PASSPHRASE` when encryption is on)
+and offers `search_bookmarks`, `list_folders`, `list_folder`, `get_bookmark`
+and `propose_changes`. It reuses the extension's core (records, search,
+validation, crypto, the Drive client) through one bundled file.
+
+It never edits the sync file. Proposals (move, retitle, rename folder, merge
+folders; `core/proposals.ts`), checked against the library, go to
+`Marksync/proposals.json`. When Settings opens, the extension takes them
+over (`services/assistant-service.ts`): IDs are mapped to this browser's
+bookmarks, anything that no longer applies is dropped, and the rest becomes
+an ordinary *Tidy up the library* review (moves are a tidy-up kind of their
+own, undoable from the log). The file is then deleted. While another
+tidy-up review is open, the proposals wait in Drive.
+
 ## Tags
 
 Browsers have no synced tags, so Marksync keeps its own: `local:tags` in

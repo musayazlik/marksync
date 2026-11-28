@@ -27,6 +27,7 @@ const tidyKey: Record<NonNullable<SortLogEntry['tidy']>['action'], string> = {
   rename: 'tidyLogRename',
   merge: 'tidyLogMerge',
   remove: 'tidyLogRemove',
+  move: 'tidyLogMove',
 };
 const errorKey: Record<string, string> = {
   auth: 'aiErrAuth',

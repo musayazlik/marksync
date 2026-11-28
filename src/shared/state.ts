@@ -219,11 +219,11 @@ export interface SortLogEntry {
 
 /** One applied tidy-up change (sync/tidy.ts). `bookmarkId` of the log entry is the bookmark or folder. */
 export interface TidyChange {
-  action: 'retitle' | 'rename' | 'merge' | 'remove';
+  action: 'retitle' | 'rename' | 'merge' | 'remove' | 'move';
   /** Title or folder name before. */
   before: string;
   after?: string;
-  /** Merge and remove: where the folder was, to bring it back. */
+  /** Merge, remove and move: where the folder (or item) was, to bring it back. */
   parentId?: string;
   index?: number;
   /** Merge: the items moved into `targetId`. */

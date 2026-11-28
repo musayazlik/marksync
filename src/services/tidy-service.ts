@@ -37,7 +37,7 @@ const STRUCTURE_ANSWER_TOKENS = 1500;
 const TITLES_ANSWER_TOKENS = 1200;
 const FATAL = new Set(['auth', 'credits', 'permission', 'unavailable']);
 /** Applied in this order: titles and names first, folders disappear last. */
-const ORDER: Record<TidyProposal['kind'], number> = { retitle: 0, rename: 1, merge: 2, remove: 3 };
+const ORDER: Record<TidyProposal['kind'], number> = { retitle: 0, rename: 1, move: 2, merge: 3, remove: 4 };
 
 type JobItem = typeof aiTidyItem;
 const queues = new WeakMap<JobItem, Promise<unknown>>();

@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.8.0](https://github.com/musayazlik/marksync/compare/v0.7.0...v0.8.0) (2026-11-28)
+
+
+### Features
+
+* **ai:** name bookmarks with AI, with titles you can edit before saving ([b8ff5cf](https://github.com/musayazlik/marksync/commit/b8ff5cf4e0dba2474b58f18c6d64b735cbb1b247)), closes [#40](https://github.com/musayazlik/marksync/issues/40)
+* **mcp:** MCP server so AI assistants can search bookmarks and propose changes ([ed75e16](https://github.com/musayazlik/marksync/commit/ed75e16e1cc09aa923d647b53a13dcc70a3270bf)), closes [#15](https://github.com/musayazlik/marksync/issues/15)
+* **storage:** sync through a WebDAV server (Nextcloud, ownCloud, NAS) instead of Google Drive ([b91fb6d](https://github.com/musayazlik/marksync/commit/b91fb6d45a55da0467beb07e420775099c23ee70)), closes [#16](https://github.com/musayazlik/marksync/issues/16)
+
 ## [0.7.0](https://github.com/musayazlik/marksync/compare/v0.6.0...v0.7.0) (2026-11-27)
 
 

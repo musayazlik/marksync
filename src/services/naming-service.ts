@@ -159,7 +159,9 @@ async function plan(
   const ask = async (messages: ChatMessage[], research: boolean, schema: Record<string, unknown>, take: (text: string) => TidyProposal[]) => {
     if (!(await still())) return false;
     if (runner.budgeted && (await overBudget({ budget: opts.budget }))) {
-      await updateJob((j) => void Object.assign(j, { state: 'ready', stopped: 'budget', stopMessage: t('aiErrBudget') }));
+      await updateJob((j) => {
+        if (j.id === jobId && j.state === 'planning') Object.assign(j, { state: 'ready', stopped: 'budget', stopMessage: t('aiErrBudget') });
+      });
       return false;
     }
     try {

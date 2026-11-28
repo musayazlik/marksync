@@ -77,7 +77,7 @@ export function parseMultistatus(xml: string): DavEntry[] {
     const href = block.match(tag('href'))?.[1];
     if (!href) continue;
     // Only the properties the server found (status 200).
-    const found = (block.match(/<(?:[\w-]+:)?propstat(?:\s[^>]*)?>[\s\S]*?<\/(?:[\w-]+:)?propstat>/gi) ?? []).filter((p) => /<(?:[\w-]+:)?status>[^<]*\s2\d\d\s/i.test(p)).join('');
+    const found = (block.match(/<(?:[\w-]+:)?propstat(?:\s[^>]*)?>[\s\S]*?<\/(?:[\w-]+:)?propstat>/gi) ?? []).filter((p) => /<(?:[\w-]+:)?status>[^<]*\s2\d\d\b/i.test(p)).join('');
     const value = (name: string) => {
       const m = found.match(tag(name));
       return m ? xmlDecode(m[1]!.trim()) : undefined;
@@ -130,6 +130,8 @@ export class WebDavClient implements FileStore {
     const abs = new URL(href, this.base);
     const basePath = decodeURIComponent(this.base.pathname);
     const p = decodeURIComponent(abs.pathname);
+    // Some servers answer for the base folder without its trailing slash.
+    if (`${p}/` === basePath) return '';
     if (!p.startsWith(basePath)) return undefined;
     return p.slice(basePath.length).replace(/\/+$/, '');
   }
@@ -169,7 +171,8 @@ export class WebDavClient implements FileStore {
 
   private async propfind(path: string, depth: 0 | 1): Promise<{ entry: DavEntry; path: string }[]> {
     const res = await this.request('PROPFIND', path, {
-      folder: true,
+      // A collection listing (and the base folder) ends in "/"; a single file must not.
+      folder: depth === 1 || path === '',
       headers: { Depth: String(depth), 'Content-Type': 'application/xml; charset=utf-8' },
       body: PROPFIND_BODY,
     });
@@ -203,7 +206,8 @@ export class WebDavClient implements FileStore {
       );
     const desc = /\bdesc\b/.test(orderBy);
     const key = (f: DriveFile) => (orderBy.startsWith('modifiedTime') ? f.modifiedTime : f.createdTime) ?? '';
-    files.sort((a, b) => key(a).localeCompare(key(b)) * (desc ? -1 : 1) || a.name.localeCompare(b.name));
+    // Ties (same second) by name, in the same direction: backup names carry the time.
+    files.sort((a, b) => (key(a).localeCompare(key(b)) || a.name.localeCompare(b.name)) * (desc ? -1 : 1));
     return files;
   }
 
@@ -257,7 +261,13 @@ export class WebDavClient implements FileStore {
   }
 
   async updateJson(id: string, data: unknown, expectedVersion?: string): Promise<DriveFile> {
-    await this.put(id, data, expectedVersion ? { 'If-Match': expectedVersion } : {});
+    try {
+      // Without a version: only if the file still exists, like Drive (a plain PUT would re-create it without its properties).
+      await this.put(id, data, { 'If-Match': expectedVersion ?? '*' });
+    } catch (err) {
+      if (!expectedVersion && err instanceof DriveError && err.status === 412) throw new DriveError(404, 'Not found.');
+      throw err;
+    }
     return this.getMeta(id);
   }
 

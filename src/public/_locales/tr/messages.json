@@ -125,9 +125,6 @@
   "welcomeNoDuplicates": {
     "message": "Birden fazla tarayıcıda zaten bulunan yer imleri eşleştirilir, kopyalanmaz."
   },
-  "accountHeading": {
-    "message": "Google hesabı"
-  },
   "disconnect": {
     "message": "Bağlantıyı kes"
   },
@@ -530,20 +527,11 @@
   "aiLogEmpty": {
     "message": "Henüz kayıt yok. Gelen kutusu klasörüne eklediğiniz yer imleri, yapay zekâ onları yerleştirdiğinde burada görünür."
   },
-  "aiLogTotals": {
-    "message": "{1} taşındı · {2} gelen kutusunda kaldı · {3} başarısız"
-  },
   "columnBookmark": {
     "message": "Yer imi"
   },
-  "columnMove": {
-    "message": "Nereden → Nereye"
-  },
   "columnReason": {
     "message": "Gerekçe"
-  },
-  "columnResult": {
-    "message": "Sonuç"
   },
   "aiStatusMoved": {
     "message": "Taşındı"
@@ -2194,5 +2182,29 @@
   },
   "shareEmailMessageCode": {
     "message": "“{1}” yer imi klasörünü Marksync üzerinden sizinle paylaştım. Marksync Ayarlar → Paylaşılan klasörler → Katıl bölümünde {2} kodunu kullanın."
+  },
+  "sharedNeedsViewer": {
+    "message": "Paylaşım için web görüntüleyicisi gerekir (katılma sayfası, davet edilenlerin paylaşılan klasörü açmasını sağlar). Bu derlemede görüntüleyici adresi ayarlı değil."
+  },
+  "errInvalidRequest": {
+    "message": "Geçersiz istek."
+  },
+  "openFailed": {
+    "message": "Tarayıcı, uzantıların {1} adresini açmasına izin vermiyor."
+  },
+  "importFileLabel": {
+    "message": "Yer imleri HTML dosyası"
+  },
+  "shareMassDeleteLocal": {
+    "message": "Burada {2} yer iminden {1} tanesi kaldırıldı. Silme herkes için uygulansın mı, yoksa korunsunlar mı?"
+  },
+  "shareMassDeleteRemote": {
+    "message": "Başka bir üye {2} yer iminden {1} tanesini kaldırdı. Silme burada da uygulansın mı, yoksa kopyalarınız korunsun mu?"
+  },
+  "shareApplyDeletion": {
+    "message": "Silmeyi uygula"
+  },
+  "shareKeepMine": {
+    "message": "Kopyalarımı koru"
   }
 }

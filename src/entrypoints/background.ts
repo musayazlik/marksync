@@ -27,7 +27,7 @@ import { compareBackup, restoreFromBackup, searchBackups } from '../services/his
 import { allTags, setTags, tagsByLocalId } from '../services/tags-service';
 import { actOnDigest, getDigest } from '../services/digest-service';
 import { connectWebDav, storageInfo, useDrive } from '../services/webdav-service';
-import { createShare, invite, joinShare, leaveShare, listShares, parseEmails, sharePeople, syncShares } from '../services/share-service';
+import { createShare, invite, joinShare, leaveShare, listShares, parseEmails, resolveShare, sharePeople, syncShares } from '../services/share-service';
 import { checkAssistantProposals } from '../services/assistant-service';
 import { buildIndex, deleteIndex, resumeIndex, searchByMeaning, semanticReady, semanticStatus, stopIndex } from '../services/semantic-service';
 // Also installs the encryption codec for every Drive client (see drive-store.ts).
@@ -230,6 +230,9 @@ export default defineBackground(() => {
         return sharePeople(req.fileId);
       case 'shareSyncNow':
         return syncShares();
+      case 'shareResolve':
+        if (typeof req.fileId !== 'string' || (req.action !== 'apply' && req.action !== 'keep')) throw new Error(t('shareUnknown'));
+        return resolveShare(req.fileId, req.action);
       case 'syncNow':
         if (!(await getSettings()).syncEnabled) throw new Error(t('syncOffHint'));
         await runSync(req.allowMassDelete ? { allowMassDelete: true } : {});
@@ -301,12 +304,12 @@ export default defineBackground(() => {
       case 'digestGet':
         return getDigest();
       case 'digestAct':
-        if (typeof req.id !== 'string' || !['open', 'keep', 'archive', 'delete'].includes(req.action)) throw new Error('Invalid request.');
+        if (typeof req.id !== 'string' || !['open', 'keep', 'archive', 'delete'].includes(req.action)) throw new Error(t('errInvalidRequest'));
         return actOnDigest(req.id, req.action);
       case 'tagsGet':
         return { byId: await tagsByLocalId(), all: await allTags() };
       case 'tagsSet':
-        if (typeof req.id !== 'string' || !req.id || !Array.isArray(req.tags)) throw new Error('Invalid tags.');
+        if (typeof req.id !== 'string' || !req.id || !Array.isArray(req.tags)) throw new Error(t('errInvalidRequest'));
         return setTags(req.id, req.tags.filter((x): x is string => typeof x === 'string'));
       case 'aiListModels':
         return listModels(req.refresh === true);
@@ -398,7 +401,7 @@ export default defineBackground(() => {
   const pageOrigin = browser.runtime.getURL('');
   const knownTypes = new Set<Request['type']>([
     'connect', 'disconnect', 'connectWebdav', 'storageInfo',
-    'shareList', 'shareCreate', 'shareInvite', 'shareJoin', 'shareLeave', 'sharePeople', 'shareSyncNow', 'syncNow', 'checkNow', 'resyncFromDrive', 'keepLocal', 'backupNow', 'listBackups',
+    'shareList', 'shareCreate', 'shareInvite', 'shareJoin', 'shareLeave', 'sharePeople', 'shareSyncNow', 'shareResolve', 'syncNow', 'checkNow', 'resyncFromDrive', 'keepLocal', 'backupNow', 'listBackups',
     'restoreBackup', 'deleteBackup', 'historyCompare', 'historyRestore', 'historySearch', 'listBrowsers', 'removeBrowser', 'importFromBrowser', 'importHtml',
     'exportHtml', 'getRedirectUrl', 'settingsChanged', 'aiListFolders', 'aiTestKey', 'aiSortNow', 'aiUndo',
     'aiClearLog', 'aiListModels', 'aiUsage', 'aiEndpointModels', 'aiBuiltinStatus', 'tagsGet', 'tagsSet', 'digestGet', 'digestAct', 'semStatus', 'semBuild', 'semStop', 'semDelete', 'semSearch', 'semReady', 'aiBulkStart', 'aiBulkCancel', 'aiBulkApply', 'aiBulkDiscard',

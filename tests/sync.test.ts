@@ -228,3 +228,30 @@ describe('when the sync file is created again', () => {
     expect(liveRecords(remote.state!.records)).toHaveLength(2);
   });
 });
+
+describe('interrupted syncs', () => {
+  it('does not create bookmarks twice when applying fails halfway', async () => {
+    const bar = brave.bookmarks.root('toolbar');
+    for (let i = 0; i < 5; i++) await brave.bookmarks.add(bar, `x${i}`, `https://x${i}.example/`);
+    await sync(brave);
+    await sync(firefox);
+    for (let i = 5; i < 8; i++) await brave.bookmarks.add(bar, `x${i}`, `https://x${i}.example/`);
+    await sync(brave);
+
+    // Firefox creates the three new bookmarks, then fails in the order pass.
+    const real = firefox.bookmarks.getTree.bind(firefox.bookmarks);
+    let calls = 0;
+    firefox.bookmarks.getTree = async () => {
+      if (++calls === 3) throw new Error('worker stopped');
+      return real();
+    };
+    await expect(sync(firefox)).rejects.toThrow('worker stopped');
+    firefox.bookmarks.getTree = real;
+
+    await sync(firefox);
+    await sync(brave);
+    const titles = (await dump(firefox)).map((l) => l.replace(/ <.*$/, ''));
+    expect(titles).toHaveLength(8);
+    expect(await dump(brave)).toEqual(await dump(firefox));
+  });
+});

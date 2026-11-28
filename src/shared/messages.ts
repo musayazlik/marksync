@@ -31,6 +31,7 @@ export type Request =
   | { type: 'shareLeave'; fileId: string }
   | { type: 'sharePeople'; fileId: string }
   | { type: 'shareSyncNow' }
+  | { type: 'shareResolve'; fileId: string; action: 'apply' | 'keep' }
   | { type: 'disconnect' }
   | { type: 'syncNow'; allowMassDelete?: boolean }
   | { type: 'checkNow' }
@@ -109,6 +110,7 @@ export interface ResponseData {
   shareLeave: void;
   sharePeople: { email: string; name: string; role: string }[];
   shareSyncNow: void;
+  shareResolve: void;
   disconnect: void;
   syncNow: void;
   checkNow: void;

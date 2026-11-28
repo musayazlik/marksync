@@ -44,7 +44,14 @@ const T = tr
     };
 
 const $ = <T extends HTMLElement = HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
-const fileId = decodeURIComponent(location.hash.slice(1)).trim();
+const fileId = (() => {
+  try {
+    return decodeURIComponent(location.hash.slice(1)).trim();
+  } catch {
+    return '';
+  }
+})();
+document.documentElement.lang = tr ? 'tr' : 'en';
 
 $('#title').textContent = T.title;
 $('#text').textContent = T.text;

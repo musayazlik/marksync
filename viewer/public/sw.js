@@ -1,10 +1,22 @@
 // The viewer's service worker: keeps the app itself available offline and
 // makes it installable. Bookmarks are never cached: they always come from
 // Google Drive (and may be encrypted), only the page, scripts and styles are.
-const CACHE = 'marksync-viewer-v1';
+const CACHE = 'marksync-viewer-v2';
+const PAGES = ['./', './index.html', './join.html', './manifest.webmanifest', './logo.svg', './icon-128.png'];
+
+/** The pages, and the hashed scripts and styles they load (found in the HTML). */
+async function precache() {
+  const cache = await caches.open(CACHE);
+  await cache.addAll(PAGES);
+  for (const page of ['./index.html', './join.html']) {
+    const html = await (await cache.match(page))?.text();
+    const assets = [...(html ?? '').matchAll(/(?:src|href)="(\.\/assets\/[^"]+)"/g)].map((m) => m[1]);
+    if (assets.length) await cache.addAll(assets);
+  }
+}
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(CACHE).then((c) => c.addAll(['./', './index.html', './manifest.webmanifest', './logo.svg'])));
+  event.waitUntil(precache());
   self.skipWaiting();
 });
 
@@ -27,6 +39,12 @@ self.addEventListener('fetch', (event) => {
         }
         return res;
       })
-      .catch(() => caches.match(event.request).then((hit) => hit ?? caches.match('./index.html'))),
+      .catch(async () => {
+        const hit = await caches.match(event.request);
+        if (hit) return hit;
+        // Offline: pages fall back to the viewer; anything else is simply missing.
+        if (event.request.mode === 'navigate') return (await caches.match('./index.html')) ?? Response.error();
+        return Response.error();
+      }),
   );
 });

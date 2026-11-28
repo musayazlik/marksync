@@ -8,7 +8,7 @@ import { readLocal } from '../sync/local-tree';
 import { sanitizeRemoteRecords } from '../core/validate';
 import { quote } from '../platform/drive';
 import { appFolders, assertInFolder, driveClient, withFolders } from './drive-store';
-import { localBookmarks, restoreRecords } from './sync-service';
+import { localBookmarks, restoreRecords, sharedContainer } from './sync-service';
 
 export interface BackupInfo {
   id: string;
@@ -23,7 +23,8 @@ export interface BackupInfo {
 /** The current local tree as records, using the shared ids where known. */
 export async function currentRecords(): Promise<RecordMap> {
   const state = await syncStateItem.getValue();
-  const { snapshot } = await readLocal(localBookmarks(), state.menuFolderId);
+  // Shared folders are not part of the personal bookmarks (they have their own file).
+  const { snapshot } = await readLocal(localBookmarks(), state.menuFolderId, await sharedContainer());
   const { records } = buildLocalRecords(snapshot, state.mapping, {}, Date.now(), () => crypto.randomUUID());
   return records;
 }

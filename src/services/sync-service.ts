@@ -20,9 +20,13 @@ let ignoreEventsUntil = 0;
 /** Run after every successful sync (shared folders register here, to avoid an import cycle). */
 export const afterSyncHooks: (() => Promise<unknown> | void)[] = [];
 
-async function sharedContainer(): Promise<string[]> {
-  const { containerId } = await sharesItem.getValue();
-  return containerId ? [containerId] : [];
+/**
+ * Folders the personal sync leaves out: the "Marksync Shared" container and
+ * every shared folder, wherever the user moved it.
+ */
+export async function sharedContainer(): Promise<string[]> {
+  const { containerId, shares } = await sharesItem.getValue();
+  return [...(containerId ? [containerId] : []), ...shares.map((s) => s.localFolderId)];
 }
 
 export function isApplying(): boolean {

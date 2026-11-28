@@ -69,6 +69,8 @@ export class FakeWebDav {
     const path = this.pathOf(url);
     if (path === undefined) return new Response('forbidden', { status: 403 });
     const node = this.nodes.get(path);
+    // Strict servers (Apache mod_dav) refuse a file addressed like a folder.
+    if (node && !node.folder && url.pathname.endsWith('/')) return new Response('not found', { status: 404 });
     const parent = path.includes('/') ? path.slice(0, path.lastIndexOf('/')) : '';
 
     if (method === 'PROPFIND') {

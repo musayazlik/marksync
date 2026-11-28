@@ -17,7 +17,7 @@ import {
 } from '../core/tidy';
 import { isOpenable } from '../core/search';
 import { t } from '../shared/i18n';
-import { aiModelsItem, aiTidyItem, getSettings, statusItem, type TidyJob } from '../shared/state';
+import { aiModelsItem, aiTidyItem, getSettings, sharesItem, statusItem, syncStateItem, type TidyJob } from '../shared/state';
 import { detectSpecialRoots } from '../sync/local-tree';
 import { applyTidy } from '../sync/tidy';
 import { aiRunner, assertPermission, type AiRunner } from './ai-client';
@@ -71,10 +71,18 @@ interface Scope {
 
 async function readScope(scopeId: string): Promise<Scope> {
   const api = localBookmarks();
-  const [tree, special, s] = await Promise.all([api.getTree(), detectSpecialRoots(api), getSettings()]);
+  const [tree, special, s, sync, shares] = await Promise.all([api.getTree(), detectSpecialRoots(api), getSettings(), syncStateItem.getValue(), sharesItem.getValue()]);
   if (scopeId && !findTreeNode(tree, scopeId)) throw new Error(t('tidyScopeGone'));
   const tops = (tree[0]?.children ?? []).map((c) => c.id);
-  const fixed = [...tops, ...(s.aiInboxFolderId ? [s.aiInboxFolderId] : []), ...(scopeId ? [scopeId] : [])];
+  // Never merged, renamed or removed: top-level folders, the Chromium "Bookmarks Menu"
+  // stand-in (a root for the sync), the inbox, the scope and the shared folders' container.
+  const fixed = [
+    ...tops,
+    ...(sync.menuFolderId ? [sync.menuFolderId] : []),
+    ...(s.aiInboxFolderId ? [s.aiInboxFolderId] : []),
+    ...(scopeId ? [scopeId] : []),
+    ...(shares.containerId ? [shares.containerId] : []),
+  ];
   const exclude = [...special.exclude];
   const bookmarks: Scope['bookmarks'] = [];
   const walk = (nodes: SortTreeNode[], path: string) => {
@@ -168,7 +176,9 @@ async function plan(jobId: string, runner: AiRunner, scope: Scope, p: ReturnType
   const ask = async (messages: ChatMessage[], schema: Record<string, unknown>, take: (text: string) => TidyProposal[]): Promise<boolean> => {
     if (!(await still())) return false;
     if (runner.budgeted && (await overBudget({ budget }))) {
-      await updateJob((j) => void Object.assign(j, { state: 'ready', stopped: 'budget', stopMessage: t('aiErrBudget') }));
+      await updateJob((j) => {
+        if (j.id === jobId && j.state === 'planning') Object.assign(j, { state: 'ready', stopped: 'budget', stopMessage: t('aiErrBudget') });
+      });
       return false;
     }
     try {
@@ -178,7 +188,9 @@ async function plan(jobId: string, runner: AiRunner, scope: Scope, p: ReturnType
       try {
         found = take(reply.text);
       } catch {
-        await updateJob((j) => void (j.failures = (j.failures ?? 0) + 1));
+        await updateJob((j) => {
+          if (j.id === jobId) j.failures = (j.failures ?? 0) + 1;
+        });
       }
       await updateJob((j) => {
         if (j.id !== jobId) return;

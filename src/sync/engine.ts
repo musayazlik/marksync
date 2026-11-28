@@ -2,6 +2,7 @@ import {
   adoptRemote,
   applyRestore,
   buildLocalRecords,
+  ensurePositions,
   countNewDeletions,
   liveRecords,
   maxClock,
@@ -159,7 +160,9 @@ async function attemptSync(deps: SyncDeps, opts: SyncOptions): Promise<SyncResul
   // Nothing from Drive is trusted as-is: malformed records are dropped and
   // far-future clocks are clamped, so one bad record cannot break sync.
   const cleaned = remote ? sanitizeRemoteRecords(remote.state.records, wallClock) : { records: {}, dropped: 0 };
-  const remoteRecords = cleaned.records;
+  // A schema 1 file has no position keys yet: give it the same keys the
+  // mirror's migration gives, so concurrent changes merge in one key space.
+  const remoteRecords = ensurePositions(cleaned.records);
   const confirmedAt = optionalClock(remote?.state.confirmedDeletionAt);
 
   // Never let the clock go backwards, even if this computer's clock is behind.
@@ -199,7 +202,9 @@ async function attemptSync(deps: SyncDeps, opts: SyncOptions): Promise<SyncResul
     // A restore already took its own "before restore" backup.
     if (!opts.restore) await deps.beforeRemoteMassDelete?.(fromRemote.length);
   }
-  merged = sanitize(merged, now);
+  // Orphans go to "other", or to the only root there is (a shared folder's view).
+  const fallbackRoot = snapshot.roots.other ? 'other' : (ROOT_KEYS.find((k) => snapshot.roots[k]) ?? 'other');
+  merged = sanitize(merged, now, fallbackRoot);
 
   deps.onApplying?.(true);
   let applied;
@@ -207,6 +212,8 @@ async function attemptSync(deps: SyncDeps, opts: SyncOptions): Promise<SyncResul
     applied = await applyRecords(deps.bookmarks, merged, mapping, {
       ...(state.menuFolderId ? { menuFolderId: state.menuFolderId } : {}),
       special,
+      // The mirror stays as it was: only which local item is which record is kept.
+      saveMapping: (m) => deps.local.save({ ...state, mapping: m }),
     });
   } finally {
     deps.onApplying?.(false);
@@ -224,7 +231,11 @@ async function attemptSync(deps: SyncDeps, opts: SyncOptions): Promise<SyncResul
   // dropped, so the cleaned file replaces the broken one.
   const confirmedDeletionAt = confirmed ? now : confirmedAt;
   const uploaded =
-    !remote || cleaned.dropped > 0 || confirmedDeletionAt !== confirmedAt || !recordsEqual(merged, remoteRecords);
+    !remote ||
+    remote.state.schema !== SYNC_SCHEMA ||
+    cleaned.dropped > 0 ||
+    confirmedDeletionAt !== confirmedAt ||
+    !recordsEqual(merged, remoteRecords);
   let remoteVersion = remote?.version ?? null;
   if (uploaded) {
     remoteVersion = await deps.remote.save(

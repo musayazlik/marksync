@@ -125,6 +125,38 @@ describe('shared folders', () => {
     expect(await titlesIn(grandma.bookmarks, gFolder)).toEqual(['Doctor', 'Football club', 'School']);
   });
 
+  it('keeps items whose folder was deleted meanwhile, and asks before a mass deletion', async () => {
+    const owner = await newBrowser();
+    const family = await owner.bookmarks.add('1', 'Family');
+    const school = await owner.bookmarks.add(family, 'School');
+    for (let i = 0; i < 25; i++) await owner.bookmarks.add(family, `b${i}`, `https://b${i}.example/`);
+    const view = await createShare(family, [], 'writer');
+
+    const kid = await newBrowser();
+    drive.access.set(view.fileId, { canEdit: true, ownedByMe: false });
+    await joinShare(view.fileId);
+    const kidFolder = (await shared()).localFolderId;
+    const kidSchool = (await kid.bookmarks.getChildren(kidFolder)).find((c) => c.title === 'School')!.id;
+    // The kid adds into "School" while the owner deletes it, before syncing.
+    await kid.bookmarks.add(kidSchool, 'New', 'https://new.example/');
+    await use(owner);
+    await owner.bookmarks.removeTree(school);
+    await syncShares();
+    await use(kid);
+    await syncShares();
+    // "New" is not lost in an invisible root: it is in the shared folder.
+    expect(await titlesIn(kid.bookmarks, kidFolder)).toContain('New');
+
+    // The kid deletes most bookmarks: the guard stops and asks.
+    for (const c of (await kid.bookmarks.getChildren(kidFolder)).slice(0, 22)) await kid.bookmarks.remove(c.id);
+    await syncShares();
+    expect((await shared()).massDelete).toMatchObject({ source: 'local' });
+    const { resolveShare } = await import('../src/services/share-service');
+    await resolveShare(view.fileId, 'keep');
+    expect((await shared()).massDelete).toBeUndefined();
+    expect((await kid.bookmarks.getChildren(kidFolder)).length).toBeGreaterThan(20);
+  });
+
   it('refuses files that are not Marksync shared folders, or that it cannot open', async () => {
     await newBrowser();
     await expect(joinShare('1AbCdEfGhIjKlmnop')).rejects.toThrow('shareNoAccess');

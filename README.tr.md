@@ -42,6 +42,13 @@ oradadır. Üçüncü taraf bir sunucu yoktur; her şey Google Drive'ınızdaki
 - İsteğe bağlı uçtan uca şifreleme: Drive'daki eşitleme dosyası, yedekler ve tarayıcı listeleri yalnızca sizin bildiğiniz bir parolayla şifrelenir (AES-256-GCM, PBKDF2)
 - Hesap adresi ekranda gizli görünür (`mu*****7@gmail.com`), tıklayınca açılır
 
+## Kararlılık
+
+Marksync 1.0 kararlı bir sürümdür. 1.0'dan itibaren sürümler [anlamsal sürümlemeyi](https://semver.org/lang/tr/)
+izler: sizin bir şey yapmanızı gerektiren bir değişiklik (örneğin eski sürümlerin okuyamadığı yeni bir
+eşitleme dosyası biçimi) yalnızca yeni bir ana sürümle gelir ve sürüm notlarında belirtilir. Eşitlediğiniz
+her tarayıcıda Marksync'i güncel tutun.
+
 ## Desteklenen tarayıcılar
 
 | Tarayıcı | Nereden kurulur | Not |

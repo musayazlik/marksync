@@ -45,6 +45,13 @@ other file there.
 - Optional end-to-end encryption: the sync file, backups and browser lists in Drive are encrypted with a passphrase only you know (AES-256-GCM, PBKDF2)
 - The account address is masked on screen (`mu*****7@gmail.com`) until you click it
 
+## Stability
+
+Marksync 1.0 is stable. From 1.0 on, versions follow [semantic versioning](https://semver.org):
+a change that needs you to act (for example a new sync file format that older versions cannot
+read) only comes with a new major version, and is called out in the release notes. Keep Marksync
+up to date in every browser you sync.
+
 ## Supported browsers
 
 | Browser | Install from | Notes |

@@ -125,6 +125,14 @@ export const statusItem = storage.defineItem<Status>('local:status', {
 export const syncStateItem = storage.defineItem<LocalState>('local:syncState', {
   fallback: { mapping: {}, mirror: {}, keep: [] },
 });
+/**
+ * Where this browser keeps Marksync's files: Google Drive (default) or a
+ * WebDAV server. The WebDAV password (an app password, ideally) stays in
+ * this browser, like the API keys.
+ */
+export type Backend = { kind: 'drive' } | { kind: 'webdav'; url: string; username: string; password: string };
+export const backendItem = storage.defineItem<Backend>('local:backend', { fallback: { kind: 'drive' } });
+
 /** Access tokens live in session storage, so they are gone when the browser closes. */
 export const tokenItem = storage.defineItem<Token>('session:token');
 export const driveIdsItem = storage.defineItem<DriveIds>('local:driveIds', { fallback: {} });

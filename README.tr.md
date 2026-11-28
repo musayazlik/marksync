@@ -20,6 +20,7 @@ oradadır. Üçüncü taraf bir sunucu yoktur; her şey Google Drive'ınızdaki
 - Aynı yer imleri zaten olan bir tarayıcı bağlandığında kopya oluşmaz
 - Bir eşitleme yer imlerinin çoğunu silecekse durur ve onay ister
 - Google Drive'a otomatik ve elle yedekleme, tek tıkla geri yükleme
+- Google Drive yerine kendi sunucunuz: herhangi bir WebDAV sunucusu (Nextcloud, ownCloud, NAS) aynı şifreleme ve çakışmaya karşı güvenli yazmayla aynı dosyaları tutar
 - Yapay zekâ asistanları: `marksync-mcp` sunucusu Claude, Cursor ve diğer MCP istemcilerinin yer imlerinizde arama yapmasını ve Marksync'te onayladığınız değişiklikler önermesini sağlar ([mcp/](mcp/))
 - Anlamla arama: hiçbir kelime eşleşmese bile yer imlerini konusuna göre bulun (isteğe bağlı; OpenRouter'da ya da kendi sunucunuzda embedding, indeks Drive üzerinden paylaşılır)
 - Yeniden keşfet: günde ya da haftada bir, popup unuttuğunuz birkaç yer imini (bazıları son kaydettiklerinizle ilgili) açmanız, tutmanız, arşivlemeniz ya da silmeniz için getirir; varsayılan kapalı, hiçbir şey tarayıcıdan çıkmaz

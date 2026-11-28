@@ -12,11 +12,11 @@ import {
   WrongPassphraseError,
   type EncryptionInfo,
 } from '../core/crypto';
-import { DriveClient, quote, type DriveCodec } from '../platform/drive';
-import { driveClient, setDriveCodec, withFolders } from './drive-store';
+import { quote, type DriveCodec } from '../platform/drive';
+import type { FileStore } from '../platform/store';
+import { driveClient, rawClient, setDriveCodec, withFolders } from './drive-store';
 import { LockedError } from './errors';
 import { exclusive } from './sync-service';
-import { getAccessToken, invalidateToken } from '../platform/identity';
 import { t } from '../shared/i18n';
 import {
   driveIdsItem,
@@ -50,8 +50,8 @@ export const ENCRYPTION_FILE = 'encryption.json';
 const INFO_MAX_AGE_MS = 60_000;
 
 /** Plain Drive access, for encryption.json and for rewriting files in another format. */
-function rawDrive(): DriveClient {
-  return new DriveClient(getAccessToken, invalidateToken);
+function rawDrive(): FileStore {
+  return rawClient();
 }
 
 /** Tied to the account's Marksync folder: after switching accounts it is not used. */
@@ -146,7 +146,7 @@ export async function encryptionStatus(): Promise<EncryptionStatus> {
 }
 
 /** Every Marksync file in Drive except encryption.json: the sync file, backups and browser snapshots. */
-async function dataFiles(drive: DriveClient): Promise<{ id: string; name: string }[]> {
+async function dataFiles(drive: FileStore): Promise<{ id: string; name: string }[]> {
   return withFolders(drive, async (f) => {
     const [top, backups, browsers] = await Promise.all([
       drive.list(`${quote(f.folderId)} in parents and mimeType != 'application/vnd.google-apps.folder'`),
@@ -158,7 +158,7 @@ async function dataFiles(drive: DriveClient): Promise<{ id: string; name: string
 }
 
 /** Reads every file with `read` and writes it back with `write`, so it ends up in the other format. */
-async function rewriteAll(read: DriveClient, write: DriveClient): Promise<number> {
+async function rewriteAll(read: FileStore, write: FileStore): Promise<number> {
   let n = 0;
   for (const file of await dataFiles(read)) {
     const data = await read.downloadJson<unknown>(file.id);

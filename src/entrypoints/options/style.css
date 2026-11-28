@@ -1073,3 +1073,21 @@ input[type='checkbox'].tick:indeterminate::after {
 .bulk-row .bulk-target:has(.naming-input) {
   flex: 1 1 260px;
 }
+
+/* Storage: WebDAV sign-in. */
+.webdav-box summary {
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--iris);
+}
+
+.webdav-box[open] summary {
+  margin-bottom: 8px;
+}
+
+#webdav-url,
+#webdav-user,
+#webdav-pass {
+  flex: 1 1 200px;
+  min-width: 0;
+}

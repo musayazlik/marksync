@@ -10,7 +10,7 @@ import {
   type TagMap,
   type TagsFile,
 } from '../core/tags';
-import type { DriveClient } from '../platform/drive';
+import type { FileStore } from '../platform/store';
 import { DriveError, quote } from '../platform/drive';
 import { driveIdsItem, statusItem, syncStateItem, tagsItem, type TagsStore } from '../shared/state';
 import { driveClient, withFolders } from './drive-store';
@@ -95,7 +95,7 @@ export function scheduleTagsSync(delay = 3_000): void {
   timer = setTimeout(() => void syncTags().catch((err) => console.warn('[marksync] tags sync failed', err)), delay);
 }
 
-async function tagsFileId(drive: DriveClient): Promise<string | undefined> {
+async function tagsFileId(drive: FileStore): Promise<string | undefined> {
   const ids = await driveIdsItem.getValue();
   if (ids.tagsFileId) return ids.tagsFileId;
   const file = await withFolders(drive, (f) => drive.findByName(TAGS_FILE, f.folderId));
@@ -126,7 +126,7 @@ export function syncTags(): Promise<void> {
 }
 
 /** One read-merge-write; false when the file changed meanwhile. */
-async function mergeOnce(drive: DriveClient): Promise<boolean> {
+async function mergeOnce(drive: FileStore): Promise<boolean> {
   const now = Date.now();
   const state = await syncStateItem.getValue();
   const live = new Set(Object.values(state.mirror).filter(isLive).map((r) => r.id));
@@ -166,7 +166,13 @@ async function mergeOnce(drive: DriveClient): Promise<boolean> {
     const file: TagsFile = { schema: 1, kind: 'marksync-tags', items: merged, updatedAt: now };
     if (id) {
       if ((await drive.getMeta(id)).version !== version) return false;
-      version = (await drive.updateJson(id, file)).version;
+      try {
+        version = (await drive.updateJson(id, file, version)).version;
+      } catch (err) {
+        // WebDAV: changed between the check and the write; merge again.
+        if (err instanceof DriveError && err.status === 412) return false;
+        throw err;
+      }
     } else {
       const { winner, ours } = await withFolders(drive, async (f) => {
         const made = await drive.createJson(TAGS_FILE, f.folderId, file);

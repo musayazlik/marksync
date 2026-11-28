@@ -21,6 +21,8 @@ import type { ImportMode, ImportResult } from '../sync/importer';
 /** Requests from the popup and options page to the background script. */
 export type Request =
   | { type: 'connect' }
+  | { type: 'connectWebdav'; url: string; username: string; password: string }
+  | { type: 'storageInfo' }
   | { type: 'disconnect' }
   | { type: 'syncNow'; allowMassDelete?: boolean }
   | { type: 'checkNow' }
@@ -90,6 +92,8 @@ export type Request =
 
 export interface ResponseData {
   connect: string;
+  connectWebdav: string;
+  storageInfo: { kind: 'drive' } | { kind: 'webdav'; url: string; username: string };
   disconnect: void;
   syncNow: void;
   checkNow: void;

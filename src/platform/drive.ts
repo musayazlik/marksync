@@ -4,6 +4,7 @@
  */
 
 import { isDriveId } from '../core/validate';
+import type { FileStore } from './store';
 
 const API = 'https://www.googleapis.com/drive/v3';
 const UPLOAD = 'https://www.googleapis.com/upload/drive/v3';
@@ -21,6 +22,8 @@ export interface DriveFile {
   size?: string;
   appProperties?: Record<string, string>;
   parents?: string[];
+  /** Set by the WebDAV store for folders (Drive lists never ask for it). */
+  mimeType?: string;
 }
 
 export class DriveError extends Error {
@@ -47,7 +50,7 @@ export interface DriveCodec {
   decode(stored: unknown): Promise<unknown>;
 }
 
-export class DriveClient {
+export class DriveClient implements FileStore {
   constructor(
     private readonly getToken: () => Promise<string>,
     private readonly onUnauthorized: () => Promise<void>,
@@ -136,7 +139,8 @@ export class DriveClient {
     return (await res.json()) as DriveFile;
   }
 
-  async updateJson(id: string, data: unknown): Promise<DriveFile> {
+  /** Drive has no conditional write; callers compare the version first (see DriveRemoteStore.save). */
+  async updateJson(id: string, data: unknown, _expectedVersion?: string): Promise<DriveFile> {
     const content = this.codec ? await this.codec.encode(data) : data;
     const res = await this.request(`${UPLOAD}/files/${fileIdPath(id)}?uploadType=media&fields=${FILE_FIELDS}`, {
       method: 'PATCH',

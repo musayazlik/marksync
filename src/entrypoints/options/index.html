@@ -95,6 +95,27 @@
               </div>
               <a class="button" href="./links.html" data-i18n="linkOpen"></a>
             </div>
+            <div class="setting stacked">
+              <div class="setting-text">
+                <span class="setting-title" data-i18n="storageLabel"></span>
+                <p id="storage-state" class="muted small"></p>
+              </div>
+              <details id="webdav-box" class="webdav-box">
+                <summary data-i18n="webdavSummary"></summary>
+                <div class="stack tight">
+                  <p class="muted small" data-i18n="webdavHelp"></p>
+                  <input id="webdav-url" type="url" autocomplete="url" spellcheck="false" maxlength="500" placeholder="https://cloud.example.org/remote.php/dav/files/ana/" data-i18n-aria-label="webdavUrl" />
+                  <div class="key-row">
+                    <input id="webdav-user" autocomplete="username" spellcheck="false" maxlength="200" data-i18n-placeholder="webdavUser" data-i18n-aria-label="webdavUser" />
+                    <input id="webdav-pass" type="password" autocomplete="current-password" maxlength="1000" data-i18n-placeholder="webdavPassword" data-i18n-aria-label="webdavPassword" />
+                  </div>
+                  <p class="muted small" data-i18n="webdavPrivacy"></p>
+                  <div class="row wrap">
+                    <button id="webdav-connect" class="primary" data-i18n="webdavConnect"></button>
+                  </div>
+                </div>
+              </details>
+            </div>
             <div class="setting">
               <div class="setting-text">
                 <label for="deviceName" data-i18n="deviceNameLabel"></label>
